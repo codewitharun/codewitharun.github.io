@@ -196,3 +196,19 @@
   background-color: #222;
   color: #e6e6e6;
 }
+
+/* .container1 {
+  display: flex;
+  flex-direction: row;
+}
+
+.container__half {
+  flex: 1;
+} */
+
+@media screen and (max-width: 565px) {
+  .f {
+    display: flex;
+    flex-direction: column;
+  }
+}
