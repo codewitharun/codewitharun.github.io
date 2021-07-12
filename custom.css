@@ -220,13 +220,10 @@
 
 .typewriter-text {
   display: inline-block;
-  overflow:auto;
+  overflow: auto;
   letter-spacing: 2px;
   animation: typing 5s steps(30, end), blink 0.75s step-end infinite;
-  white-space:initial;
-  
-  border-right: 4px solid orange;
-  box-sizing: border-box;
+  white-space: normal;
 }
 
 @keyframes typing {
