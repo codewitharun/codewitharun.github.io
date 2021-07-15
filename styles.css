@@ -1,0 +1,67 @@
+body {
+  background-color: rgb(183, 182, 255);
+}
+h1,
+p {
+  color: sienna;
+}
+
+.h {
+  text-align: center;
+  letter-spacing: 10px;
+  text-decoration: overline underline double black;
+}
+.p {
+  text-align: justify;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+table {
+  margin-left: 35%;
+}
+.tb {
+  color: antiquewhite;
+  background-color: black;
+}
+thead {
+  color: white;
+  background-color: darkcyan;
+}
+tfoot {
+  color: white;
+  background-color: salmon;
+  text-transform: uppercase;
+}
+
+.container {
+  margin-left: 38%;
+  letter-spacing: 5px;
+
+  /* border-spacing: 10px; */
+}
+  
+#name,
+#email,
+#contact,
+#submit,
+#reset {
+  padding: 5px;
+}
+::selection{
+  color: rgb(0, 0, 0);
+  background-color: rgba(38, 0, 255, 0.459);
+}
+
+.link {
+  text-decoration: none;
+  transition: ease-out;
+  transition-duration: 10ms;
+  color: rgb(255, 0, 0);
+}
+.link:hover {
+  color: black;
+}
+.link:active {
+  color: purple;
+}
