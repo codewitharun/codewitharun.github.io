@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 function App() {
   const [id, setId] = useState("");
-  const Production_URLL = "https://sociable-xisn.onrender.com/";
-  const Production_URL = "http://localhost:3001/api/";
+  const Production_URL = "https://sociable-xisn.onrender.com/api";
+  // const Production_URL = "http://localhost:3001/api/";
   function Signup() {
     // replace 3001 with your API port number
     const newUser = {
@@ -14,12 +14,12 @@ function App() {
     };
 
     axios
-      .post(`${Production_URL}`, newUser)
+      .post(`${Production_URL}/signup`, newUser)
       .then((response) => {
         console.log("User added successfully:", response.data.id);
       })
       .catch((err) => {
-        console.log("Error:", err.response.data);
+        console.log("Error:", err.response);
       });
   }
   function Login() {
@@ -33,7 +33,7 @@ function App() {
     };
 
     axios
-      .post(`${Production_URL}login`, newUser)
+      .post(`${Production_URL}/login`, newUser)
       .then((response) => {
         console.log("User LoggedIn successfully:", response.data.userID);
         setId(response.data.userID);
@@ -52,7 +52,7 @@ function App() {
     };
 
     axios
-      .post(`${Production_URL}logout`, newUser)
+      .post(`${Production_URL}/logout`, newUser)
       .then((response) => {
         console.log("UserLogout :", response.data);
         setId("");
@@ -64,7 +64,7 @@ function App() {
   function getUser() {
     if (id) {
       axios
-        .get(`${Production_URL}users/${id}`)
+        .get(`${Production_URL}/users/${id}`)
         .then((response) => {
           console.log("User Found:", response.data);
         })
@@ -77,7 +77,7 @@ function App() {
   }
   async function getAllUsers() {
     axios
-      .get(`${Production_URL}users`)
+      .get(`${Production_URL}/users`)
       .then((response) => {
         console.log("All Users Found:", response.data);
       })
