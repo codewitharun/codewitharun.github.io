@@ -5,11 +5,14 @@ import { Fab, Box, Tooltip } from "@mui/material";
 import { PlusOne, Download } from "@mui/icons-material";
 import { Route } from "react-router";
 import { useSpring, animated } from "@react-spring/web";
-
+import { Parallax } from "react-scroll-parallax";
+import { ParallaxBanner } from "react-scroll-parallax";
+// import { BannerLayer } from "react-scroll-parallax/dist/components/ParallaxBanner/types";
+import "./App.css";
 function Myapi() {
-  const [id, setId] = useState("");
+  const [user, setUser] = useState("");
   const Production_URL = "https://sociable-xisn.onrender.com/api";
-  // const Production_URL = "http://localhost:3001/api/";
+  // const Production_URL = "http://localhost:3001/api";
   function Signup() {
     // replace 3001 with your API port number
     const newUser = {
@@ -42,7 +45,10 @@ function Myapi() {
       .post(`${Production_URL}/login`, newUser)
       .then((response) => {
         console.log("User LoggedIn successfully:", response.data.userID);
-        setId(response.data.userID);
+        localStorage.setItem("user", JSON.stringify(response.data));
+        const getUser = localStorage.getItem("user");
+        setUser(JSON.parse(getUser));
+        console.log("User LoggedIn successfully", JSON.parse(getUser));
       })
       .catch((err) => {
         console.log("Error:", err.response.data);
@@ -61,23 +67,23 @@ function Myapi() {
       .post(`${Production_URL}/logout`, newUser)
       .then((response) => {
         console.log("UserLogout :", response.data);
-        setId("");
+        setUser(null);
       })
       .catch((err) => {
         console.log("Error:", err.response.data);
       });
   }
   function getUser() {
-    if (id) {
+    if (user) {
       axios
-        .get(`${Production_URL}/users/${id}`)
+        .get(`${Production_URL}/users/${user.userID}`)
         .then((response) => {
           console.log("User Found:", response.data);
         })
         .catch((err) => {
           console.log("Error:", err.response.data);
         });
-    } else if (!id) {
+    } else if (!user) {
       console.log("User ID is required");
     }
   }
@@ -94,6 +100,46 @@ function Myapi() {
   useEffect(() => {
     // addUser();
   }, []);
+
+  const background = {
+    image:
+      "https://s3-us-west-2.amazonaws.com/s.cdpn.io/105988/banner-background.jpg",
+    translateY: [0, 50],
+    opacity: [1, 0.3],
+    scale: [1.05, 1, "easeOutCubic"],
+    shouldAlwaysCompleteAnimation: true,
+  };
+
+  const headline = {
+    translateY: [0, 30],
+    scale: [1, 1.05, "easeOutCubic"],
+    shouldAlwaysCompleteAnimation: true,
+    expanded: false,
+    children: (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <h1 className="text-6xl md:text-8xl text-white font-thin">
+          {user && `Welcome ${user?.name}`}
+        </h1>
+      </div>
+    ),
+  };
+
+  const foreground = {
+    image:
+      "https://s3-us-west-2.amazonaws.com/s.cdpn.io/105988/banner-foreground.png",
+    translateY: [0, 15],
+    scale: [1, 1.1, "easeOutCubic"],
+    shouldAlwaysCompleteAnimation: true,
+  };
+
+  const gradientOverlay = {
+    opacity: [0, 0.9],
+    shouldAlwaysCompleteAnimation: true,
+    expanded: false,
+    children: (
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-blue-900" />
+    ),
+  };
   const springs = useSpring({
     from: { x: 32 },
     to: { x: 1200 },
@@ -102,8 +148,8 @@ function Myapi() {
   return (
     <div
       style={{
-        backgroundColor: "red",
-        height: 500,
+        // backgroundColor: "red",
+        height: "100%",
         width: "100%",
         justifyContent: "center",
         alignItems: "center",
@@ -113,13 +159,10 @@ function Myapi() {
     >
       {/* <ResponsiveAppBar /> */}
       {/* <Route path="/" component={ResponsiveAppBar} /> */}
-      <animated.div
-        style={{
-          width: 80,
-          height: 80,
-          background: "#ff6d6d",
-          borderRadius: 8,
-        }}
+
+      <ParallaxBanner
+        layers={[background, headline, foreground, gradientOverlay]}
+        className="full"
       />
       <Tooltip title={"Resume"}>
         <Fab
@@ -134,10 +177,13 @@ function Myapi() {
           <Download color="white" style={{ color: "#ffffff" }} />
         </Fab>
       </Tooltip>
-      <text style={{ textAlign: "center" }}>{id}</text>
-      <button style={{ height: 100, width: 100 }} onClick={() => Signup()}>
-        <text>Signup</text>
-      </button>
+
+      <Parallax speed={-10}>
+        <div />
+        <button style={{ height: 100, width: 100 }} onClick={() => Signup()}>
+          <text>Signup</text>
+        </button>
+      </Parallax>
       <button style={{ height: 100, width: 100 }} onClick={() => Login()}>
         <text>Login</text>
       </button>
