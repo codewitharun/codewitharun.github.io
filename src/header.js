@@ -12,15 +12,17 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import axios from "axios";
 const pages = ["Home", "About", "Contact", "Projects"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
-
 function ResponsiveAppBar() {
+  const navigate = useNavigate();
+  const [user, setUser] = React.useState({});
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-
+  const Production_URL = "https://sociable-xisn.onrender.com/api";
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -32,10 +34,42 @@ function ResponsiveAppBar() {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (Setting) => {
     setAnchorElUser(null);
-  };
+    console.log("menu", Setting);
+    let id = localStorage.getItem("userID");
+    if (id && Setting === "Profile") {
+      axios
+        .get(`${Production_URL}/users/${id}`)
+        .then((response) => {
+          console.log("User Found:", response.data);
+          setUser(response.data);
+        })
+        .catch((err) => {
+          console.log("Error:", err.response.data);
+        });
+    } else if (id && Setting === "Logout") {
+      const newUser = {
+        name: "Arun Singh",
+        email: "arunk4it@gmail.com",
+        password: "43md33rm2S",
+        mobileNumber: 333243233,
+        deviceToken: "dfdslfk43r34rkmlefk34rmk34mr",
+      };
 
+      axios
+        .post(`${Production_URL}/logout`, newUser)
+        .then((response) => {
+          console.log("UserLogout :", response.data);
+          localStorage.setItem("userID", "");
+          setUser(null);
+          navigate("/");
+        })
+        .catch((err) => {
+          console.log("Error:", err.response.data);
+        });
+    }
+  };
   return (
     <AppBar position="static" style={{ backgroundColor: "#101010" }}>
       <Container maxWidth="xl">
@@ -133,20 +167,19 @@ function ResponsiveAppBar() {
               justifyContent: "center",
             }}
           >
-          
             {pages.map((page) => (
-                 <Link
-                 key={page}
-                 to={page === "Home" ? "/" : `/${page.toLowerCase()}`}
-                 style={{ textDecoration: "none" }}
-               >
-              <Button
+              <Link
                 key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
+                to={page === "Home" ? "/" : `/${page.toLowerCase()}`}
+                style={{ textDecoration: "none" }}
               >
-                {page}
-              </Button>
+                <Button
+                  key={page}
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  {page}
+                </Button>
               </Link>
             ))}
           </Box>
@@ -154,7 +187,7 @@ function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt={user?.name} src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
             <Menu
@@ -177,7 +210,7 @@ function ResponsiveAppBar() {
                 <MenuItem
                   style={{ backgroundColor: "#101010", color: "white" }}
                   key={setting}
-                  onClick={handleCloseUserMenu}
+                  onClick={() => handleCloseUserMenu(setting)}
                 >
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
