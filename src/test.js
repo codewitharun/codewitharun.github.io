@@ -9,10 +9,12 @@ import { Parallax } from "react-scroll-parallax";
 import { ParallaxBanner } from "react-scroll-parallax";
 // import { BannerLayer } from "react-scroll-parallax/dist/components/ParallaxBanner/types";
 import "./App.css";
+import { Link } from "react-router-dom";
 function Myapi() {
   const [user, setUser] = useState("");
-  const Production_URL = "https://sociable-xisn.onrender.com/api";
-  // const Production_URL = "http://localhost:3001/api";
+  const [token, setToken] = useState("");
+  // const Production_URL = "https://sociable-xisn.onrender.com/api";
+  const Production_URL = "http://localhost:3001/api";
   function Signup() {
     // replace 3001 with your API port number
     const newUser = {
@@ -46,6 +48,8 @@ function Myapi() {
       .then((response) => {
         console.log("User LoggedIn successfully:", response.data.userID);
         localStorage.setItem("user", JSON.stringify(response.data));
+        localStorage.setItem("token", response.data.token);
+        setToken(response.data.token);
         const getUser = localStorage.getItem("user");
         setUser(JSON.parse(getUser));
         console.log("User LoggedIn successfully", JSON.parse(getUser));
@@ -62,9 +66,14 @@ function Myapi() {
       mobileNumber: 333243233,
       deviceToken: "dfdslfk43r34rkmlefk34rmk34mr",
     };
-
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    };
     axios
-      .post(`${Production_URL}/logout`, newUser)
+      .post(`${Production_URL}/logout`, newUser, config)
       .then((response) => {
         console.log("UserLogout :", response.data);
         setUser(null);
@@ -88,8 +97,14 @@ function Myapi() {
     }
   }
   async function getAllUsers() {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    };
     axios
-      .get(`${Production_URL}/users`)
+      .get(`${Production_URL}/users`, config)
       .then((response) => {
         console.log("All Users Found:", response.data);
       })
@@ -180,9 +195,11 @@ function Myapi() {
 
       <Parallax speed={-10}>
         <div />
-        <button style={{ height: 100, width: 100 }} onClick={() => Signup()}>
-          <text>Signup</text>
-        </button>
+        <Link to={"/signup"}>
+          <button style={{ height: 100, width: 100 }}>
+            <text>Signup</text>
+          </button>
+        </Link>
       </Parallax>
       <button style={{ height: 100, width: 100 }} onClick={() => Login()}>
         <text>Login</text>
