@@ -24,7 +24,7 @@ export default function Contact() {
   async function user() {
     setUser(localStorage.getItem("userID"));
     if (userId === null) {
-      navigate("/");
+      navigate("/login");
     }
   }
   return (

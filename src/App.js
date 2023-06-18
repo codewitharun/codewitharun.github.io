@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Myapi from "./test";
 import ResponsiveAppBar from "./header";
 import Contact from "./Screen/Contact";
+import Signup from "./Screen/Signup/Signup";
+import Login from "./Screen/login/Login";
 
 function Layout() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="about" element={<Contact />} />
         <Route path="contact" element={<Contact />} />
         <Route path="projects" element={<Contact />} />
+        <Route path="signup" element={<Signup />} />
+        <Route path="login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );
