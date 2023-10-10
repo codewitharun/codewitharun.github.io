@@ -1,10 +1,9 @@
-"use client";
 import React from "react";
-
+import Navbar from "../nav";
 function page() {
   return (
     <div>
-      <text>Testing my skill</text>
+      <Navbar />
     </div>
   );
 }
