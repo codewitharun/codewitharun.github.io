@@ -1,0 +1,61 @@
+@import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap");
+
+.home-container {
+  position: relative;
+  height: 100vh;
+  overflow: hidden; /* Ensure content doesn't overflow */
+}
+
+.background-image {
+  background-image: url("https://source.unsplash.com/featured/?nature");
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1; /* Place behind other content */
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  /* color: #fff; Text color for readability */
+  text-align: center;
+  padding: 0 20px; /* Adjust padding as needed */
+}
+
+.text-5xl {
+  font-size: 5rem;
+  font-weight: 800;
+  color: #000;
+  margin-bottom: 20px;
+}
+
+.fancy-text {
+  font-size: 1.5rem;
+  line-height: 1.8;
+  margin-bottom: 30px; /* Adjust spacing as needed */
+  color: #000;
+  font-family: "Permanent Marker", cursive;
+}
+
+.cta-button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 12px 24px;
+  font-size: 1.25rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #0056b3;
+}
