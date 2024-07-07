@@ -6,8 +6,10 @@ import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import Home from './pages/Home';
 import Blog from './pages/blog';
+import AiTesting from './pages/test';
 
 function App() {
+
   return (
     <Router>
       <Routes>
@@ -16,6 +18,7 @@ function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/contact" element={<Contact />} />
         <Route path='/blog' element={<Blog />} />
+        <Route path='/ai' element={<AiTesting />} />
       </Routes>
     </Router>
   );

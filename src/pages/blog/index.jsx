@@ -69,7 +69,7 @@ const Blog = () => {
                         />
                         <div className="mb-4">
                             <CKEditor
-                            
+
                                 editor={ClassicEditor}
                                 data="<p>Start writing your post...</p>"
                                 onChange={handleEditorChange}

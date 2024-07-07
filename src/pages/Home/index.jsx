@@ -5,6 +5,7 @@ import Footer from '../../components/Footer';
 import './styles.css';
 import { useNavigate } from 'react-router-dom';
 
+
 const Home = () => {
     const [displayText, setDisplayText] = useState('');
     const targetText = "I am a React Native developer with 2 years of experience. Check out my projects below.";
@@ -45,8 +46,9 @@ const Home = () => {
                         {displayText}
                     </animated.p>
                     <animated.button style={fadeIn} onClick={() => { navigate("/projects") }} className="cta-button">
-                        View Projects
+                        Hire Me
                     </animated.button>
+
                 </animated.div>
             </div>
             <Footer />
