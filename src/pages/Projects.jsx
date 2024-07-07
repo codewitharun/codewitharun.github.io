@@ -5,8 +5,8 @@ import ProjectCard from '../components/ProjectCard';
 
 const Projects = () => {
     const projects = [
-        { title: 'Project One', description: 'Description of project one.', link: '#' },
-        { title: 'Project Two', description: 'Description of project two.', link: '#' },
+        { title: 'Task Flow', description: 'Description of project one.', link: '#' },
+        { title: 'Sociable', description: 'Description of project two.', link: '#' },
         // Add more projects here
     ];
 

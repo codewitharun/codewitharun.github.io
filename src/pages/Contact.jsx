@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import ContactForm from '../components/ContactForm';
 
 const Contact = () => {
+    
     return (
         <div>
             <Header />
