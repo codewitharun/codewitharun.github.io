@@ -45,8 +45,8 @@ const Home = () => {
                     <animated.p style={fadeIn} className="fancy-text">
                         {displayText}
                     </animated.p>
-                    <animated.button style={fadeIn} onClick={() => { navigate("/projects") }} className="cta-button">
-                        Hire Me
+                    <animated.button style={fadeIn} onClick={() => { navigate("/ai") }} className="cta-button">
+                        Enter New World
                     </animated.button>
 
                 </animated.div>
