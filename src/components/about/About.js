@@ -1,18 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Style from './About.module.scss';
 import Terminal from "./Terminal";
-import {Box} from "@mui/material";
-import {info} from "../../info/Info";
+import { Box } from "@mui/material";
+import { info } from "../../info/Info";
 
 
-export default function About({innerRef}) {
-    const firstName = info.firstName.toLowerCase()
+export default function About({ innerRef }) {
+    const [typedText, setTypedText] = useState('');
+    const firstName = info.firstName.toLowerCase();
+    const [fullText, setFullText] = useState('');
+
+    useEffect(() => {
+        setFullText(
+            `<p><span style="color:${info.baseColor}">${firstName}${info.lastName.toLowerCase()} $</span> cat about${firstName}</p>` +
+            `<p><span style="color:${info.baseColor}">about${firstName} <span class="${Style.green}">(main)</span> $ </span>${info.bio}</p>`
+        );
+    }, []);
+
+    useEffect(() => {
+        let index = 0;
+        const interval = setInterval(() => {
+            setTypedText((prev) => prev + fullText[index]);
+            index++;
+            if (index === fullText.length) {
+                clearInterval(interval); // Stop typing when all characters are displayed
+            }
+        }, 30); // Adjust typing speed (50ms per character)
+
+        return () => clearInterval(interval); // Cleanup interval on unmount
+    }, [fullText]);
 
     function aboutMeText() {
         return <>
-            <p><span style={{color: info.baseColor}}>{firstName}{info.lastName.toLowerCase()} $</span> cat
+            <p><span style={{ color: info.baseColor }}>{firstName}{info.lastName.toLowerCase()} $</span> cat
                 about{firstName} </p>
-            <p><span style={{color: info.baseColor}}>about{firstName} <span
+            <p><span style={{ color: info.baseColor }}>about{firstName} <span
                 className={Style.green}>(main)</span> $ </span>
                 {info.bio}
             </p>
@@ -21,15 +43,15 @@ export default function About({innerRef}) {
 
     function skillsText() {
         return <>
-            <p><span style={{color: info.baseColor}}>{firstName}{info.lastName.toLowerCase()} $</span> cd skills/tools
+            <p><span style={{ color: info.baseColor }}>{firstName}{info.lastName.toLowerCase()} $</span> cd skills/tools
             </p>
-            <p><span style={{color: info.baseColor}}>skills/tools <span
-                className={Style.green}>(main)</span> $</span> ls</p>
-            <p style={{color: info.baseColor}}> Proficient With</p>
+            <p><span style={{ color: info.baseColor }}>skills/tools <span
+                className={Style.green}>(arun_work)</span> $</span> ls</p>
+            <p style={{ color: info.baseColor }}> Proficient With</p>
             <ul className={Style.skills}>
                 {info.skills.proficientWith.map((proficiency, index) => <li key={index}>{proficiency}</li>)}
             </ul>
-            <p style={{color: info.baseColor}}> Exposed To</p>
+            <p style={{ color: info.baseColor }}> Exposed To</p>
             <ul className={Style.skills}>
                 {info.skills.exposedTo.map((skill, index) => <li key={index}>{skill}</li>)}
             </ul>
@@ -38,9 +60,9 @@ export default function About({innerRef}) {
 
     function miscText() {
         return <>
-            <p><span style={{color: info.baseColor}}>{firstName}{info.lastName.toLowerCase()} $</span> cd
+            <p><span style={{ color: info.baseColor }}>{firstName}{info.lastName.toLowerCase()} $</span> cd
                 hobbies/interests</p>
-            <p><span style={{color: info.baseColor}}>hobbies/interests <span
+            <p><span style={{ color: info.baseColor }}>hobbies/interests <span
                 className={Style.green}>(main)</span> $</span> ls</p>
             <ul>
                 {info.hobbies.map((hobby, index) => (
@@ -52,9 +74,9 @@ export default function About({innerRef}) {
 
     return (
         <Box ref={innerRef} display={'flex'} flexDirection={'column'} alignItems={'center'} mt={'3rem'} id={'about'}>
-            <Terminal text={aboutMeText()}/>
-            <Terminal text={skillsText()}/>
-            <Terminal text={miscText()}/>
+            <Terminal text={<div dangerouslySetInnerHTML={{ __html: typedText }} />} />
+            <Terminal text={skillsText()} />
+            <Terminal text={miscText()} />
         </Box>
     )
 }
