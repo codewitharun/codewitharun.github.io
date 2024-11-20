@@ -82,10 +82,10 @@ export const info = {
         // Just change the links so that they lead to your social profiles.
 
     ],
-    bio: "Hello! I'm Arun. I'm a software engineer for OTS Solutions. I studied CompSci at AKTU, I enjoy long walks on the beach, and I believe artificial intelligence will inevitably rule us all one day. You should hire me!",
+    bio: "Hello! I'm Arun. I'm a software engineer for OTS Solutions. I studied CompSci at AKTU, I enjoy long walks on the beach, and I believe artificial intelligence will inevitably rule us all one day. You should hire me!", 
     skills:
     {
-        proficientWith: ['javascript', 'react', 'git', 'github', 'bootstrap', 'html5', 'css3', 'figma'],
+        proficientWith: ['react-native','javascript', 'react', 'git', 'github', 'bootstrap', 'html5', 'css3', 'figma'],
         exposedTo: ['nodejs', 'python', 'adobe illustrator']
     }
     ,
