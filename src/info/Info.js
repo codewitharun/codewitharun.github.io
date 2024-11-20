@@ -41,20 +41,20 @@ export const info = {
         },
         {
             emoji: '🌎',
-            text: 'based in the US'
+            text: 'based in the INDIA 🇮🇳'
         },
         {
             emoji: "💼",
-            text: "Systems Engineer at Google"
+            text: "React Native Developer @OTS Solutions"
         },
         {
             emoji: "📧",
-            text: "johnsmith@gmail.com"
+            text: "arunk4it@gmail.com"
         }
     ],
     socials: [
         {
-            link: "https://facebook.com",
+            link: "https://facebook.com/aadusdad",
             icon: 'fa fa-facebook',
             label: 'facebook'
         },
@@ -82,30 +82,28 @@ export const info = {
         // Just change the links so that they lead to your social profiles.
 
     ],
-    bio: "Hello! I'm Arun. I'm a software engineer for OTS Solutions. I studied CompSci at AKTU, I enjoy long walks on the beach, and I believe artificial intelligence will inevitably rule us all one day. You should hire me!", 
+    bio: "Hello! I'm Arun. I'm a software engineer for OTS Solutions. I studied CompSci at AKTU, I enjoy long walks on the beach, and I believe artificial intelligence will inevitably rule us all one day. You should hire me!",
     skills:
     {
-        proficientWith: ['react-native','javascript', 'react', 'git', 'github', 'bootstrap', 'html5', 'css3', 'figma'],
+        proficientWith: ['react-native', 'javascript', 'react', 'git', 'github', 'bootstrap', 'html5', 'css3', 'figma'],
         exposedTo: ['nodejs', 'python', 'adobe illustrator']
     }
     ,
     hobbies: [
         {
+            label: 'cooking',
+            emoji: '🌶'
+        },
+        {
             label: 'reading',
             emoji: '📖'
         },
-        {
-            label: 'theater',
-            emoji: '🎭'
-        },
+
         {
             label: 'movies',
             emoji: '🎥'
         },
-        {
-            label: 'cooking',
-            emoji: '🌶'
-        }
+
         // Same as above, change the emojis to match / relate to your hobbies or interests.
         // You can also remove the emojis if you'd like, I just think they look cute :P
     ],
