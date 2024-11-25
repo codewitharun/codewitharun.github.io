@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Define the API base URL
-const API_URL = 'https://appaura-backend.vercel.app/api/blogs';
+const API_URL = 'https://api.appaura.xyz/api/blogs';
 
 // Create a new Post
 export const createPost = async (postData) => {
@@ -15,15 +15,25 @@ export const createPost = async (postData) => {
 };
 
 // Get all Posts
-export const getAllPosts = async () => {
+export const getAllPosts = async (page = 1, limit = 10, search = '') => {
     try {
-        const response = await axios.get(`${API_URL}/posts`);
-        return response.data; // Return the list of posts
+        // Build the query string with optional parameters
+        const queryParams = new URLSearchParams({
+            page: page.toString(),
+            limit: limit.toString(),
+            search: search
+        });
+
+        // Make the API request with query parameters
+        const response = await axios.get(`${API_URL}/posts?${queryParams.toString()}`);
+
+        return response.data; // Return the response data
     } catch (error) {
         console.error('Error fetching posts:', error);
         throw error;
     }
 };
+
 
 // Get a single Post by ID
 export const getPostById = async (id) => {
