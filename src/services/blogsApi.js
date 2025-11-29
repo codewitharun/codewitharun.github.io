@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Define the API base URL
-const API_URL = 'https://api.appaura.xyz/api/blogs';
+const API_URL = 'https://api.arun.codes/api/blogs';
 
 // Create a new Post
 export const createPost = async (postData) => {
