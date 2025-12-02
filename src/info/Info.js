@@ -36,6 +36,11 @@ export const info = {
       icon: "fa fa-instagram",
       label: "Instagram",
     },
+    {
+      link: "https://x.com/arunk4it",
+      icon: "fa fa-twitter",
+      label: "twitter",
+    },
   ],
 
   bio: `Hey! I'm Arun — a software engineer who loves building scalable, user-focused applications. 
