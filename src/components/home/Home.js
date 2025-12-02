@@ -37,7 +37,7 @@ export default function Home({ innerRef }) {
          {/* Text + Socials */}
          <Box display="flex" flexDirection="column" maxWidth="500px">
             <h1>
-               Hi, I'm 
+               Hi, I'm{" "}
                <span 
                   style={{
                      background: info.gradient, 
@@ -45,7 +45,7 @@ export default function Home({ innerRef }) {
                      WebkitTextFillColor: 'transparent'
                   }}
                >
-                   { info.firstName}
+                 " "  { info.firstName}
                </span>
                <span className={Style.hand}>🤚</span>
             </h1>
