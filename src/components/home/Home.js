@@ -45,7 +45,7 @@ export default function Home({ innerRef }) {
                      WebkitTextFillColor: 'transparent'
                   }}
                >
-                 " "  { info.firstName}
+               {info.firstName}
                </span>
                <span className={Style.hand}>🤚</span>
             </h1>
