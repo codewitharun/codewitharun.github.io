@@ -1,126 +1,136 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, CircularProgress } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import { getPostById } from '../../services/blogsApi'; // Import the API function to fetch a blog by id
-import Styles from "./blogDetails.module.scss";
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getPostById } from "../../services/blogsApi";
 
 function BlogDetails({ innerRef }) {
-    const { id } = useParams(); // Get the blog ID from the URL
-    const [blog, setBlog] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [darkMode, setDarkMode] = useState(false);
+  const { id } = useParams();
+  const [blog, setBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
 
-    useEffect(() => {
-        const fetchBlog = async () => {
-            try {
-                const response = await getPostById(id); // Fetch blog details by ID
-                if (response) {
-                    setBlog(response);
-                } else {
-                    setError("Post not found");
-                }
-            } catch (error) {
-                setError("Error fetching blog");
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const response = await getPostById(id);
+        if (response) {
+          setBlog(response);
+        } else {
+          setError("Post not found");
+        }
+      } catch (error) {
+        setError("Error fetching blog");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        fetchBlog();
-    }, [id]); // Refetch when ID changes
+    fetchBlog();
+  }, [id]);
 
-    useEffect(() => {
-        // Retrieve dark mode setting from local storage or default to false
-        const savedDarkMode = JSON.parse(localStorage.getItem('darkMode'));
-        setDarkMode(savedDarkMode || false);
-    }, []);
+  useEffect(() => {
+    const savedDarkMode = JSON.parse(localStorage.getItem("darkMode"));
+    setDarkMode(savedDarkMode || false);
+  }, []);
 
-    if (loading) {
-        return <CircularProgress />;
-    }
-
-    if (error) {
-        return (
-            <Box display="flex" flexDirection="column" alignItems="center" p={4}>
-                <Typography variant="h5" color="error" gutterBottom>
-                    {error}
-                </Typography>
-                <Typography variant="body1" color="textSecondary">
-                    We couldn't find the post you're looking for. Please check the URL or try again later.
-                </Typography>
-            </Box>
-        );
-    }
-
+  if (loading) {
     return (
-        <Box
-            ref={innerRef}
-            // className={darkMode ? Styles.dark : Styles.light} // Apply dark or light mode class
-            display="flex"
-            flexDirection="row"
-            justifyContent="center"
-            padding={2}
-            gap={4}
-            sx={{
-                maxWidth: '100%',
-                margin: '0 auto',
-            }}
-        >
-            {/* Left Sidebar for ads (20% width) */}
-            <Box
-                flex={1}
-                display={{ xs: 'none', sm: 'block' }} // Hidden on small screens
-                padding={0}
-                className="sidebar"
-                borderRadius="8px"
-            >
-
-            </Box>
-
-            {/* Main Blog Content (80% width) */}
-            <Box
-                flex={4}
-                maxWidth="800px"
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                p={4}
-                className="blog-main"
-                borderRadius="8px"
-                boxShadow={2}
-            >
-                <Typography variant="h4" gutterBottom>
-                    {blog.name}
-                </Typography>
-                <Box
-                    component="img"
-                    src={blog.image}
-                    alt={blog.name}
-                    width="100%"
-
-                    objectFit="cover"
-                    mb={4}
-                    borderRadius="8px"
-                />
-                <Box
-                    dangerouslySetInnerHTML={{ __html: blog.content }}
-                    style={{ width: '100%', lineHeight: 1.6 }}
-                />
-            </Box>
-
-            {/* Right Sidebar for ads (20% width) */}
-            <Box
-                flex={1}
-                display={{ xs: 'none', sm: 'block' }} // Hidden on small screens
-                padding={0}
-                className="sidebar"
-                borderRadius="8px"
-            >
-
-            </Box>
-        </Box>
+      <Box
+        justifyContent="center"
+        display="flex"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress />
+      </Box>
     );
+  }
+
+  if (error) {
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
+        p={4}
+      >
+        <Typography variant="h5" color="error" gutterBottom>
+          {error}
+        </Typography>
+        <Typography variant="body1" color="textSecondary">
+          We couldn't find the post you're looking for. Please check the URL or
+          try again later.
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      ref={innerRef}
+      display="flex"
+      justifyContent="center"
+      width="100%"
+      sx={{
+        minHeight: "100vh",
+        padding: { xs: "1rem 0.5rem", sm: "2rem 1rem" },
+        transition: "0.3s ease",
+      }}
+    >
+      <Box
+        width="100%"
+        maxWidth="750px"
+        p={{ xs: 2, md: 4 }}
+        borderRadius="12px"
+        // boxShadow={darkMode ? 0 : 2}
+        sx={{
+          backgroundColor: darkMode ? "transparent" : "#fff",
+          textAlign: "left",
+          transition: "0.3s ease",
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: "bold",
+            mb: 2,
+            fontSize: { xs: "1.4rem", sm: "1.7rem", md: "2rem" },
+            wordBreak: "break-word",
+          }}
+        >
+          {blog.name}
+        </Typography>
+
+        <Box
+          component="img"
+          src={blog.image}
+          alt={blog.name}
+          sx={{
+            width: "100%",
+            maxWidth: "100%",
+            height: "auto",
+            borderRadius: "8px",
+            objectFit: "contain",
+            display: "block",
+            margin: "0 auto 1.5rem auto",
+          }}
+        />
+
+        <Box
+          dangerouslySetInnerHTML={{ __html: blog.content }}
+          sx={{
+            width: "100%",
+            lineHeight: 1.7,
+            fontSize: { xs: "1rem", sm: "1.05rem" },
+            wordBreak: "break-word",
+          }}
+        />
+      </Box>
+    </Box>
+  );
 }
 
 export default BlogDetails;
