@@ -1,25 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Dancing+Script:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap');
 @import "./variables.modules";
-
-
-body {
-    font-family: 'Roboto', Helvetica, sans-serif;
-    font-size: 1.5vh;
-    width: 100%;
-    height: 100%;
-    color: $dark;
-    background-color: $white;
-    box-sizing: border-box;
-}
-
-li {
-    color: $dark;
-}
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    font-size: 16px;
+    width: 100%;
+    height: 100%;
+    color: $dark;
+    background: $white;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    
+    // Animated gradient background
+    background: linear-gradient(-45deg, #f8f8f8, #ffffff, #f0f0f0, #f8f8f8);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+li {
+    color: $dark;
 }
 
 a,
@@ -28,12 +45,32 @@ a:hover,
 a:visited,
 a:active {
     text-decoration: none;
+    transition: $transition;
 }
 
 img {
     max-width: 100%;
+    height: auto;
 }
 
 ul {
     list-style-type: none;
+}
+
+// Custom scrollbar
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, $purple, $pink);
+    border-radius: 5px;
+    
+    &:hover {
+        background: linear-gradient(135deg, $pink, $purple);
+    }
 }

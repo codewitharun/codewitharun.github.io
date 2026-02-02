@@ -1,0 +1,43 @@
+@import "../../variables.modules";
+
+.portfolioCard {
+  transition: $transition;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  &:hover {
+    box-shadow: 0 20px 60px rgba(141, 83, 255, 0.3);
+    border-color: rgba(141, 83, 255, 0.5);
+  }
+}
+
+.description {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.techChip {
+  background: rgba(141, 83, 255, 0.15) !important;
+  color: #e0e0e0 !important;
+  border: 1px solid rgba(141, 83, 255, 0.3) !important;
+  
+  &:hover {
+    background: rgba(141, 83, 255, 0.25) !important;
+  }
+}
+
+.portfolioLinks {
+  a {
+    color: inherit;
+    transition: $transition;
+    
+    &:hover {
+      color: $purple;
+    }
+  }
+}
+
+.linkButton {
+  cursor: pointer;
+  transition: $transition;
+}
+

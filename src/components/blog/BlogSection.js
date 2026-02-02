@@ -63,7 +63,9 @@ function BlogSection({ innerRef }) {
       display={"flex"}
       flexDirection={"column"}
       alignItems={"center"}
-      // mt={'3rem'}
+      mt={'4rem'}
+      mb={'4rem'}
+      px={{ xs: '1rem', md: '2rem' }}
       id={"blog"}
       sx={{ width: "100%" }}
     >
@@ -74,45 +76,75 @@ function BlogSection({ innerRef }) {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         sx={{
-          mb: "2rem",
+          mb: "3rem",
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "500px",
+          '& .MuiOutlinedInput-root': {
+            borderRadius: '50px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            '&:hover': {
+              borderColor: 'rgba(141, 83, 255, 0.5)',
+            },
+            '&.Mui-focused': {
+              borderColor: 'rgba(141, 83, 255, 0.8)',
+            }
+          }
         }}
       />
 
       {/* Blog List Section */}
       <Grid
         container
-        columns={2}
-        spacing={2}
+        spacing={3}
         justifyContent="center"
-        sx={{ width: "60%" }}
+        sx={{ width: "100%", maxWidth: "1200px" }}
       >
         {blogs.map((blog, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={4} key={index.toString()}>
+          <Grid item xs={12} sm={10} md={8} lg={6} key={index.toString()}>
             <BlogItem blog={blog} />
           </Grid>
         ))}
       </Grid>
 
       {/* Loading Indicator */}
-      {loading && <CircularProgress sx={{ mt: 3 }} />}
+      {loading && <CircularProgress sx={{ mt: 3, color: 'primary.main' }} />}
 
       {/* Pagination */}
       {!loading && blogs.length > 0 && (
-        <Stack spacing={2} sx={{ mt: 3 }}>
+        <Stack spacing={2} sx={{ mt: 4 }}>
           <Pagination
             count={totalPages}
             page={page}
             onChange={handlePageChange}
             variant="outlined"
             shape="rounded"
+            sx={{
+              '& .MuiPaginationItem-root': {
+                color: 'inherit',
+                '&.Mui-selected': {
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                  }
+                }
+              }
+            }}
           />
         </Stack>
       )}
 
       {!loading && blogs.length === 0 && (
-        <Typography sx={{ mt: 3 }} variant="h6">
+        <Typography 
+          sx={{ 
+            mt: 3, 
+            fontSize: '1.2rem',
+            opacity: 0.7
+          }} 
+          variant="h6"
+        >
           No blogs found.
         </Typography>
       )}
