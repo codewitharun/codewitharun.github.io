@@ -1,6 +1,7 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Box, Button, Typography } from "@mui/material";
 import moment from "moment";
+import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { motion } from 'framer-motion';
 
@@ -110,5 +111,14 @@ function BlogItem({ blog }) {
     </motion.div>
   );
 }
+
+BlogItem.propTypes = {
+  blog: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)]),
+  }).isRequired,
+};
 
 export default BlogItem;

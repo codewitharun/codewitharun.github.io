@@ -7,7 +7,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import PropTypes from "prop-types";
 import { getAllPosts } from "../../services/blogsApi";
 import BlogItem from "./BlogItem";
 
@@ -31,11 +32,7 @@ function BlogSection({ innerRef }) {
     };
   }, [searchQuery]);
 
-  useEffect(() => {
-    fetchBlogs(1); // Reset to the first page when query changes
-  }, [debouncedSearchQuery]);
-
-  const fetchBlogs = async (currentPage = 1) => {
+  const fetchBlogs = useCallback(async (currentPage = 1) => {
     setLoading(true);
     try {
       const response = await getAllPosts(
@@ -51,7 +48,11 @@ function BlogSection({ innerRef }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [debouncedSearchQuery, limit]);
+
+  useEffect(() => {
+    fetchBlogs(1); // Reset to the first page when query changes
+  }, [fetchBlogs]);
 
   const handlePageChange = (event, value) => {
     fetchBlogs(value); // Fetch data for the selected page
@@ -101,8 +102,8 @@ function BlogSection({ innerRef }) {
         justifyContent="center"
         sx={{ width: "100%", maxWidth: "1200px" }}
       >
-        {blogs.map((blog, index) => (
-          <Grid item xs={12} sm={10} md={8} lg={6} key={index.toString()}>
+        {blogs.map((blog) => (
+          <Grid item xs={12} sm={10} md={8} lg={6} key={blog.id || blog.name}>
             <BlogItem blog={blog} />
           </Grid>
         ))}
@@ -151,5 +152,12 @@ function BlogSection({ innerRef }) {
     </Box>
   );
 }
+
+BlogSection.propTypes = {
+  innerRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+  ])
+};
 
 export default BlogSection;

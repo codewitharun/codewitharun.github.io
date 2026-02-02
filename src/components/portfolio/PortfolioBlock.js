@@ -18,7 +18,6 @@ function PortfolioBlock(props) {
             flexDirection={'column'} 
             justifyContent={'center'} 
             alignItems={'center'}
-            className={Style.portfolioCard}
             sx={{
                borderRadius: '1.5rem',
                overflow: 'hidden',

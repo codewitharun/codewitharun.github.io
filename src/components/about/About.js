@@ -40,7 +40,7 @@ export default function About({ innerRef }) {
             `<p><span style="color:${info.baseColor}">${firstName}${info.lastName.toLowerCase()}@portfolio $</span> cat about_${firstName}</p>` +
             `<p><span style="color:${info.baseColor}">about_${firstName} <span class="${Style.green}">(main)</span> $ </span>${info.bio}</p>`
         );
-    }, []);
+    }, [firstName]);
 
     useEffect(() => {
         if (!fullText) return;
