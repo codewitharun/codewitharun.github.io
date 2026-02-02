@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Style from './Navbar.module.scss';
-import Toggler from "./home/Toggler";
 import { useLocation } from "react-router-dom";
 import { HashLink as Link } from 'react-router-hash-link';
 import { Box } from "@mui/material";
 import { info } from "../info/Info";
 import { singlePage } from '../info/Info';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 const links = [
     {
@@ -44,30 +44,114 @@ const scrollWidthOffset = (el) => {
     window.scrollTo({ top: yCoordinate + yOffset, behavior: 'smooth' });
 }
 
+const navVariants = {
+    hidden: { y: -100, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: {
+            type: "spring",
+            stiffness: 100,
+            damping: 20,
+            delay: 0.1
+        }
+    }
+};
 
-export default function Navbar({ darkMode, handleClick, active, setActive }) {
+const linkVariants = {
+    hover: {
+        y: -3,
+        transition: {
+            type: "spring",
+            stiffness: 400,
+            damping: 10
+        }
+    }
+};
+
+export default function Navbar({ active, setActive }) {
+    const { scrollY } = useScroll();
+    const backgroundColor = useTransform(
+        scrollY,
+        [0, 100],
+        ['rgba(10, 10, 10, 0)', 'rgba(10, 10, 10, 0.8)']
+    );
+    const backdropFilter = useTransform(
+        scrollY,
+        [0, 100],
+        ['blur(0px)', 'blur(20px)']
+    );
 
     return (
-        <Box component={'nav'} width={'100%'} position={singlePage ? 'fixed' : 'relative'} className={darkMode ? Style.dark : Style.light}>
-            <Box component={'ul'} display={'flex'} justifyContent={'center'} alignItems={'center'}
-                gap={{ xs: '2rem', md: '8rem' }}
-                textTransform={'lowercase'} fontSize={'1rem'}>
-                {links.map((link, index) => (
-                    <Box key={index} component={'li'} className={(link.active === active && !link.type) && Style.active}
-                        sx={{ borderImageSource: info.gradient }}>
-                        <Link to={singlePage ? `#${link.to}` : `/${link.to}`}
-                            scroll={el => scrollWidthOffset(el)}
-                            smooth
-                            onClick={() => setActive(link.active)} className={Style.link}>
-                            {!link.type && <p style={{ padding: '0.5rem 0' }}>{link.name}</p>}
-                            {link.type && <h1>{link.name}</h1>}
-                        </Link>
-                    </Box>
-                ))}
-                <li>
-                    <Toggler darkMode={darkMode} handleClick={handleClick} />
-                </li>
-            </Box>
-        </Box>
+        <motion.nav
+            initial="hidden"
+            animate="visible"
+            variants={navVariants}
+            style={{
+                width: '100%',
+                position: singlePage ? 'fixed' : 'relative',
+                top: 0,
+                zIndex: 1000,
+            }}
+        >
+            <motion.div
+                style={{
+                    backgroundColor,
+                    backdropFilter,
+                    WebkitBackdropFilter: backdropFilter,
+                }}
+                className={Style.dark}
+            >
+                <Box component={'ul'} display={'flex'} justifyContent={'center'} alignItems={'center'}
+                    gap={{ xs: '1.5rem', sm: '3rem', md: '6rem', lg: '8rem' }}
+                    textTransform={'lowercase'} fontSize={'1rem'}
+                    py={{ xs: '1rem', md: '1.5rem' }}
+                    px={{ xs: '1rem', md: '2rem' }}
+                >
+                    {links.map((link, index) => (
+                        <motion.li
+                            key={index}
+                            variants={linkVariants}
+                            whileHover="hover"
+                            style={{ listStyle: 'none' }}
+                        >
+                            <Box 
+                                component={'div'} 
+                                className={(link.active === active && !link.type) ? Style.active : ''}
+                                sx={{ 
+                                    position: 'relative',
+                                    borderImageSource: info.gradient 
+                                }}
+                            >
+                                <Link 
+                                    to={singlePage ? `#${link.to}` : `/${link.to}`}
+                                    scroll={el => scrollWidthOffset(el)}
+                                    smooth
+                                    onClick={() => setActive(link.active)} 
+                                    className={Style.link}
+                                >
+                                    {!link.type && (
+                                        <motion.p 
+                                            style={{ padding: '0.5rem 0', margin: 0 }}
+                                            whileHover={{ scale: 1.1 }}
+                                        >
+                                            {link.name}
+                                        </motion.p>
+                                    )}
+                                    {link.type && (
+                                        <motion.h1 
+                                            style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}
+                                            whileHover={{ scale: 1.1, rotate: 5 }}
+                                        >
+                                            {link.name}
+                                        </motion.h1>
+                                    )}
+                                </Link>
+                            </Box>
+                        </motion.li>
+                    ))}
+                </Box>
+            </motion.div>
+        </motion.nav>
     )
 }

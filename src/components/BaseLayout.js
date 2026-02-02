@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Style from './BaseLayout.module.scss'
 import Navbar from "./Navbar";
 import { useLocation } from "react-router-dom";
@@ -15,42 +15,42 @@ export default function BaseLayout() {
    const refHome = useScrollObserver(setActive);
    const refAbout = useScrollObserver(setActive);
    const refPortfolio = useScrollObserver(setActive);
-   let [darkMode, setDarkMode] = useState(false);
-
-
-
-   function handleToggleDarkMode() {
-      let oppositeOfCurrentDarkMode = !darkMode
-      console.log(oppositeOfCurrentDarkMode)
-      localStorage.setItem('darkMode', `${oppositeOfCurrentDarkMode}`)
-      setDarkMode(oppositeOfCurrentDarkMode)
-   }
-
-   useEffect(() => {
-      let detectedDarkMode = JSON.parse(localStorage.getItem('darkMode'));
-
-      if (detectedDarkMode) {
-         setDarkMode(detectedDarkMode)
-      } else {
-         localStorage.setItem('darkMode', 'false')
-      }
-   }, [])
 
    return (
-      <Box className={darkMode ? Style.dark : Style.light}>
+      <Box className={Style.dark}>
          <Grid container display={'flex'} flexDirection={'column'} minHeight={'100vh'}
             justifyContent={'space-between'}>
             <Grid item>
-               <Navbar darkMode={darkMode} handleClick={handleToggleDarkMode} active={active} setActive={setActive} />
+               <Navbar active={active} setActive={setActive} />
             </Grid>
             <Grid item flexGrow={1}>
                {singlePage ? <SinglePageRoutes refs={{ refHome, refAbout, refPortfolio }} /> : <MultiPageRoutes />}
             </Grid>
             <Grid item>
-               <Box component={'footer'} display={'flex'} flexDirection={'column'} alignItems={'center'}
-                  py={'1.5rem'} sx={{ opacity: 0.7 }} width={'100%'}>
-                  <p>Created with ❤️ by <a href={'https://www.arun.codes'}>Arun Kumar</a></p>
-                  <p>&copy; ∞</p>
+               <Box 
+                  component={'footer'} 
+                  display={'flex'} 
+                  flexDirection={'column'} 
+                  alignItems={'center'}
+                  py={'2rem'} 
+                  px={'1rem'}
+                  sx={{ 
+                     opacity: 0.8,
+                     position: 'relative',
+                     zIndex: 1
+                  }} 
+                  width={'100%'}
+               >
+                  <p style={{ margin: '0.5rem 0', fontSize: '0.9rem' }}>
+                     Created with ❤️ by <a href={'https://www.arun.codes'} style={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        fontWeight: 600
+                     }}>Arun Kumar</a>
+                  </p>
+                  <p style={{ margin: '0.5rem 0', fontSize: '0.85rem' }}>&copy; ∞</p>
                </Box>
             </Grid>
          </Grid>

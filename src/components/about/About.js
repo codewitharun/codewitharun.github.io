@@ -3,6 +3,32 @@ import Style from './About.module.scss';
 import Terminal from "./Terminal";
 import { Box } from "@mui/material";
 import { info } from "../../info/Info";
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.3,
+            delayChildren: 0.2
+        }
+    }
+};
+
+const terminalVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.9 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: {
+            type: "spring",
+            stiffness: 100,
+            damping: 15
+        }
+    }
+};
 
 export default function About({ innerRef }) {
     const [typedText, setTypedText] = useState('');
@@ -69,10 +95,33 @@ export default function About({ innerRef }) {
     }
 
     return (
-        <Box ref={innerRef} display={'flex'} flexDirection={'column'} alignItems={'center'} mt={'3rem'} id={'about'}>
-            <Terminal text={<div dangerouslySetInnerHTML={{ __html: typedText }} />} />
-            <Terminal text={skillsText()} />
-            <Terminal text={miscText()} />
+        <Box 
+            ref={innerRef} 
+            display={'flex'} 
+            flexDirection={'column'} 
+            alignItems={'center'} 
+            mt={'4rem'} 
+            mb={'4rem'}
+            px={{ xs: '1rem', md: '2rem' }}
+            id={'about'}
+        >
+            <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                style={{ width: '100%', maxWidth: '1200px' }}
+            >
+                <motion.div variants={terminalVariants}>
+                    <Terminal text={<div dangerouslySetInnerHTML={{ __html: typedText }} />} />
+                </motion.div>
+                <motion.div variants={terminalVariants}>
+                    <Terminal text={skillsText()} />
+                </motion.div>
+                <motion.div variants={terminalVariants}>
+                    <Terminal text={miscText()} />
+                </motion.div>
+            </motion.div>
         </Box>
     );
 }

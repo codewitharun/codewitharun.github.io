@@ -1,128 +1,183 @@
 @import "../../variables.modules";
 
-// Default styles
-h1 {
-  font-size: 2rem;
-  text-align: center;
-  @media only screen and (min-width: 940px) {
-    font-size: 3rem;
-    text-align: left;
+.blogContent {
+  color: rgba(255, 255, 255, 0.9);
+  
+  // Headings
+  h1, h2, h3, h4, h5, h6 {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
   }
-}
-
-h2 {
-  font-size: 1.25rem;
-  text-align: center;
-  @media only screen and (min-width: 940px) {
+  
+  h1 {
     font-size: 2rem;
-    text-align: left;
+    border-bottom: 2px solid rgba(141, 83, 255, 0.3);
+    padding-bottom: 0.5rem;
   }
-}
-
-.hand {
-  animation-name: wave;
-  animation-duration: 2.5s;
-  animation-iteration-count: infinite;
-  transform-origin: 70% 70%;
-  display: inline-block;
-}
-
-a {
-  color: $dark;
-  transition: color 200ms ease;
-}
-
-a:hover {
-  color: $lightgray;
-  transition: color 200ms ease;
-}
-
-@keyframes wave {
-  0% {
-    transform: rotate(0deg);
-  }
-  10% {
-    transform: rotate(14deg);
-  }
-  20% {
-    transform: rotate(-8deg);
-  }
-  30% {
-    transform: rotate(14deg);
-  }
-  40% {
-    transform: rotate(-4deg);
-  }
-  50% {
-    transform: rotate(10deg);
-  }
-  60% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
-/* Dark mode styles */
-.dark {
-  background-color: $dark;
-  color: $white;
-
-  h1,
+  
   h2 {
-    color: $white;
+    font-size: 1.75rem;
+    border-bottom: 1px solid rgba(141, 83, 255, 0.2);
+    padding-bottom: 0.4rem;
   }
-
+  
+  h3 {
+    font-size: 1.5rem;
+  }
+  
+  h4 {
+    font-size: 1.25rem;
+  }
+  
+  // Paragraphs
+  p {
+    margin-bottom: 1.2rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  // Links
   a {
-    color: $white;
+    color: rgba(141, 83, 255, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(141, 83, 255, 0.3);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      color: rgba(202, 107, 230, 1);
+      border-bottom-color: rgba(202, 107, 230, 0.5);
+    }
   }
-
-  a:hover {
-    color: $lightgray;
+  
+  // Lists
+  ul, ol {
+    margin: 1.5rem 0;
+    padding-left: 2rem;
+    color: rgba(255, 255, 255, 0.85);
+    
+    li {
+      margin-bottom: 0.8rem;
+      line-height: 1.7;
+    }
   }
-
-  .hand {
-    color: $lightgray;
+  
+  ul {
+    list-style-type: disc;
   }
-
-  .blog-main {
-    background-color: $dark;
-    color: $white;
+  
+  ol {
+    list-style-type: decimal;
   }
-
-  .sidebar {
-    background-color: #333;
+  
+  // Code blocks
+  pre {
+    background: rgba(27, 27, 39, 0.8);
+    border: 1px solid rgba(141, 83, 255, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    position: relative;
+    
+    &::before {
+      content: 'CODE';
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      font-size: 0.7rem;
+      color: rgba(141, 83, 255, 0.6);
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
+    
+    code {
+      background: transparent;
+      padding: 0;
+      border: none;
+      color: rgba(255, 255, 255, 0.9);
+      font-family: inherit;
+    }
   }
-}
-
-.light {
-  background-color: $white;
-  color: $dark;
-
-  h1,
-  h2 {
-    color: $dark;
+  
+  // Inline code
+  code {
+    background: rgba(141, 83, 255, 0.15);
+    border: 1px solid rgba(141, 83, 255, 0.3);
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.9em;
+    color: rgba(141, 83, 255, 0.9);
+    word-break: break-word;
   }
-
-  a {
-    color: $dark;
+  
+  // Blockquotes
+  blockquote {
+    border-left: 4px solid rgba(141, 83, 255, 0.5);
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
+    background: rgba(141, 83, 255, 0.05);
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
   }
-
-  a:hover {
-    color: $lightgray;
+  
+  // Images
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.5rem 0;
   }
-
-  .hand {
-    color: $dark;
+  
+  // Tables
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    background: rgba(27, 27, 39, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    
+    th, td {
+      padding: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: left;
+    }
+    
+    th {
+      background: rgba(141, 83, 255, 0.2);
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 600;
+    }
+    
+    tr:hover {
+      background: rgba(141, 83, 255, 0.1);
+    }
   }
-
-  .blog-main {
-    background-color: $white;
-    color: $dark;
+  
+  // Strong and emphasis
+  strong, b {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
   }
-
-  .sidebar {
-    background-color: #f7f7f7;
+  
+  em, i {
+    color: rgba(255, 255, 255, 0.85);
+    font-style: italic;
+  }
+  
+  // Horizontal rule
+  hr {
+    border: none;
+    border-top: 2px solid rgba(141, 83, 255, 0.3);
+    margin: 2rem 0;
   }
 }

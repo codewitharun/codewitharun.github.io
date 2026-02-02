@@ -2,13 +2,13 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getPostById } from "../../services/blogsApi";
+import Style from './blogDetails.module.scss';
 
 function BlogDetails({ innerRef }) {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -28,11 +28,6 @@ function BlogDetails({ innerRef }) {
 
     fetchBlog();
   }, [id]);
-
-  useEffect(() => {
-    const savedDarkMode = JSON.parse(localStorage.getItem("darkMode"));
-    setDarkMode(savedDarkMode || false);
-  }, []);
 
   if (loading) {
     return (
@@ -85,9 +80,8 @@ function BlogDetails({ innerRef }) {
         maxWidth="750px"
         p={{ xs: 2, md: 4 }}
         borderRadius="12px"
-        // boxShadow={darkMode ? 0 : 2}
         sx={{
-          backgroundColor: darkMode ? "transparent" : "#fff",
+          backgroundColor: "transparent",
           textAlign: "left",
           transition: "0.3s ease",
         }}
@@ -99,6 +93,7 @@ function BlogDetails({ innerRef }) {
             mb: 2,
             fontSize: { xs: "1.4rem", sm: "1.7rem", md: "2rem" },
             wordBreak: "break-word",
+            color: "rgba(255, 255, 255, 0.95)",
           }}
         >
           {blog.name}
@@ -120,12 +115,14 @@ function BlogDetails({ innerRef }) {
         />
 
         <Box
+          className={Style.blogContent}
           dangerouslySetInnerHTML={{ __html: blog.content }}
           sx={{
             width: "100%",
-            lineHeight: 1.7,
+            lineHeight: 1.8,
             fontSize: { xs: "1rem", sm: "1.05rem" },
             wordBreak: "break-word",
+            color: "rgba(255, 255, 255, 0.9)",
           }}
         />
       </Box>

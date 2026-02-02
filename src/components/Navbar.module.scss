@@ -1,33 +1,59 @@
 @import "../variables.modules";
 
 nav {
-  transition: all 400ms;
-  z-index: 1;
+  transition: $transition;
+  z-index: 1000;
 }
 
 .dark {
-  background-color: $dark;
-}
-
-
-.light {
-  background-color: $white;
+  @include glass($glass-bg-dark, rgba(255, 255, 255, 0.1));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  a, p, h1 {
+    color: $white;
+  }
 }
 
 .active {
-  border-bottom: 5px solid;
-  border-image-slice: 1;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(135deg, $purple, $pink, $cyan);
+    border-radius: 2px;
+    animation: slideIn 0.3s ease;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 li {
   transition: $transition;
-
-  &:hover {
-    transform: translateY(-3px);
-    transition: $transition;
-  }
+  cursor: pointer;
 }
 
-.link:hover {
-  color: unset;
+.link {
+  transition: $transition;
+  position: relative;
+  display: block;
+  
+  &:hover {
+    color: $purple !important;
+  }
+  
+  p, h1 {
+    transition: $transition;
+  }
 }
