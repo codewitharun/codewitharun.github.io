@@ -4,6 +4,7 @@ import PortfolioBlock from "./PortfolioBlock";
 import { Box, Grid, Typography } from "@mui/material";
 import { info } from "../../info/Info";
 import { motion } from 'framer-motion';
+import useSEO from '../../hooks/useSEO';
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -31,6 +32,14 @@ const itemVariants = {
 };
 
 export default function Portfolio({ innerRef }) {
+    // SEO for Portfolio page
+    useSEO({
+        title: 'Portfolio | Arun Kumar - React Native Projects & Apps',
+        description: 'View my portfolio of React Native mobile applications including Ageas Federal Life Insurance, Sodality, TaskFlow, EzySplit, and more. Built with React Native, TypeScript, and Firebase.',
+        keywords: 'Arun Kumar Portfolio, React Native Projects, Mobile App Portfolio, React Native Apps, iOS Apps, Android Apps, Mobile Development Projects',
+        url: 'https://www.arun.codes/portfolio',
+        image: 'https://www.arun.codes/favicon_io/android-chrome-512x512.png'
+    });
     return (
         <Box 
             id={'portfolio'} 

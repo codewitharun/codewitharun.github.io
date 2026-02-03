@@ -16,7 +16,8 @@ export const info = {
 
   miniBio: [
     { emoji: "💻", text: "React Native • TypeScript • Full-Stack" },
-    { emoji: "🏢", text: "Full-Stack Consultant @ Federal Bank / Ageas Federal" },
+    { emoji: "🏢", text: "Senior React Native Developer @ Durapid Technologies" },
+    { emoji: "🤝", text: "Full-Stack Consultant @ Federal Bank / Ageas Federal" },
     { emoji: "📍", text: "Jaipur, India 🇮🇳" },
     { emoji: "📧", text: "arun4dev@icloud.com" },
   ],
@@ -50,7 +51,9 @@ export const info = {
     },
   ],
 
-  bio: `React Native Developer with ~4 years of hands-on experience building scalable, production-grade mobile applications for Android and iOS. Currently working as a Full-Stack Consultant at Federal Bank / Ageas Federal Life Insurance, where I created the Ageas Federal Life Insurance app from scratch and am now working on Phase 2.
+  bio: `React Native Developer with ~4 years of hands-on experience building scalable, production-grade mobile applications for Android and iOS. Currently working as a Senior React Native Developer at Durapid Technologies Pvt. Ltd., where I develop and maintain cross-platform mobile applications, work on production features including performance optimization, API integrations, and scalable UI architecture.
+
+Additionally, I serve as a Full-Stack Consultant at Federal Bank / Ageas Federal Life Insurance, where I created the Ageas Federal Life Insurance app from scratch and am now working on Phase 2. This role involves collaborating closely with backend, QA, and product teams to ensure app stability, maintainability, and store-ready builds.
 
 I specialize in React Native, TypeScript, Firebase, Redux, and native integrations, with practical exposure to live streaming, real-time chat, payment gateways, maps, notifications, and App Store / Play Store deployments. I have worked on startup-scale and enterprise-level products, including white-label platforms and consumer-facing apps.
 

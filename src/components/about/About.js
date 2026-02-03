@@ -4,6 +4,7 @@ import Terminal from "./Terminal";
 import { Box } from "@mui/material";
 import { info } from "../../info/Info";
 import { motion } from 'framer-motion';
+import useSEO from '../../hooks/useSEO';
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -36,6 +37,15 @@ export default function About({ innerRef }) {
     const firstName = info.firstName.toLowerCase();
     const [line1Full, setLine1Full] = useState('');
     const [line2Full, setLine2Full] = useState('');
+
+    // SEO for About page
+    useSEO({
+        title: 'About Me | Arun Kumar - Senior React Native Developer',
+        description: `Learn about ${info.firstName} ${info.lastName}, a Senior React Native Developer with 4+ years of experience. Skills include React Native, TypeScript, Firebase, and full-stack development. Based in Jaipur, India.`,
+        keywords: 'About Arun Kumar, React Native Developer Skills, TypeScript Developer, Firebase Developer, Mobile App Developer Experience',
+        url: 'https://www.arun.codes/about',
+        image: 'https://www.arun.codes/favicon_io/android-chrome-512x512.png'
+    });
 
     useEffect(() => {
         setLine1Full(`${firstName}${info.lastName.toLowerCase()}@portfolio $ cat about_${firstName}`);

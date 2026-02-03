@@ -11,6 +11,7 @@ import { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { getAllPosts } from "../../services/blogsApi";
 import BlogItem from "./BlogItem";
+import useSEO from "../../hooks/useSEO";
 
 function BlogSection({ innerRef }) {
   const [blogs, setBlogs] = useState([]);
@@ -20,6 +21,15 @@ function BlogSection({ innerRef }) {
   const [page, setPage] = useState(1); // Current page number
   const [totalPages, setTotalPages] = useState(1); // Total number of pages
   const limit = 10; // Number of blogs per page
+
+  // SEO for Blog page
+  useSEO({
+    title: 'Blog | Arun Kumar - React Native Developer Blog',
+    description: 'Read articles and blog posts about React Native development, mobile app development, TypeScript, Firebase, and software engineering insights from Arun Kumar.',
+    keywords: 'React Native Blog, Mobile Development Blog, TypeScript Blog, Firebase Tutorials, Software Engineering Blog, Tech Blog',
+    url: 'https://www.arun.codes/blog',
+    image: 'https://www.arun.codes/favicon_io/android-chrome-512x512.png'
+  });
 
   // Debouncing logic
   useEffect(() => {

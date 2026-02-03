@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getPostById } from "../../services/blogsApi";
 import Style from './blogDetails.module.scss';
+import useSEO from '../../hooks/useSEO';
 
 function BlogDetails({ innerRef }) {
   const { id } = useParams();
@@ -28,6 +29,15 @@ function BlogDetails({ innerRef }) {
 
     fetchBlog();
   }, [id]);
+
+  // SEO for individual blog posts
+  useSEO({
+    title: blog ? `${blog.name} | Arun Kumar's Blog` : 'Blog Post | Arun Kumar',
+    description: blog ? `Read ${blog.name} on Arun Kumar's blog. React Native development insights, mobile app development tips, and software engineering articles.` : 'Read blog posts about React Native development and mobile app development.',
+    keywords: blog ? `${blog.name}, React Native, Mobile Development, Blog Post, Arun Kumar` : 'React Native Blog, Mobile Development Blog',
+    url: blog ? `https://www.arun.codes/blog/${id}` : 'https://www.arun.codes/blog',
+    image: blog?.image || 'https://www.arun.codes/favicon_io/android-chrome-512x512.png'
+  });
 
   if (loading) {
     return (
