@@ -31,29 +31,40 @@ const terminalVariants = {
 };
 
 export default function About({ innerRef }) {
-    const [typedText, setTypedText] = useState('');
+    const [line1Text, setLine1Text] = useState('');
+    const [line2Text, setLine2Text] = useState('');
     const firstName = info.firstName.toLowerCase();
-    const [fullText, setFullText] = useState('');
+    const [line1Full, setLine1Full] = useState('');
+    const [line2Full, setLine2Full] = useState('');
 
     useEffect(() => {
-        setFullText(
-            `<p><span style="color:${info.baseColor}">${firstName}${info.lastName.toLowerCase()}@portfolio $</span> cat about_${firstName}</p>` +
-            `<p><span style="color:${info.baseColor}">about_${firstName} <span class="${Style.green}">(main)</span> $ </span>${info.bio}</p>`
-        );
+        setLine1Full(`${firstName}${info.lastName.toLowerCase()}@portfolio $ cat about_${firstName}`);
+        setLine2Full(`${info.bio}`);
     }, [firstName]);
 
     useEffect(() => {
-        if (!fullText) return;
+        if (!line1Full) return;
 
         let index = 0;
         const interval = setInterval(() => {
-            setTypedText((prev) => prev + fullText[index]);
+            setLine1Text(line1Full.substring(0, index + 1));
             index++;
-            if (index === fullText.length) clearInterval(interval);
+            if (index === line1Full.length) {
+                clearInterval(interval);
+                // Start typing line 2 after a short delay
+                setTimeout(() => {
+                    let index2 = 0;
+                    const interval2 = setInterval(() => {
+                        setLine2Text(line2Full.substring(0, index2 + 1));
+                        index2++;
+                        if (index2 === line2Full.length) clearInterval(interval2);
+                    }, 25);
+                }, 500);
+            }
         }, 25);
 
         return () => clearInterval(interval);
-    }, [fullText]);
+    }, [line1Full, line2Full]);
 
     function skillsText() {
         return (
@@ -113,7 +124,21 @@ export default function About({ innerRef }) {
                 style={{ width: '100%', maxWidth: '1200px' }}
             >
                 <motion.div variants={terminalVariants}>
-                    <Terminal text={<div dangerouslySetInnerHTML={{ __html: typedText }} />} />
+                    <Terminal text={
+                        <div>
+                            <div>
+                                <span style={{ color: info.baseColor }}>{line1Text}</span>
+                            </div>
+                            {line1Text.length === line1Full.length && (
+                                <div>
+                                    <span style={{ color: info.baseColor }}>about_{firstName} </span>
+                                    <span className={Style.green}>(main)</span>
+                                    <span style={{ color: info.baseColor }}> $ </span>
+                                    <span>{line2Text}</span>
+                                </div>
+                            )}
+                        </div>
+                    } />
                 </motion.div>
                 <motion.div variants={terminalVariants}>
                     <Terminal text={skillsText()} />
