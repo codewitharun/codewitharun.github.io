@@ -119,7 +119,7 @@ export const info = {
     // This is where your portfolio projects will be detailed
     {
       title: "Coming Soon!!",
-      live: "https://appaura.xyz", //this should be a link to the live version of your project, think github pages, netlify, heroku, etc. Or your own domain, if you have it.
+      live: "https://www.arun.codes", //this should be a link to the live version of your project, think github pages, netlify, heroku, etc. Or your own domain, if you have it.
       source: "https://github.com/codewitharun", // this should be a link to the **repository** of the project, where the code is hosted.
       image: mock5,
     },

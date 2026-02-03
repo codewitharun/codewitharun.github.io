@@ -9,6 +9,7 @@ import HireMeModal from "./HireMeModal";
 import { Box, Button } from "@mui/material";
 import { info } from "../../info/Info";
 import { motion } from 'framer-motion';
+import useSEO from '../../hooks/useSEO';
 
 // Fun, catchy titles that rotate
 const catchyTitles = [
@@ -76,6 +77,15 @@ export default function Home({ innerRef }) {
    const [currentTitleIndex, setCurrentTitleIndex] = useState(0);
    const [isTyping, setIsTyping] = useState(true);
    const [modalOpen, setModalOpen] = useState(false);
+
+   // SEO for Home page
+   useSEO({
+      title: 'Arun Kumar | Senior React Native Developer | Portfolio',
+      description: 'Senior React Native Developer with 4+ years of experience building scalable mobile apps. Working at Durapid Technologies and Full-Stack Consultant at Federal Bank/Ageas Federal. Specialized in React Native, TypeScript, Firebase, and native integrations.',
+      keywords: 'Arun Kumar, React Native Developer, Senior React Native Developer, TypeScript Developer, Full-Stack Developer, Mobile App Developer, Durapid Technologies, Portfolio',
+      url: 'https://www.arun.codes/',
+      image: 'https://www.arun.codes/favicon_io/android-chrome-512x512.png'
+   });
 
    const greeting = "Hi, I'm ";
    const name = info.firstName;
