@@ -80,11 +80,13 @@ function BlogSection({ innerRef }) {
           mb: "3rem",
           width: "100%",
           maxWidth: "500px",
+          color: 'white',
           '& .MuiOutlinedInput-root': {
             borderRadius: '50px',
             background: 'rgba(255, 255, 255, 0.05)',
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: 'white',
             '&:hover': {
               borderColor: 'rgba(141, 83, 255, 0.5)',
             },
