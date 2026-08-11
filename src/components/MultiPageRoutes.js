@@ -5,6 +5,7 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import BlogSection from "./blog/BlogSection";
 import BlogDetails from "./blog/BlogDetails";
+import Love from "./love/Love";
 
 export default function MultiPageRoutes() {
     return (
@@ -15,6 +16,7 @@ export default function MultiPageRoutes() {
             {/* <Route exact path={'/blog'} element={<Blog />} /> */}
             <Route path="/blog" element={<BlogSection />} />
             <Route path="/blog/:id" element={<BlogDetails />} />
+            <Route path="/love" element={<Love />} />
         </Routes>
     )
 }
