@@ -1,9 +1,9 @@
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import useSEO from '../../hooks/useSEO';
 import { getPostById } from "../../services/blogsApi";
 import Style from './blogDetails.module.scss';
-import useSEO from '../../hooks/useSEO';
 
 function BlogDetails({ innerRef }) {
   const { id } = useParams();

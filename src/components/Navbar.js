@@ -32,6 +32,11 @@ const links = [
         name: 'Blog',
         to: 'blog',
         active: 'blog'
+    },
+    {
+        name: 'Love',
+        to: 'love',
+        active: 'love'
     }
 ]
 
@@ -102,7 +107,8 @@ export default function Navbar({ active, setActive }) {
                 className={Style.dark}
             >
                 <Box component={'ul'} display={'flex'} justifyContent={'center'} alignItems={'center'}
-                    gap={{ xs: '1.5rem', sm: '3rem', md: '6rem', lg: '8rem' }}
+                    gap={{ xs: '1rem', sm: '2rem', md: '4rem', lg: '6rem' }}
+                    flexWrap={'wrap'}
                     textTransform={'lowercase'} fontSize={'1rem'}
                     py={{ xs: '1rem', md: '1.5rem' }}
                     px={{ xs: '1rem', md: '2rem' }}
