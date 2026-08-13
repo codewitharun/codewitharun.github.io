@@ -743,8 +743,64 @@
   backdrop-filter: blur(10px);
 }
 
+.messageOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(20, 8, 18, 0.78);
+  backdrop-filter: blur(12px);
+}
+
+.messageModal {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  border-radius: 10px;
+  padding: clamp(1rem, 3vw, 1.4rem);
+  position: relative;
+  display: grid;
+  gap: 0.85rem;
+  background: linear-gradient(135deg, #fff9fc, #ffe8f1);
+  box-shadow: 0 32px 80px rgba(26, 4, 18, 0.46);
+
+  button {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.85rem;
+    z-index: 1;
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(77, 23, 48, 0.76);
+    color: #fff7fb;
+    cursor: pointer;
+  }
+
+  img {
+    width: 100%;
+    display: block;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(34, 7, 25, 0.12);
+  }
+}
+
+.messageEyebrow {
+  color: #9e164c !important;
+  font-family: 'Caveat', cursive !important;
+  font-size: clamp(1.35rem, 3vw, 1.7rem) !important;
+  text-align: center;
+}
+
 .letterCard {
   width: min(620px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
   border-radius: 8px;
   padding: clamp(1.6rem, 5vw, 3rem);
   position: relative;
@@ -782,10 +838,19 @@
   }
 
   strong {
+    display: block;
+    margin: 0.4rem 0 0.8rem;
     color: #b5155b;
     font-family: 'Caveat', cursive;
     font-size: 1.8rem;
   }
+}
+
+.letterSignOff {
+  margin-bottom: 0 !important;
+  font-family: 'Caveat', cursive;
+  font-size: 1.35rem;
+  color: #9e164c !important;
 }
 
 .petalPicker {
