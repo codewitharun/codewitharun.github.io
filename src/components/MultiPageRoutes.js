@@ -16,7 +16,7 @@ export default function MultiPageRoutes() {
             {/* <Route exact path={'/blog'} element={<Blog />} /> */}
             <Route path="/blog" element={<BlogSection />} />
             <Route path="/blog/:id" element={<BlogDetails />} />
-            <Route path="/love" element={<Love />} />
+            {/* <Route path="/love" element={<Love />} /> */}
         </Routes>
     )
 }
