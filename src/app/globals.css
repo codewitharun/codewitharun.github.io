@@ -228,6 +228,20 @@ h1, h2, h3, h4 {
 
 /* Rendered Markdown — used for both the admin content preview and public
    blog posts, so post content looks the same wherever it's shown. */
+.markdown-content {
+  /* A long unbroken run of characters (a URL, a hash, or — as happened in
+     testing — a giant no-space garbled string) has no natural place to
+     break a line at. Without this, that single "word" can't shrink to fit
+     beside a floated image (see ResizableImage's align attribute in
+     RichTextEditor.tsx) and just overflows past it instead of wrapping —
+     the same overflow bug `break-words` already fixes on post titles,
+     applied here to the body content too. overflow-wrap inherits, so this
+     one rule covers every descendant (p, li, blockquote, td, …).
+  */
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 .markdown-content h1,
 .markdown-content h2,
 .markdown-content h3 {
