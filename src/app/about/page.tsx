@@ -25,6 +25,8 @@ export default function AboutPage() {
             src="/images/self.jpeg"
             alt={brand.founder}
             fill
+            sizes="(max-width: 768px) 10rem, 16rem"
+            priority
             className="object-cover"
           />
         </div>
