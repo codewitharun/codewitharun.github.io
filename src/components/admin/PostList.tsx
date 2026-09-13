@@ -1,8 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Pencil, Search, Trash2 } from "lucide-react";
 import type { Post } from "@/lib/posts";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Search,
+  Trash2,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 type PostListProps = {
   posts: Post[];
@@ -20,7 +26,9 @@ export default function PostList({ posts, onEdit, onDelete }: PostListProps) {
     const q = query.trim().toLowerCase();
     if (!q) return posts;
     return posts.filter(
-      (post) => post.title.toLowerCase().includes(q) || post.slug.toLowerCase().includes(q)
+      (post) =>
+        post.title.toLowerCase().includes(q) ||
+        post.slug.toLowerCase().includes(q),
     );
   }, [posts, query]);
 
@@ -39,7 +47,9 @@ export default function PostList({ posts, onEdit, onDelete }: PostListProps) {
   if (posts.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-        <p className="text-sm text-ink-soft">No posts yet — create your first one above.</p>
+        <p className="text-sm text-ink-soft">
+          No posts yet — create your first one above.
+        </p>
       </div>
     );
   }
@@ -66,16 +76,23 @@ export default function PostList({ posts, onEdit, onDelete }: PostListProps) {
 
       {filtered.length === 0 ? (
         <div className="mt-4 rounded-2xl border border-dashed border-border p-10 text-center">
-          <p className="text-sm text-ink-soft">No posts match &quot;{query}&quot;.</p>
+          <p className="text-sm text-ink-soft">
+            No posts match &quot;{query}&quot;.
+          </p>
         </div>
       ) : (
         <>
           <div className="mt-4 divide-y divide-border-soft rounded-2xl border border-border bg-bg-card">
             {pagePosts.map((post) => (
-              <div key={post.id} className="flex items-center justify-between gap-4 p-4">
+              <div
+                key={post.id}
+                className="flex items-center justify-between gap-4 p-4"
+              >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="truncate font-display text-sm font-bold text-ink">{post.title}</p>
+                    <p className="truncate font-display text-sm font-bold text-ink">
+                      {post.title}
+                    </p>
                     <span
                       className={`mono-label shrink-0 rounded-full px-2 py-0.5 text-[10px] ${
                         post.status === "published"
@@ -86,7 +103,9 @@ export default function PostList({ posts, onEdit, onDelete }: PostListProps) {
                       {post.status}
                     </span>
                   </div>
-                  <p className="truncate text-xs text-ink-faint">/blog/{post.slug}</p>
+                  <p className="truncate text-xs text-ink-faint">
+                    /blog/{post.slug}
+                  </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <button
@@ -111,7 +130,10 @@ export default function PostList({ posts, onEdit, onDelete }: PostListProps) {
           </div>
 
           {totalPages > 1 && (
-            <nav aria-label="Post list pagination" className="mt-4 flex items-center justify-center gap-1.5">
+            <nav
+              aria-label="Post list pagination"
+              className="mt-4 flex items-center justify-center gap-1.5"
+            >
               <button
                 type="button"
                 disabled={currentPage === 1}
