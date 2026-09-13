@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /posts/{postId} {
+      // Public can read only published posts.
+      allow read: if resource.data.status == "published";
+
+      // Only the admin account can read drafts, create, update, or delete.
+      // Replace ADMIN_EMAIL with your actual sign-in email before deploying.
+      allow read, write: if request.auth != null
+        && request.auth.token.email == "ADMIN_EMAIL";
+    }
+  }
+}

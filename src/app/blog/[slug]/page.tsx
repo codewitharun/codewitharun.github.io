@@ -1,0 +1,93 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { ArrowLeft } from "lucide-react";
+import Reveal from "@/components/Reveal";
+import { getPostBySlug, getPublishedPosts } from "@/lib/posts";
+import { siteUrl } from "@/data/site";
+
+export const revalidate = 300;
+
+type BlogPostPageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+export async function generateStaticParams() {
+  // Best-effort at build time — if Firestore can't be reached (rules not
+  // deployed yet, no network in this build environment), fall back to no
+  // pre-rendered posts rather than failing the build; `revalidate` picks
+  // them up on first request once Firestore is reachable.
+  try {
+    const posts = await getPublishedPosts();
+    return posts.map((post) => ({ slug: post.slug }));
+  } catch {
+    return [];
+  }
+}
+
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
+  if (!post || post.status !== "published") return {};
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      url: `${siteUrl}/blog/${post.slug}`,
+      images: post.coverImage ? [{ url: post.coverImage }] : undefined,
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
+  if (!post || post.status !== "published") notFound();
+
+  return (
+    <div className="mx-auto max-w-3xl px-6 py-20">
+      <Reveal>
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-mint"
+        >
+          <ArrowLeft size={14} /> All notes
+        </Link>
+
+        <h1 className="mt-6 font-display text-4xl font-bold text-ink md:text-5xl">
+          {post.title}
+        </h1>
+        <p className="mono-label mt-3 text-[11px] text-ink-faint">
+          {new Date(post.createdAt).toLocaleDateString("en-IN", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </p>
+      </Reveal>
+
+      {post.coverImage && (
+        <Reveal delay={0.05}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- Storage download URL */}
+          <img
+            src={post.coverImage}
+            alt={post.title}
+            className="mt-8 w-full rounded-2xl border border-border object-cover"
+          />
+        </Reveal>
+      )}
+
+      <Reveal delay={0.1}>
+        <div className="markdown-content mt-8">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+        </div>
+      </Reveal>
+    </div>
+  );
+}

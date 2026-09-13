@@ -24,8 +24,8 @@ All real copy and project data lives in one place: `src/data/site.ts`. Edit that
 bio, skills, socials, or the project list — every page reads from it, nothing is hardcoded
 per-page.
 
-Pages: `/` (home), `/about`, `/portfolio`, `/blog` (currently an empty state — wire up MDX or a
-CMS later, the route/metadata are already correct either way).
+Pages: `/` (home), `/about`, `/portfolio` (+ a `/portfolio/[slug]` case-study page per project),
+`/blog` (+ `/blog/[slug]`), and `/admin` — a private, unindexed dashboard for writing posts.
 
 ## Running it
 
@@ -34,6 +34,31 @@ npm install
 npm run dev      # http://localhost:3000
 npm run build && npm run start   # production build
 ```
+
+## Admin & blog setup
+
+Blog posts live in Firestore, images in Firebase Storage — the existing `devarun-1d87a` Firebase
+project (already used by the old admin dashboard) rather than a new one. `/admin` is a real
+Firebase Auth login, not a hardcoded password: only the one admin account can create, edit, or
+delete posts; everyone else can only read posts whose `status` is `"published"`.
+
+One-time setup in the [Firebase console](https://console.firebase.google.com/project/devarun-1d87a):
+
+1. **Authentication → Sign-in method** — enable **Email/Password**.
+2. **Authentication → Users → Add user** — create the one account you'll log into `/admin` with.
+3. **Firestore Database** — if not already provisioned, create it (production mode is fine, rules
+   below replace the defaults). Then **Rules** tab → paste the contents of `firestore.rules` at
+   the repo root, replacing `ADMIN_EMAIL` with the email from step 2 → Publish.
+4. **Storage** — if not already provisioned, click "Get started". Then **Rules** tab → paste
+   `storage.rules`, same `ADMIN_EMAIL` swap → Publish.
+
+After that, sign in at `/admin` with that email/password to write posts. Posts are Markdown
+(rendered with `react-markdown` + GFM, same renderer on `/admin`'s preview and the public
+`/blog/[slug]` page), with an optional cover image uploaded straight to Storage.
+
+If you'd rather not hand-edit the rules files in the console every time, `npx firebase-tools`
+(after `firebase login` + `firebase use devarun-1d87a`) can deploy both with
+`firebase deploy --only firestore:rules,storage:rules` instead.
 
 ## Before going live on techtiten.com
 

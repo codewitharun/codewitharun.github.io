@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
-import Image from "next/image";
 import Reveal from "@/components/Reveal";
 import { bio, brand, hobbies, skills } from "@/data/site";
+import type { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "About Arun Kumar — React Native Developer & Software Engineer",
@@ -21,7 +21,12 @@ export default function AboutPage() {
 
       <Reveal delay={0.1} className="mt-10 flex flex-col gap-10 md:flex-row">
         <div className="relative mx-auto h-40 w-40 shrink-0 overflow-hidden rounded-2xl border border-border md:mx-0">
-          <Image src="/images/self.png" alt={brand.founder} fill className="object-cover" />
+          <Image
+            src="/images/self.jpeg"
+            alt={brand.founder}
+            fill
+            className="object-cover"
+          />
         </div>
         <div className="space-y-4 text-ink-soft">
           {bio.split("\n\n").map((para) => (
@@ -31,7 +36,9 @@ export default function AboutPage() {
       </Reveal>
 
       <Reveal delay={0.15} className="mt-16">
-        <p className="mono-label mb-4 text-xs text-violet">$ ls skills --proficient</p>
+        <p className="mono-label mb-4 text-xs text-violet">
+          $ ls skills --proficient
+        </p>
         <div className="flex flex-wrap gap-2">
           {skills.proficientWith.map((s) => (
             <span
@@ -45,7 +52,9 @@ export default function AboutPage() {
       </Reveal>
 
       <Reveal delay={0.2} className="mt-12">
-        <p className="mono-label mb-4 text-xs text-violet">$ ls skills --currently-learning</p>
+        <p className="mono-label mb-4 text-xs text-violet">
+          $ ls skills --currently-learning
+        </p>
         <div className="flex flex-wrap gap-2">
           {skills.learning.map((s) => (
             <span
@@ -59,7 +68,9 @@ export default function AboutPage() {
       </Reveal>
 
       <Reveal delay={0.25} className="mt-12">
-        <p className="mono-label mb-4 text-xs text-violet">$ cd hobbies &amp;&amp; ls</p>
+        <p className="mono-label mb-4 text-xs text-violet">
+          $ cd hobbies &amp;&amp; ls
+        </p>
         <div className="flex flex-wrap gap-4">
           {hobbies.map((h) => (
             <span

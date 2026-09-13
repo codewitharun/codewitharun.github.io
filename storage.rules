@@ -1,0 +1,13 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /blog-images/{allPaths=**} {
+      // Cover images need to be publicly readable so they render on the
+      // public blog. Only the admin account can upload/delete them.
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.email == "ADMIN_EMAIL";
+    }
+  }
+}
