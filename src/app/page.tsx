@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
 import ProjectMedia from "@/components/ProjectMedia";
 import Reveal from "@/components/Reveal";
-import TitanShape from "@/components/three/TitanShape";
+import TitanShape from "@/components/three/TitanShapeLazy";
 import { brand, miniBio } from "@/data/site";
 import { getProjectsForBuild } from "@/lib/projects";
 import { ArrowUpRight, FileDown, Mail } from "lucide-react";

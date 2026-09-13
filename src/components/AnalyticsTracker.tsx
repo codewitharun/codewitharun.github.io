@@ -2,8 +2,13 @@
 
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { logEvent } from "firebase/analytics";
-import { getFirebaseAnalytics } from "@/lib/firebase";
+
+// Both the Firebase Analytics SDK and the lightweight app-init module
+// (see lib/firebase-analytics.ts) are loaded via a dynamic import() inside
+// the effect below, not a static import here — this component sits in the
+// root layout and therefore ships on every public page, so keeping it out
+// of the initial bundle means visitors don't pay for analytics JS before
+// first paint. It still loads within a second of mount either way.
 
 /**
  * Fires a Firebase Analytics `page_view` event on first load and on every
@@ -22,12 +27,17 @@ export default function AnalyticsTracker() {
     const query = searchParams.toString();
     const path = query ? `${pathname}?${query}` : pathname;
 
-    getFirebaseAnalytics().then((analytics) => {
-      if (!analytics) return; // unsupported browser, ad blocker, or SSR — no-op
-      logEvent(analytics, "page_view", {
-        page_path: path,
-        page_location: window.location.href,
-        page_title: document.title,
+    Promise.all([
+      import("@/lib/firebase-analytics"),
+      import("firebase/analytics"),
+    ]).then(([{ getFirebaseAnalytics }, { logEvent }]) => {
+      getFirebaseAnalytics().then((analytics) => {
+        if (!analytics) return; // unsupported browser, ad blocker, or SSR — no-op
+        logEvent(analytics, "page_view", {
+          page_path: path,
+          page_location: window.location.href,
+          page_title: document.title,
+        });
       });
     });
   }, [pathname, searchParams]);

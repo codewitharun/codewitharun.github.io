@@ -57,6 +57,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full">
+      <head>
+        {/* Firebase Analytics lazy-loads gtag.js from this origin; ImageKit
+            serves every uploaded post/project image from ik.imagekit.io.
+            Warming up the connection (DNS + TLS) ahead of the actual
+            request shaves the round-trip off whichever of these ends up
+            mattering for that page — a Lighthouse "Preconnect to required
+            origins" fix. */}
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://ik.imagekit.io" crossOrigin="anonymous" />
+      </head>
       <body className="flex min-h-full flex-col bg-bg text-ink">
         <script
           type="application/ld+json"

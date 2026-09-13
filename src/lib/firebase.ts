@@ -1,7 +1,15 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getAnalytics, isSupported, type Analytics } from "firebase/analytics";
+
+// Analytics lives in its own module (lib/firebase-analytics.ts) with a
+// minimal import graph (firebase/app + firebase/analytics only) — see the
+// comment there. Re-exported here so admin code that wants both auth/db
+// and analytics in one import can still get it from this file; the
+// public-facing AnalyticsTracker imports the lightweight module directly
+// instead, so firebase/auth + firebase/firestore never end up in ITS
+// bundle (which ships on every public page via the root layout).
+export { getFirebaseAnalytics } from "./firebase-analytics";
 
 // Reusing the existing "devarun-1d87a" Firebase project (previously wired
 // up in the old appaura-admin dashboard) rather than standing up a new
@@ -32,27 +40,5 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-
-// Analytics only runs in the browser (it needs `window`, IndexedDB, etc.),
-// so it can't just be `getAnalytics(app)` at module scope — that would
-// throw during server rendering and at build time. `isSupported()` also
-// weeds out environments where it silently wouldn't work anyway (very old
-// browsers, some in-app webviews, private-browsing IndexedDB restrictions).
-// See src/components/AnalyticsTracker.tsx for where this actually gets used
-// to log page_view events — that's what populates both the historical
-// Analytics reports and the "Realtime" tab in the Firebase console, since
-// Realtime isn't a separate product to wire up, just a live view over the
-// same events.
-let analyticsPromise: Promise<Analytics | null> | null = null;
-
-export function getFirebaseAnalytics(): Promise<Analytics | null> {
-  if (typeof window === "undefined") return Promise.resolve(null);
-  if (!analyticsPromise) {
-    analyticsPromise = isSupported()
-      .then((supported) => (supported ? getAnalytics(app) : null))
-      .catch(() => null);
-  }
-  return analyticsPromise;
-}
 
 export default app;
