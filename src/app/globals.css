@@ -1,0 +1,227 @@
+@import "tailwindcss";
+
+/* Techtiten — dark-only design system.
+   Palette carries the accent gradient already used on the old
+   arun.codes site (mint rgb(0,255,164) + violet rgb(166,104,255)) so the
+   rebrand keeps visual continuity with existing brand recognition,
+   rather than inventing a new identity from nothing. Background is a
+   near-black with a faint blue-violet bias rather than pure black, so it
+   reads as chosen rather than a default #000. */
+
+:root {
+  --bg: #08080d;
+  --bg-raised: #101018;
+  --bg-card: #14141f;
+  --border: #242433;
+  --border-soft: #1b1b28;
+
+  --ink: #f3f2f8;
+  --ink-soft: #c9c6d6;
+  --ink-faint: #8a86a0;
+
+  --mint: #00ffa4;
+  --mint-dim: #05b87b;
+  --violet: #a668ff;
+  --violet-dim: #7c4fd1;
+
+  --gradient: linear-gradient(135deg, var(--mint), var(--violet));
+
+  /* Self-hosted via @fontsource (npm packages), not next/font/google —
+     that requires reaching fonts.googleapis.com at build time, which
+     isn't guaranteed on every network this project gets built on. */
+  --font-display: "Sora", var(--font-body);
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-card: var(--bg-card);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-mint: var(--mint);
+  --color-mint-dim: var(--mint-dim);
+  --color-violet: var(--violet);
+  --color-violet-dim: var(--violet-dim);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--violet);
+  color: #0a0a0f;
+}
+
+.text-gradient {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mono-label {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Device mockup — laptop + phone rendered from CSS shapes only, so a
+   project's screenshot (live capture or fallback mock) can drop into a
+   realistic frame without a designer producing a bespoke composite image
+   per project. Sized in percentages so it scales with its grid cell. */
+.device-frame {
+  position: relative;
+  width: 100%;
+  padding-top: 62%;
+}
+
+.device-frame__laptop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.device-frame__laptop-screen {
+  position: relative;
+  width: 86%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #08080c;
+  border: 1px solid #2e2e3b;
+  border-bottom: none;
+  border-radius: 12px 12px 3px 3px;
+  /* Real bezel, not a hairline — enough black padding around the
+     screenshot that the laptop reads as a device, not a cropped photo. */
+  padding: 12px 12px 18px;
+  box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.65);
+}
+
+.device-frame__laptop-bezel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--bg-raised);
+}
+
+.device-frame__laptop-bezel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+
+.device-frame__laptop-base {
+  width: 100%;
+  max-width: 30rem;
+  height: 12px;
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(#34343f, #1a1a22);
+  position: relative;
+}
+
+.device-frame__laptop-base::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15%;
+  height: 5px;
+  background: var(--bg);
+  border-radius: 0 0 6px 6px;
+}
+
+.device-frame__phone {
+  position: absolute;
+  left: 5%;
+  bottom: -3%;
+  /* Sized against the laptop, not the card — a phone this size in front
+     of a laptop should read as an accent, not a second equal-sized
+     screen. Height comes out well short of the laptop's, on purpose. */
+  width: 15%;
+  aspect-ratio: 9 / 19.5;
+  background: #08080c;
+  border: 1px solid #34333f;
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 8px 4px;
+  box-shadow: 0 25px 45px -18px rgba(0, 0, 0, 0.7);
+}
+
+.device-frame__phone-notch {
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34%;
+  height: 5px;
+  background: #08080d;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.device-frame__phone-bezel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-raised);
+}
+
+.device-frame__phone-bezel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .device-frame {
+    padding-top: 70%;
+  }
+  .device-frame__phone {
+    width: 22%;
+  }
+}

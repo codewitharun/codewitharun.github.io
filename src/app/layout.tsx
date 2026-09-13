@@ -1,0 +1,63 @@
+import type { Metadata } from "next";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
+import { siteJsonLd } from "@/lib/schema";
+import { brand, siteUrl, seoKeywords } from "@/data/site";
+// Self-hosted fonts via @fontsource (npm packages), not next/font/google —
+// that fetches from fonts.googleapis.com at build time, which isn't
+// guaranteed to be reachable on every network this gets built on.
+import "@fontsource/sora/500.css";
+import "@fontsource/sora/600.css";
+import "@fontsource/sora/700.css";
+import "@fontsource/sora/800.css";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  title: {
+    default:
+      "Techtiten — Arun Kumar, React Native Developer & Software Engineer in Jaipur, India",
+    template: "%s · Techtiten",
+  },
+  description:
+    "Techtiten (also written Tech Titan) is the software studio of Arun Kumar — a React Native developer and software engineer based in Jaipur, India. React Native apps, tools, and experiments, including EzySplit — built imperfect and shipped anyway.",
+  keywords: seoKeywords,
+  authors: [{ name: brand.founder, url: siteUrl }],
+  creator: brand.founder,
+  publisher: brand.name,
+  openGraph: {
+    type: "website",
+    url: siteUrl,
+    siteName: "Techtiten",
+    title: "Techtiten — Arun Kumar, React Native Developer & Software Engineer",
+    description:
+      "Arun Kumar — React Native Developer & Software Engineer from Jaipur, India — building under the Techtiten name. Not perfect. Building anyway.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@arunk4it",
+    creator: "@arunk4it",
+  },
+};
+
+export default function RootLayout({ children }: LayoutProps<"/">) {
+  return (
+    <html lang="en" className="h-full">
+      <body className="flex min-h-full flex-col bg-bg text-ink">
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd()) }}
+        />
+        <Nav />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </body>
+    </html>
+  );
+}

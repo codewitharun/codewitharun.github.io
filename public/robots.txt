@@ -1,7 +1,0 @@
-# https://www.robotstxt.org/robotstxt.html
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /appaura-admin
-
-Sitemap: https://www.arun.codes/sitemap.xml
