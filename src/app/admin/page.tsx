@@ -1,22 +1,27 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { LogOut, Plus, Download } from "lucide-react";
-import { useAdminAuth } from "@/lib/useAdminAuth";
-import { getAllPosts, deletePost, deleteCoverImage, type Post } from "@/lib/posts";
+import LoginForm from "@/components/admin/LoginForm";
+import PostEditor from "@/components/admin/PostEditor";
+import PostList from "@/components/admin/PostList";
+import ProjectEditor from "@/components/admin/ProjectEditor";
+import ProjectList from "@/components/admin/ProjectList";
 import {
-  getAllProjects,
+  deleteCoverImage,
+  deletePost,
+  getAllPosts,
+  type Post,
+} from "@/lib/posts";
+import {
   deleteProject,
   deleteProjectImage,
+  getAllProjects,
   importFallbackProjectsIfEmpty,
   type ProjectDoc,
 } from "@/lib/projects";
 import { revalidatePaths } from "@/lib/revalidate";
-import LoginForm from "@/components/admin/LoginForm";
-import PostList from "@/components/admin/PostList";
-import PostEditor from "@/components/admin/PostEditor";
-import ProjectList from "@/components/admin/ProjectList";
-import ProjectEditor from "@/components/admin/ProjectEditor";
+import { useAdminAuth } from "@/lib/useAdminAuth";
+import { Download, LogOut, Plus } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 type Tab = "posts" | "projects";
 
@@ -170,7 +175,8 @@ function ProjectsPanel() {
             onClick={handleImport}
             className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:border-mint hover:text-mint disabled:opacity-60"
           >
-            <Download size={15} /> {importing ? "Importing…" : "Import starter projects"}
+            <Download size={15} />{" "}
+            {importing ? "Importing…" : "Import starter projects"}
           </button>
         )}
       </div>
@@ -179,7 +185,11 @@ function ProjectsPanel() {
         {loading ? (
           <p className="text-sm text-ink-faint">Loading projects…</p>
         ) : (
-          <ProjectList projects={projects} onEdit={setEditing} onDelete={handleDelete} />
+          <ProjectList
+            projects={projects}
+            onEdit={setEditing}
+            onDelete={handleDelete}
+          />
         )}
       </div>
     </>

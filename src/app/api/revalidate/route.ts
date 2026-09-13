@@ -18,7 +18,10 @@ export async function POST(request: Request) {
   const paths = body?.paths;
 
   if (!Array.isArray(paths) || paths.some((p) => typeof p !== "string")) {
-    return Response.json({ error: "paths must be an array of strings" }, { status: 400 });
+    return Response.json(
+      { error: "paths must be an array of strings" },
+      { status: 400 },
+    );
   }
 
   for (const path of paths) {
