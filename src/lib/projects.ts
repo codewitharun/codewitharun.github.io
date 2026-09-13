@@ -1,23 +1,18 @@
+import { fallbackProjects, type Project, type ProjectLinks } from "@/data/site";
+import { db } from "@/lib/firebase";
+import { uploadImage } from "@/lib/imageUpload";
 import {
+  addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
   orderBy,
+  query,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
-import { db, storage } from "@/lib/firebase";
-import { fallbackProjects, type Project, type ProjectLinks } from "@/data/site";
 
 const PROJECTS_COLLECTION = "projects";
 
@@ -115,7 +110,9 @@ export async function getProjectsForBuild(): Promise<ProjectDoc[]> {
   }
 }
 
-export async function getProjectBySlug(slug: string): Promise<ProjectDoc | null> {
+export async function getProjectBySlug(
+  slug: string,
+): Promise<ProjectDoc | null> {
   const projects = await getAllProjects();
   return projects.find((p) => p.slug === slug) ?? null;
 }
@@ -149,7 +146,10 @@ export async function createProject(input: ProjectInput): Promise<string> {
   return docRef.id;
 }
 
-export async function updateProject(id: string, input: ProjectInput): Promise<void> {
+export async function updateProject(
+  id: string,
+  input: ProjectInput,
+): Promise<void> {
   await updateDoc(doc(db, PROJECTS_COLLECTION, id), {
     ...input,
     updatedAt: Timestamp.now(),
@@ -166,7 +166,7 @@ export async function deleteProject(id: string): Promise<void> {
  * retyping every other field at each call site. */
 export function projectDocToInput(
   p: ProjectDoc,
-  overrides: Partial<ProjectInput> = {}
+  overrides: Partial<ProjectInput> = {},
 ): ProjectInput {
   return {
     slug: p.slug,
@@ -198,9 +198,12 @@ export function projectDocToInput(
 export async function resolvePositionAndReorder(
   otherProjects: ProjectDoc[],
   position: number,
-  makeCurrent: boolean
+  makeCurrent: boolean,
 ): Promise<number> {
-  const zeroIndex = Math.max(0, Math.min(Math.round(position) - 1, otherProjects.length));
+  const zeroIndex = Math.max(
+    0,
+    Math.min(Math.round(position) - 1, otherProjects.length),
+  );
 
   await Promise.all(
     otherProjects.map((p, i) => {
@@ -212,30 +215,32 @@ export async function resolvePositionAndReorder(
         projectDocToInput(p, {
           order: newOrder,
           ...(shouldClearCurrent ? { currentlyWorkingOn: false } : {}),
-        })
+        }),
       );
-    })
+    }),
   );
 
   return zeroIndex;
 }
 
-/** Uploads a project cover image to Storage and returns its public download URL. */
-export async function uploadProjectImage(projectSlug: string, file: File): Promise<string> {
-  const path = `project-images/${projectSlug}-${Date.now()}-${file.name}`;
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, file);
-  return getDownloadURL(storageRef);
+/** Uploads a project cover image via ImageKit (see /api/upload-image) and returns its public URL. */
+export async function uploadProjectImage(
+  projectSlug: string,
+  file: File,
+): Promise<string> {
+  return uploadImage(
+    file,
+    `${projectSlug}-${Date.now()}-${file.name}`,
+    "project-images",
+  );
 }
 
-export async function deleteProjectImage(url: string): Promise<void> {
-  try {
-    await deleteObject(ref(storage, url));
-  } catch {
-    // Best-effort — a missing or externally-hosted (e.g. one of the
-    // original /projects/mockN.png static assets) URL shouldn't block
-    // editing or deleting the project itself.
-  }
+export async function deleteProjectImage(_url: string): Promise<void> {
+  // Best-effort no-op — same reasoning as posts.ts's deleteCoverImage:
+  // ImageKit deletion needs a fileId we don't store alongside the plain
+  // URL, and this already had to tolerate non-deletable URLs before (the
+  // static /projects/mockN.png assets). Clean up stray uploads from the
+  // ImageKit Media Library directly.
 }
 
 /**
@@ -266,8 +271,8 @@ export async function importFallbackProjectsIfEmpty(): Promise<number> {
         order: index,
         createdAt: now,
         updatedAt: now,
-      } satisfies ProjectFirestoreDoc)
-    )
+      } satisfies ProjectFirestoreDoc),
+    ),
   );
   return fallbackProjects.length;
 }

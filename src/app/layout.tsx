@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 import { siteJsonLd } from "@/lib/schema";
 import { brand, siteUrl, seoKeywords } from "@/data/site";
 // Self-hosted fonts via @fontsource (npm packages), not next/font/google —
@@ -61,6 +63,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd()) }}
         />
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
         <Nav />
         <main className="flex-1">{children}</main>
         <Footer />

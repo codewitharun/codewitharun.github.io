@@ -11,6 +11,7 @@ import {
   importFallbackProjectsIfEmpty,
   type ProjectDoc,
 } from "@/lib/projects";
+import { revalidatePaths } from "@/lib/revalidate";
 import LoginForm from "@/components/admin/LoginForm";
 import PostList from "@/components/admin/PostList";
 import PostEditor from "@/components/admin/PostEditor";
@@ -46,6 +47,7 @@ function PostsPanel() {
     if (!confirm(`Delete "${post.title}"? This can't be undone.`)) return;
     await deletePost(post.id);
     if (post.coverImage) await deleteCoverImage(post.coverImage);
+    revalidatePaths(["/blog", `/blog/${post.slug}`, "/rss.xml"]);
     refresh();
   }
 
@@ -117,6 +119,7 @@ function ProjectsPanel() {
     if (project.image?.startsWith("https://firebasestorage")) {
       await deleteProjectImage(project.image);
     }
+    revalidatePaths(["/portfolio", `/portfolio/${project.slug}`, "/"]);
     refresh();
   }
 

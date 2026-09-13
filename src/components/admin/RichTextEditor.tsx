@@ -1,6 +1,7 @@
 "use client";
 
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
+import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import TiptapImage from "@tiptap/extension-image";
 import TiptapLink from "@tiptap/extension-link";
@@ -21,8 +22,69 @@ import {
   Minus,
   Undo2,
   Redo2,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Loader2,
 } from "lucide-react";
 import { uploadPostImage } from "@/lib/posts";
+
+// Extends the stock Image extension with two attributes so inserted
+// images can actually be resized/aligned from within the editor (the
+// bubble menu below), instead of always rendering at their raw upload
+// size. Both render into a single merged `style` attribute — Tiptap's
+// mergeAttributes combines `style` contributions from every attribute
+// definition rather than letting one clobber the other.
+const ResizableImage = TiptapImage.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      width: {
+        default: "100%",
+        parseHTML: (element) => element.style.width || element.getAttribute("width") || "100%",
+        renderHTML: (attributes) => ({
+          style: `width: ${attributes.width}; height: auto;`,
+        }),
+      },
+      align: {
+        default: "center",
+        parseHTML: (element) => element.getAttribute("data-align") || "center",
+        // "left"/"right" float the image so paragraph text actually wraps
+        // around it — a plain block+margin approach (what this used to do)
+        // just parks the image on its own row with dead space beside it,
+        // which is exactly the "left side is empty" bug this replaces.
+        // "center" stays a non-floated block, since a centered image with
+        // wrapping text on both sides doesn't make sense.
+        renderHTML: (attributes) => {
+          const align = attributes.align || "center";
+          if (align === "left") {
+            return {
+              "data-align": align,
+              style: "float: left; margin: 0.35rem 1.5rem 0.75rem 0; clear: none;",
+            };
+          }
+          if (align === "right") {
+            return {
+              "data-align": align,
+              style: "float: right; margin: 0.35rem 0 0.75rem 1.5rem; clear: none;",
+            };
+          }
+          return {
+            "data-align": align,
+            style: "display: block; float: none; margin: 1rem auto; clear: both;",
+          };
+        },
+      },
+    };
+  },
+});
+
+const WIDTH_PRESETS = [
+  { label: "S", width: "35%" },
+  { label: "M", width: "60%" },
+  { label: "L", width: "85%" },
+  { label: "Full", width: "100%" },
+];
 
 type RichTextEditorProps = {
   value: string; // HTML
@@ -173,13 +235,14 @@ function Toolbar({ editor, slug }: { editor: Editor; slug: string }) {
         disabled={uploadingImage}
         onClick={() => fileInputRef.current?.click()}
       >
-        <ImagePlus size={15} />
+        {uploadingImage ? <Loader2 size={15} className="animate-spin" /> : <ImagePlus size={15} />}
       </ToolbarButton>
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
         className="hidden"
+        disabled={uploadingImage}
         onChange={handleImageFile}
       />
       <ToolbarButton
@@ -205,6 +268,13 @@ function Toolbar({ editor, slug }: { editor: Editor; slug: string }) {
       >
         <Redo2 size={15} />
       </ToolbarButton>
+
+      {uploadingImage && (
+        <span className="ml-auto flex items-center gap-1.5 text-xs text-ink-faint">
+          <Loader2 size={13} className="animate-spin" />
+          Compressing &amp; uploading…
+        </span>
+      )}
     </div>
   );
 }
@@ -221,7 +291,7 @@ export default function RichTextEditor({ value, onChange, slug }: RichTextEditor
         autolink: true,
         defaultProtocol: "https",
       }),
-      TiptapImage,
+      ResizableImage,
       Placeholder.configure({
         placeholder: "Write the post…",
       }),
@@ -256,6 +326,53 @@ export default function RichTextEditor({ value, onChange, slug }: RichTextEditor
     <div>
       <Toolbar editor={editor} slug={slug} />
       <div className="rounded-b-lg border border-border bg-bg text-sm text-ink">
+        <BubbleMenu
+          editor={editor}
+          shouldShow={({ editor: e }) => e.isActive("image")}
+          options={{ placement: "top" }}
+        >
+          <div className="flex items-center gap-0.5 rounded-lg border border-border bg-bg-raised p-1 shadow-lg">
+            {WIDTH_PRESETS.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                title={preset.label}
+                onClick={() =>
+                  editor.chain().focus().updateAttributes("image", { width: preset.width }).run()
+                }
+                className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+                  editor.getAttributes("image").width === preset.width
+                    ? "bg-mint/15 text-mint"
+                    : "text-ink-soft hover:bg-bg hover:text-ink"
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
+            <span className="mx-1 h-4 w-px bg-border" />
+            <ToolbarButton
+              label="Align left"
+              active={editor.getAttributes("image").align === "left"}
+              onClick={() => editor.chain().focus().updateAttributes("image", { align: "left" }).run()}
+            >
+              <AlignLeft size={15} />
+            </ToolbarButton>
+            <ToolbarButton
+              label="Align center"
+              active={editor.getAttributes("image").align === "center"}
+              onClick={() => editor.chain().focus().updateAttributes("image", { align: "center" }).run()}
+            >
+              <AlignCenter size={15} />
+            </ToolbarButton>
+            <ToolbarButton
+              label="Align right"
+              active={editor.getAttributes("image").align === "right"}
+              onClick={() => editor.chain().focus().updateAttributes("image", { align: "right" }).run()}
+            >
+              <AlignRight size={15} />
+            </ToolbarButton>
+          </div>
+        </BubbleMenu>
         <EditorContent editor={editor} />
       </div>
     </div>

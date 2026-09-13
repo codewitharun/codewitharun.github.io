@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, Loader2, X } from "lucide-react";
 import {
   createProject,
   updateProject,
@@ -11,6 +11,7 @@ import {
   type ProjectDoc,
   type ProjectInput,
 } from "@/lib/projects";
+import { revalidatePaths } from "@/lib/revalidate";
 import type { ProjectLinks } from "@/data/site";
 
 type ProjectEditorProps = {
@@ -117,6 +118,13 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
       } else {
         await createProject(input);
       }
+
+      // /portfolio and /portfolio/[slug] are ISR-cached (revalidate = 300)
+      // and the homepage shows current work too — without this a save
+      // wouldn't appear publicly for up to 5 minutes.
+      const pathsToRevalidate = new Set(["/portfolio", `/portfolio/${input.slug}`, "/"]);
+      if (project && project.slug !== input.slug) pathsToRevalidate.add(`/portfolio/${project.slug}`);
+      revalidatePaths(Array.from(pathsToRevalidate));
 
       onDone();
     } catch {
@@ -257,10 +265,20 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
               className="h-16 w-24 rounded-lg border border-border object-cover"
             />
           )}
-          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-ink-soft transition-colors hover:border-mint hover:text-mint">
-            <ImagePlus size={14} />
-            {uploading ? "Uploading…" : image ? "Replace" : "Upload"}
-            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+          <label
+            className={`inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-ink-soft transition-colors ${
+              uploading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-mint hover:text-mint"
+            }`}
+          >
+            {uploading ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />}
+            {uploading ? "Compressing & uploading…" : image ? "Replace" : "Upload"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={uploading}
+              onChange={handleImageUpload}
+            />
           </label>
           {image && (
             <button

@@ -317,6 +317,18 @@ h1, h2, h3, h4 {
 .markdown-content img {
   border-radius: 8px;
   margin: 1em 0;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Inline images can be floated left/right (see RichTextEditor's
+   ResizableImage extension) so paragraph text wraps around them. Without
+   this, a floated image trailing at the end of the content can make this
+   container collapse to less than its actual height. */
+.markdown-content::after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .markdown-content hr {

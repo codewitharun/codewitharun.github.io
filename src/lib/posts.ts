@@ -1,22 +1,17 @@
+import { db } from "@/lib/firebase";
+import { uploadImage } from "@/lib/imageUpload";
 import {
+  addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
   orderBy,
+  query,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
-import { db, storage } from "@/lib/firebase";
 
 export type PostStatus = "draft" | "published";
 
@@ -67,7 +62,10 @@ function fromDoc(id: string, data: PostDoc): Post {
  * reads go through the same functions.
  */
 export async function getAllPosts(): Promise<Post[]> {
-  const q = query(collection(db, POSTS_COLLECTION), orderBy("createdAt", "desc"));
+  const q = query(
+    collection(db, POSTS_COLLECTION),
+    orderBy("createdAt", "desc"),
+  );
   const snap = await getDocs(q);
   return snap.docs.map((d) => fromDoc(d.id, d.data() as PostDoc));
 }
@@ -118,34 +116,42 @@ export async function deletePost(id: string): Promise<void> {
   await deleteDoc(doc(db, POSTS_COLLECTION, id));
 }
 
-/** Uploads a cover image to Storage and returns its public download URL. */
-export async function uploadCoverImage(postSlug: string, file: File): Promise<string> {
-  const path = `blog-images/${postSlug}-${Date.now()}-${file.name}`;
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, file);
-  return getDownloadURL(storageRef);
+/** Uploads a cover image via ImageKit (see /api/upload-image) and returns its public URL. */
+export async function uploadCoverImage(
+  postSlug: string,
+  file: File,
+): Promise<string> {
+  return uploadImage(
+    file,
+    `${postSlug}-${Date.now()}-${file.name}`,
+    "blog-images",
+  );
 }
 
-export async function deleteCoverImage(url: string): Promise<void> {
-  try {
-    await deleteObject(ref(storage, url));
-  } catch {
-    // Best-effort — an already-missing or externally-hosted image URL
-    // shouldn't block deleting/editing the post itself.
-  }
+export async function deleteCoverImage(_url: string): Promise<void> {
+  // Best-effort no-op: ImageKit's delete API needs the file's ImageKit
+  // fileId, which isn't stored alongside the plain URL saved on the post
+  // document (same as before, when an externally-hosted image URL
+  // couldn't be deleted from Firebase Storage either). Stray uploads can
+  // be cleaned up from the ImageKit Media Library directly; ask if you'd
+  // like fileId tracked going forward so this can delete for real.
 }
 
 /**
  * Uploads an image inserted inline into the post body (via the rich text
- * editor's image button) and returns its public download URL. Shares the
- * same `blog-images/` Storage path — and so the same security rules — as
- * cover images; only distinguished by a "-content-" marker in the name.
+ * editor's image button) and returns its public URL. Shares the same
+ * `blog-images/` ImageKit folder as cover images; only distinguished by a
+ * "-content-" marker in the name.
  */
-export async function uploadPostImage(postSlug: string, file: File): Promise<string> {
-  const path = `blog-images/${postSlug}-content-${Date.now()}-${file.name}`;
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, file);
-  return getDownloadURL(storageRef);
+export async function uploadPostImage(
+  postSlug: string,
+  file: File,
+): Promise<string> {
+  return uploadImage(
+    file,
+    `${postSlug}-content-${Date.now()}-${file.name}`,
+    "blog-images",
+  );
 }
 
 export function slugify(title: string): string {

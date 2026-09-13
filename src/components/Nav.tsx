@@ -1,9 +1,9 @@
 "use client";
 
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Home" },
@@ -19,7 +19,10 @@ export default function Nav() {
   return (
     <header className="sticky top-0 z-50 border-b border-border-soft/80 bg-bg/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="font-display text-lg font-bold tracking-tight text-ink">
+        <Link
+          href="/"
+          className="font-display text-lg font-bold tracking-tight text-ink"
+        >
           Tech<span className="text-gradient">titen</span>
         </Link>
 

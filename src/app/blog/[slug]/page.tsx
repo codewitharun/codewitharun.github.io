@@ -1,13 +1,13 @@
+import Reveal from "@/components/Reveal";
+import ShareButtons from "@/components/ShareButtons";
+import { brand, siteUrl } from "@/data/site";
+import { getPostBySlug, getPublishedPosts } from "@/lib/posts";
+import { blogPostingJsonLd } from "@/lib/schema";
+import DOMPurify from "isomorphic-dompurify";
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import DOMPurify from "isomorphic-dompurify";
-import { ArrowLeft } from "lucide-react";
-import Reveal from "@/components/Reveal";
-import ShareButtons from "@/components/ShareButtons";
-import { getPostBySlug, getPublishedPosts } from "@/lib/posts";
-import { blogPostingJsonLd } from "@/lib/schema";
-import { brand, siteUrl } from "@/data/site";
 
 export const revalidate = 300;
 
@@ -28,7 +28,9 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post || post.status !== "published") return {};
@@ -67,7 +69,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd(post)) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(blogPostingJsonLd(post)),
+        }}
       />
       <Reveal>
         <Link
@@ -77,7 +81,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <ArrowLeft size={14} /> All notes
         </Link>
 
-        <h1 className="mt-6 font-display text-4xl font-bold text-ink md:text-5xl">
+        <h1 className="mt-6 break-words font-display text-4xl font-bold text-ink md:text-5xl">
           {post.title}
         </h1>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint">
@@ -104,7 +108,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <img
             src={post.coverImage}
             alt={post.title}
-            className="mt-8 w-full rounded-2xl border border-border object-cover"
+            className="mt-8 h-[280px] w-full rounded-2xl border border-border object-cover md:h-[380px]"
           />
         </Reveal>
       )}
@@ -116,13 +120,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div
           className="markdown-content mt-8"
           // eslint-disable-next-line react/no-danger -- sanitized below
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(post.content, {
+              ADD_ATTR: ["style", "data-align"],
+            }),
+          }}
         />
       </Reveal>
 
       <Reveal delay={0.15}>
         <div className="mt-12 border-t border-border-soft/60 pt-6">
-          <ShareButtons url={`${siteUrl}/blog/${post.slug}`} title={post.title} />
+          <ShareButtons
+            url={`${siteUrl}/blog/${post.slug}`}
+            title={post.title}
+          />
         </div>
       </Reveal>
     </div>

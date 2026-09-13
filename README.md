@@ -37,10 +37,10 @@ npm run build && npm run start   # production build
 
 ## Admin & blog setup
 
-Blog posts live in Firestore, images in Firebase Storage — the existing `devarun-1d87a` Firebase
-project (already used by the old admin dashboard) rather than a new one. `/admin` is a real
-Firebase Auth login, not a hardcoded password: only the one admin account can create, edit, or
-delete posts; everyone else can only read posts whose `status` is `"published"`.
+Blog posts and projects live in Firestore — the existing `devarun-1d87a` Firebase project (already
+used by the old admin dashboard) rather than a new one. `/admin` is a real Firebase Auth login, not
+a hardcoded password: only the one admin account can create, edit, or delete posts/projects;
+everyone else can only read posts/projects whose `status`/`published` field marks them public.
 
 One-time setup in the [Firebase console](https://console.firebase.google.com/project/devarun-1d87a):
 
@@ -49,16 +49,57 @@ One-time setup in the [Firebase console](https://console.firebase.google.com/pro
 3. **Firestore Database** — if not already provisioned, create it (production mode is fine, rules
    below replace the defaults). Then **Rules** tab → paste the contents of `firestore.rules` at
    the repo root, replacing `ADMIN_EMAIL` with the email from step 2 → Publish.
-4. **Storage** — if not already provisioned, click "Get started". Then **Rules** tab → paste
-   `storage.rules`, same `ADMIN_EMAIL` swap → Publish.
 
-After that, sign in at `/admin` with that email/password to write posts. Posts are Markdown
-(rendered with `react-markdown` + GFM, same renderer on `/admin`'s preview and the public
-`/blog/[slug]` page), with an optional cover image uploaded straight to Storage.
+If you'd rather not hand-edit the rules file in the console every time, `npx firebase-tools` (after
+`firebase login` + `firebase use devarun-1d87a`) can deploy it with
+`firebase deploy --only firestore:rules` instead.
 
-If you'd rather not hand-edit the rules files in the console every time, `npx firebase-tools`
-(after `firebase login` + `firebase use devarun-1d87a`) can deploy both with
-`firebase deploy --only firestore:rules,storage:rules` instead.
+After that, sign in at `/admin` with that email/password to write posts. Posts are authored with a
+Tiptap rich text editor (`src/components/admin/RichTextEditor.tsx`) that produces sanitized HTML,
+rendered as-is (via `isomorphic-dompurify`) on the public `/blog/[slug]` page.
+
+**Images** (post covers, inline post images, project covers) upload through
+[ImageKit](https://imagekit.io) rather than Firebase Storage — Firebase Storage isn't used by this
+project at all after that account got blocked. The upload flow is: the admin editor posts the file
+to this app's own `/api/upload-image` route (`src/app/api/upload-image/route.ts`), which uses the
+ImageKit Node SDK server-side to upload and returns the public URL, saved as a plain string on the
+Firestore document — same shape as before, just a different storage backend. This needs one
+environment variable, which must never be committed:
+
+```bash
+# .env.local (gitignored) — get this from the ImageKit dashboard →
+# Developer Options → API Keys → Private Key
+IMAGEKIT_PRIVATE_KEY=private_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+Also add `IMAGEKIT_PRIVATE_KEY` to the Vercel project's Environment Variables (Settings →
+Environment Variables) so production uploads work too — `.env.local` only applies locally.
+
+Note: deleting a post/project doesn't currently delete its image from ImageKit (the Firestore
+document only stores the URL, not the ImageKit `fileId` deletion needs) — clean up stray files from
+the ImageKit Media Library directly, or ask for `fileId` tracking to be added if that matters.
+
+Before any of the three upload paths above (cover image, inline post image, project image) actually
+hits `/api/upload-image`, `src/lib/imageUpload.ts` compresses the file client-side (via
+`browser-image-compression`) down to roughly 800KB and 2000px on the long edge, unless it's already
+smaller, a GIF (compressing would kill the animation), or an SVG (already tiny/vector). This is what
+keeps a 4-5MB iPhone photo or screenshot from being stored — and served to every visitor — at full
+size.
+
+## Analytics
+
+Firebase Analytics (GA4, `measurementId` in `src/lib/firebase.ts`) is wired up: every route change
+fires a `page_view` event via `src/components/AnalyticsTracker.tsx`, mounted once in the root layout.
+It only initializes in the browser and only if `firebase/analytics`'s `isSupported()` check passes
+(so it no-ops during SSR, in ad-blocked browsers, or unsupported environments, rather than throwing).
+
+"Realtime" isn't a separate thing that needed building — it's a live view, in the Firebase console
+under **Analytics → Realtime**, over these same `page_view` events, and it updates within seconds of
+a real visit. The historical reports (Analytics → Reports) fill in over the following 24-48 hours as
+Google processes the data. If the console shows no data at all after a real visit, double check
+**Project Settings → Integrations → Google Analytics** is linked for `devarun-1d87a` — the
+`measurementId` already being in the config strongly suggests it is, but it's the one thing that has
+to be set up from the console rather than code.
 
 ## Before going live on techtiten.com
 

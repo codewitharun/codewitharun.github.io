@@ -28,15 +28,22 @@ export default function AboutPage() {
         </h1>
       </Reveal>
 
-      <Reveal delay={0.1} className="mt-10 flex flex-col gap-10 md:flex-row">
-        <div className="relative mx-auto h-40 w-40 shrink-0 overflow-hidden rounded-2xl border border-border md:mx-0">
+      <Reveal
+        delay={0.1}
+        className="mt-10 flex flex-col gap-10 md:flex-row md:items-start"
+      >
+        <div className="mx-auto w-40 shrink-0 overflow-hidden rounded-2xl border border-border shadow-[0_0_60px_-20px_rgba(166,104,255,0.4)] md:mx-0">
+          {/* Same width as the original crop (10rem) — height now follows
+              the photo's own full-length aspect ratio instead of being
+              forced into a square, so the whole image shows uncropped. */}
           <Image
-            src="/images/self.jpeg"
+            src="/images/ws.png"
             alt={brand.founder}
-            fill
-            sizes="(max-width: 768px) 10rem, 16rem"
+            width={941}
+            height={1672}
+            sizes="160px"
             priority
-            className="object-cover"
+            className="h-auto w-full object-cover"
           />
         </div>
         <div className="space-y-4 text-ink-soft">

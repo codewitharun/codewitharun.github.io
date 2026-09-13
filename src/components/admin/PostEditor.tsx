@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, Loader2, X } from "lucide-react";
 import {
   createPost,
   updatePost,
@@ -10,6 +10,7 @@ import {
   type Post,
   type PostStatus,
 } from "@/lib/posts";
+import { revalidatePaths } from "@/lib/revalidate";
 import RichTextEditor from "./RichTextEditor";
 
 type PostEditorProps = {
@@ -73,6 +74,13 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
         await createPost(input);
       }
       setStatus(nextStatus);
+      // Post pages are ISR-cached (revalidate = 300 on /blog and
+      // /blog/[slug]) — without this, a save wouldn't show up publicly for
+      // up to 5 minutes. Revalidate both the new slug and (if it changed)
+      // the old one, so a renamed post doesn't leave a stale copy behind.
+      const pathsToRevalidate = new Set(["/blog", `/blog/${input.slug}`, "/rss.xml"]);
+      if (post && post.slug !== input.slug) pathsToRevalidate.add(`/blog/${post.slug}`);
+      revalidatePaths(Array.from(pathsToRevalidate));
       onDone();
     } catch {
       setError("Couldn't save — check Firestore rules are deployed and you're signed in.");
@@ -139,10 +147,20 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
               className="h-16 w-24 rounded-lg border border-border object-cover"
             />
           )}
-          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-ink-soft transition-colors hover:border-mint hover:text-mint">
-            <ImagePlus size={14} />
-            {uploading ? "Uploading…" : coverImage ? "Replace" : "Upload"}
-            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+          <label
+            className={`inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-ink-soft transition-colors ${
+              uploading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-mint hover:text-mint"
+            }`}
+          >
+            {uploading ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />}
+            {uploading ? "Compressing & uploading…" : coverImage ? "Replace" : "Upload"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={uploading}
+              onChange={handleImageUpload}
+            />
           </label>
           {coverImage && (
             <button
