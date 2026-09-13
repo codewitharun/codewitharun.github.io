@@ -138,10 +138,18 @@ export type Project = {
   image: string;
   tech: string[];
   status: string;
-  featured?: boolean;
+  /** The one project currently being actively worked on — shown in the
+   * home page's "Currently working on" section instead of a permanent
+   * "flagship" label, since what's current changes over time. */
+  currentlyWorkingOn?: boolean;
 };
 
-export const projects: Project[] = [
+// The site's original hardcoded project list. Projects now live in
+// Firestore (see src/lib/projects.ts) and are editable from /admin — this
+// array is kept only as the build-time fallback (used when Firestore is
+// unreachable at build time) and as the seed data for the admin's
+// one-time "Import starter projects" button.
+export const fallbackProjects: Project[] = [
   {
     slug: "ezysplit",
     title: "EzySplit",
@@ -150,6 +158,7 @@ export const projects: Project[] = [
     links: {
       playStore:
         "https://play.google.com/store/apps/details?id=com.techtitens.ezysplit",
+      website: "https://techtiten.com/portfolio/ezysplit",
     },
     image: "/projects/mock5.png",
     tech: [
@@ -161,7 +170,7 @@ export const projects: Project[] = [
       "Android",
     ],
     status: "Live on Play Store",
-    featured: true,
+    currentlyWorkingOn: true,
   },
   {
     slug: "ageas-federal-life-insurance",

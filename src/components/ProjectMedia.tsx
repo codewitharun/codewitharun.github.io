@@ -6,7 +6,7 @@ type ProjectMediaProps = {
   project: Project;
   /** Outer wrapper classes — background, border, rounding for the card. */
   className?: string;
-  showFlagshipBadge?: boolean;
+  showStatusBadge?: boolean;
 };
 
 /**
@@ -15,7 +15,7 @@ type ProjectMediaProps = {
  * (which already draws its own laptop + phone) renders flat, at native
  * crop, so it isn't framed a second time.
  */
-export default function ProjectMedia({ project, className, showFlagshipBadge }: ProjectMediaProps) {
+export default function ProjectMedia({ project, className, showStatusBadge }: ProjectMediaProps) {
   const { src, isLive } = getProjectImage(project);
 
   return (
@@ -35,9 +35,9 @@ export default function ProjectMedia({ project, className, showFlagshipBadge }: 
           />
         </div>
       )}
-      {showFlagshipBadge && project.featured && (
+      {showStatusBadge && project.currentlyWorkingOn && (
         <span className="mono-label absolute right-4 top-4 z-10 rounded-full bg-gradient-to-r from-mint to-violet px-2.5 py-1 text-[10px] text-bg">
-          Flagship
+          Currently building
         </span>
       )}
     </div>

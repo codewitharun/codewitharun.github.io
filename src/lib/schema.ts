@@ -7,8 +7,8 @@
 
 import { brand, siteUrl, socials } from "@/data/site";
 
-const personId = `${siteUrl}/#person`;
-const orgId = `${siteUrl}/#organization`;
+export const personId = `${siteUrl}/#person`;
+export const orgId = `${siteUrl}/#organization`;
 
 export const personSchema = {
   "@type": "Person",
@@ -28,7 +28,7 @@ export const personSchema = {
   ],
   worksFor: { "@id": orgId },
   url: siteUrl,
-  image: `${siteUrl}/images/self.png`,
+  image: `${siteUrl}/images/self.jpeg`,
   sameAs: socials.map((s) => s.href),
   address: {
     "@type": "PostalAddress",
@@ -69,5 +69,48 @@ export function siteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@graph": [personSchema, organizationSchema],
+  };
+}
+
+// ProfilePage wrapper for /about — tells search engines this page IS the
+// canonical profile page for the Person entity above, rather than just a
+// page that mentions them. References personId/orgId by @id so this stays
+// one connected graph instead of duplicating the entity.
+export function profilePageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": `${siteUrl}/about/#profilepage`,
+    url: `${siteUrl}/about`,
+    mainEntity: { "@id": personId },
+  };
+}
+
+// BlogPosting schema for individual posts — links each post back to the
+// Person (as author) and Organization (as publisher) by @id, so Google
+// can connect authorship across every post without re-declaring the
+// person each time.
+export function blogPostingJsonLd(post: {
+  slug: string;
+  title: string;
+  excerpt: string;
+  createdAt: number;
+  updatedAt: number;
+  coverImage?: string | null;
+}) {
+  const url = `${siteUrl}/blog/${post.slug}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${url}/#blogposting`,
+    mainEntityOfPage: url,
+    url,
+    headline: post.title,
+    description: post.excerpt,
+    image: post.coverImage ? [post.coverImage] : undefined,
+    datePublished: new Date(post.createdAt).toISOString(),
+    dateModified: new Date(post.updatedAt || post.createdAt).toISOString(),
+    author: { "@id": personId },
+    publisher: { "@id": orgId },
   };
 }

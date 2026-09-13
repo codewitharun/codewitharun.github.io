@@ -11,5 +11,15 @@ service cloud.firestore {
       allow read, write: if request.auth != null
         && request.auth.token.email == "ADMIN_EMAIL";
     }
+
+    match /projects/{projectId} {
+      // Public can read only published projects.
+      allow read: if resource.data.published == true;
+
+      // Only the admin account can read hidden/draft projects, create,
+      // update, or delete. Same ADMIN_EMAIL placeholder as above.
+      allow read, write: if request.auth != null
+        && request.auth.token.email == "ADMIN_EMAIL";
+    }
   }
 }

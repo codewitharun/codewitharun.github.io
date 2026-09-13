@@ -6,6 +6,7 @@ import { getPublishedPosts } from "@/lib/posts";
 export const metadata: Metadata = {
   title: "Blog",
   description: "Notes on React Native, shipping imperfect things, and building Techtiten.",
+  alternates: { canonical: "/blog" },
 };
 
 // Revalidate periodically rather than on every request — a personal blog

@@ -25,7 +25,7 @@ export type Post = {
   title: string;
   slug: string;
   excerpt: string;
-  content: string; // Markdown
+  content: string; // HTML, produced by the admin rich text editor
   coverImage: string | null;
   status: PostStatus;
   createdAt: number; // epoch ms, for easy sorting/serializing to Client Components
@@ -133,6 +133,19 @@ export async function deleteCoverImage(url: string): Promise<void> {
     // Best-effort — an already-missing or externally-hosted image URL
     // shouldn't block deleting/editing the post itself.
   }
+}
+
+/**
+ * Uploads an image inserted inline into the post body (via the rich text
+ * editor's image button) and returns its public download URL. Shares the
+ * same `blog-images/` Storage path — and so the same security rules — as
+ * cover images; only distinguished by a "-content-" marker in the name.
+ */
+export async function uploadPostImage(postSlug: string, file: File): Promise<string> {
+  const path = `blog-images/${postSlug}-content-${Date.now()}-${file.name}`;
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, file);
+  return getDownloadURL(storageRef);
 }
 
 export function slugify(title: string): string {

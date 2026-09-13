@@ -1,47 +1,191 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { LogOut, Plus } from "lucide-react";
+import { LogOut, Plus, Download } from "lucide-react";
 import { useAdminAuth } from "@/lib/useAdminAuth";
 import { getAllPosts, deletePost, deleteCoverImage, type Post } from "@/lib/posts";
+import {
+  getAllProjects,
+  deleteProject,
+  deleteProjectImage,
+  importFallbackProjectsIfEmpty,
+  type ProjectDoc,
+} from "@/lib/projects";
 import LoginForm from "@/components/admin/LoginForm";
 import PostList from "@/components/admin/PostList";
 import PostEditor from "@/components/admin/PostEditor";
+import ProjectList from "@/components/admin/ProjectList";
+import ProjectEditor from "@/components/admin/ProjectEditor";
 
-export default function AdminPage() {
-  const { user, checking, login, logout } = useAdminAuth();
+type Tab = "posts" | "projects";
+
+function PostsPanel() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Post | null | "new">(null);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshPosts = useCallback(async () => {
-    setLoadingPosts(true);
+  const refresh = useCallback(async () => {
+    setLoading(true);
     try {
       setPosts(await getAllPosts());
       setError(null);
     } catch {
       setError("Couldn't load posts — check Firestore rules are deployed.");
     } finally {
-      setLoadingPosts(false);
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    // Fetching Firestore data in response to the Firebase auth state
-    // settling (not a plain render-time value) — this is the "subscribe
-    // to an external system" case the lint rule's guidance carves out,
-    // not the cascading-render anti-pattern it's guarding against.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (user) refreshPosts();
-  }, [user, refreshPosts]);
+    refresh();
+  }, [refresh]);
 
   async function handleDelete(post: Post) {
     if (!confirm(`Delete "${post.title}"? This can't be undone.`)) return;
     await deletePost(post.id);
     if (post.coverImage) await deleteCoverImage(post.coverImage);
-    refreshPosts();
+    refresh();
   }
+
+  if (error) return <p className="mt-6 text-sm text-red-400">{error}</p>;
+
+  if (editing) {
+    return (
+      <div className="mt-8">
+        <PostEditor
+          post={editing === "new" ? null : editing}
+          onDone={() => {
+            setEditing(null);
+            refresh();
+          }}
+          onCancel={() => setEditing(null)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setEditing("new")}
+        className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2 text-sm font-semibold text-bg transition-transform hover:scale-105"
+      >
+        <Plus size={15} /> New post
+      </button>
+
+      <div className="mt-6">
+        {loading ? (
+          <p className="text-sm text-ink-faint">Loading posts…</p>
+        ) : (
+          <PostList posts={posts} onEdit={setEditing} onDelete={handleDelete} />
+        )}
+      </div>
+    </>
+  );
+}
+
+function ProjectsPanel() {
+  const [projects, setProjects] = useState<ProjectDoc[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<ProjectDoc | null | "new">(null);
+  const [error, setError] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      setProjects(await getAllProjects());
+      setError(null);
+    } catch {
+      setError("Couldn't load projects — check Firestore rules are deployed.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refresh();
+  }, [refresh]);
+
+  async function handleDelete(project: ProjectDoc) {
+    if (!confirm(`Delete "${project.title}"? This can't be undone.`)) return;
+    await deleteProject(project.id);
+    if (project.image?.startsWith("https://firebasestorage")) {
+      await deleteProjectImage(project.image);
+    }
+    refresh();
+  }
+
+  async function handleImport() {
+    setImporting(true);
+    try {
+      await importFallbackProjectsIfEmpty();
+      await refresh();
+    } catch {
+      setError("Import failed — check Firestore rules are deployed.");
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  if (error) return <p className="mt-6 text-sm text-red-400">{error}</p>;
+
+  if (editing) {
+    return (
+      <div className="mt-8">
+        <ProjectEditor
+          project={editing === "new" ? null : editing}
+          projects={projects}
+          onDone={() => {
+            setEditing(null);
+            refresh();
+          }}
+          onCancel={() => setEditing(null)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="mt-8 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setEditing("new")}
+          className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2 text-sm font-semibold text-bg transition-transform hover:scale-105"
+        >
+          <Plus size={15} /> New project
+        </button>
+        {!loading && projects.length === 0 && (
+          <button
+            type="button"
+            disabled={importing}
+            onClick={handleImport}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:border-mint hover:text-mint disabled:opacity-60"
+          >
+            <Download size={15} /> {importing ? "Importing…" : "Import starter projects"}
+          </button>
+        )}
+      </div>
+
+      <div className="mt-6">
+        {loading ? (
+          <p className="text-sm text-ink-faint">Loading projects…</p>
+        ) : (
+          <ProjectList projects={projects} onEdit={setEditing} onDelete={handleDelete} />
+        )}
+      </div>
+    </>
+  );
+}
+
+export default function AdminPage() {
+  const { user, checking, login, logout } = useAdminAuth();
+  const [tab, setTab] = useState<Tab>("posts");
 
   if (checking) {
     return (
@@ -60,7 +204,9 @@ export default function AdminPage() {
       <div className="flex items-center justify-between">
         <div>
           <p className="mono-label text-xs text-mint">Admin</p>
-          <h1 className="font-display text-2xl font-bold text-ink">Posts</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">
+            {tab === "posts" ? "Posts" : "Projects"}
+          </h1>
         </div>
         <button
           type="button"
@@ -71,38 +217,24 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {error && <p className="mt-6 text-sm text-red-400">{error}</p>}
-
-      {editing ? (
-        <div className="mt-8">
-          <PostEditor
-            post={editing === "new" ? null : editing}
-            onDone={() => {
-              setEditing(null);
-              refreshPosts();
-            }}
-            onCancel={() => setEditing(null)}
-          />
-        </div>
-      ) : (
-        <>
+      <div className="mt-6 flex gap-2 border-b border-border-soft">
+        {(["posts", "projects"] as const).map((t) => (
           <button
+            key={t}
             type="button"
-            onClick={() => setEditing("new")}
-            className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2 text-sm font-semibold text-bg transition-transform hover:scale-105"
+            onClick={() => setTab(t)}
+            className={`mono-label -mb-px border-b-2 px-3 py-2 text-xs transition-colors ${
+              tab === t
+                ? "border-mint text-mint"
+                : "border-transparent text-ink-faint hover:text-ink"
+            }`}
           >
-            <Plus size={15} /> New post
+            {t === "posts" ? "Posts" : "Projects"}
           </button>
+        ))}
+      </div>
 
-          <div className="mt-6">
-            {loadingPosts ? (
-              <p className="text-sm text-ink-faint">Loading posts…</p>
-            ) : (
-              <PostList posts={posts} onEdit={setEditing} onDelete={handleDelete} />
-            )}
-          </div>
-        </>
-      )}
+      {tab === "posts" ? <PostsPanel /> : <ProjectsPanel />}
     </div>
   );
 }

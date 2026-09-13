@@ -1,14 +1,27 @@
+import type { Metadata } from "next";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
 import ProjectMedia from "@/components/ProjectMedia";
 import Reveal from "@/components/Reveal";
 import TitanShape from "@/components/three/TitanShape";
-import { brand, miniBio, projects } from "@/data/site";
+import { brand, miniBio } from "@/data/site";
+import { getProjectsForBuild } from "@/lib/projects";
 import { ArrowUpRight, FileDown, Mail } from "lucide-react";
 import Link from "next/link";
 
-const flagship = projects.find((p) => p.featured) ?? projects[0];
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
-export default function Home() {
+// Revalidated periodically (rather than fully static) so edits made in
+// /admin — adding, editing, or reordering projects — show up on the home
+// page without a redeploy.
+export const revalidate = 300;
+
+export default async function Home() {
+  const projects = await getProjectsForBuild();
+  const current = projects.find((p) => p.currentlyWorkingOn) ?? projects[0];
+  const others = projects.filter((p) => p.slug !== current.slug).slice(0, 3);
+
   return (
     <div>
       {/* Hero */}
@@ -65,21 +78,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Flagship project */}
+      {/* About the studio — genuine prose, not just a tagline, so the
+          home page has actual depth for both readers and search engines */}
+      <section className="border-t border-border-soft/60">
+        <div className="mx-auto max-w-3xl px-6 py-16">
+          <Reveal>
+            <p className="mono-label mb-3 text-xs text-mint">About the studio</p>
+            <p className="text-ink-soft">
+              Techtiten isn&apos;t a company in the traditional sense — it&apos;s the
+              name for everything {brand.founder.split(" ")[0]} ships outside a day
+              job. Some of it is polished and already live on the App Store and
+              Play Store; some of it is a half-working idea shipped anyway,
+              because waiting for perfect is how most side projects die quietly
+              in a drafts folder instead. The throughline across all of it is
+              React Native, TypeScript, and Firebase — the same stack behind
+              production apps built for clients like Federal Bank and Ageas
+              Federal, now turned toward personal products, freelance work, and
+              the occasional experiment that may or may not go anywhere.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Currently working on */}
       <section className="border-t border-border-soft/60 bg-bg-raised/40">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <Reveal>
             <p className="mono-label mb-3 text-xs text-violet">
-              Flagship product
+              Currently working on
             </p>
             <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2">
               <div>
                 <h2 className="font-display text-3xl font-bold text-ink">
-                  {flagship.title}
+                  {current.title}
                 </h2>
-                <p className="mt-4 text-ink-soft">{flagship.description}</p>
+                <p className="mt-4 text-ink-soft">{current.description}</p>
                 <div className="mt-5 flex flex-wrap gap-2">
-                  {flagship.tech.map((t) => (
+                  {current.tech.map((t) => (
                     <span
                       key={t}
                       className="mono-label rounded-full border border-border px-3 py-1 text-[10px] text-ink-faint"
@@ -90,19 +125,39 @@ export default function Home() {
                 </div>
                 <div className="mt-6 flex flex-wrap items-center gap-5">
                   <Link
-                    href={`/portfolio/${flagship.slug}`}
+                    href={`/portfolio/${current.slug}`}
                     className="inline-flex items-center gap-1.5 text-sm font-semibold text-mint hover:underline"
                   >
                     View case study <ArrowUpRight size={15} />
                   </Link>
-                  <ProjectLinkButtons links={flagship.links} className="flex flex-wrap gap-5" />
+                  <ProjectLinkButtons links={current.links} className="flex flex-wrap gap-5" />
                 </div>
               </div>
               <ProjectMedia
-                project={flagship}
+                project={current}
                 className="relative overflow-hidden rounded-2xl border border-border shadow-[0_0_60px_-15px_rgba(166,104,255,0.35)]"
               />
             </div>
+
+            {others.length > 0 && (
+              <div className="mt-14 border-t border-border-soft/60 pt-8">
+                <p className="mono-label mb-4 text-xs text-ink-faint">
+                  Also shipped under Techtiten
+                </p>
+                <ul className="flex flex-wrap gap-3">
+                  {others.map((project) => (
+                    <li key={project.slug}>
+                      <Link
+                        href={`/portfolio/${project.slug}`}
+                        className="inline-flex items-center rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:border-mint hover:text-mint"
+                      >
+                        {project.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </Reveal>
         </div>
       </section>

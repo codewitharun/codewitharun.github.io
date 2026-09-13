@@ -4,15 +4,19 @@ import { ArrowUpRight } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import ProjectMedia from "@/components/ProjectMedia";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
-import { projects } from "@/data/site";
+import { getProjectsForBuild } from "@/lib/projects";
 
 export const metadata: Metadata = {
   title: "Portfolio — React Native & Software Engineering Work",
   description:
     "React Native apps and software built by Arun Kumar, a React Native developer and software engineer in Jaipur, India, under Techtiten (Tech Titan) and beyond — EzySplit, Ageas Federal Life Insurance, Sodality, and more.",
+  alternates: { canonical: "/portfolio" },
 };
 
-export default function PortfolioPage() {
+export const revalidate = 300;
+
+export default async function PortfolioPage() {
+  const projects = await getProjectsForBuild();
   return (
     <div className="mx-auto max-w-6xl px-6 py-20">
       <Reveal>
@@ -33,7 +37,7 @@ export default function PortfolioPage() {
               <ProjectMedia
                 project={project}
                 className="relative overflow-visible border-b border-border bg-bg-raised/40"
-                showFlagshipBadge
+                showStatusBadge
               />
               <div className="flex flex-1 flex-col p-6">
                 <Link href={`/portfolio/${project.slug}`} className="group/title w-fit">

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import DOMPurify from "isomorphic-dompurify";
 import { ArrowLeft } from "lucide-react";
 import Reveal from "@/components/Reveal";
+import ShareButtons from "@/components/ShareButtons";
 import { getPostBySlug, getPublishedPosts } from "@/lib/posts";
-import { siteUrl } from "@/data/site";
+import { blogPostingJsonLd } from "@/lib/schema";
+import { brand, siteUrl } from "@/data/site";
 
 export const revalidate = 300;
 
@@ -35,12 +36,23 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   return {
     title: post.title,
     description: post.excerpt,
+    alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
       title: post.title,
       description: post.excerpt,
       type: "article",
       url: `${siteUrl}/blog/${post.slug}`,
       images: post.coverImage ? [{ url: post.coverImage }] : undefined,
+    },
+    // Set explicitly (rather than left to inherit the root layout's
+    // account-level twitter.creator/site config) so a post with a cover
+    // image gets that image in the card LinkedIn/X preview when shared,
+    // instead of no image at all.
+    twitter: {
+      card: post.coverImage ? "summary_large_image" : "summary",
+      title: post.title,
+      description: post.excerpt,
+      images: post.coverImage ? [post.coverImage] : undefined,
     },
   };
 }
@@ -52,6 +64,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd(post)) }}
+      />
       <Reveal>
         <Link
           href="/blog"
@@ -63,13 +80,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <h1 className="mt-6 font-display text-4xl font-bold text-ink md:text-5xl">
           {post.title}
         </h1>
-        <p className="mono-label mt-3 text-[11px] text-ink-faint">
-          {new Date(post.createdAt).toLocaleDateString("en-IN", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint">
+          <span className="mono-label">
+            {new Date(post.createdAt).toLocaleDateString("en-IN", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
+          <span aria-hidden="true">·</span>
+          <span className="mono-label">
+            By{" "}
+            <Link href="/about" className="text-ink-soft hover:text-mint">
+              {brand.founder}
+            </Link>
+          </span>
+        </div>
       </Reveal>
 
       {post.coverImage && (
@@ -84,8 +110,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       )}
 
       <Reveal delay={0.1}>
-        <div className="markdown-content mt-8">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+        {/* Content is authored by the admin-only rich text editor and
+            sanitized here as defense in depth before being injected as
+            raw HTML. */}
+        <div
+          className="markdown-content mt-8"
+          // eslint-disable-next-line react/no-danger -- sanitized below
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+        />
+      </Reveal>
+
+      <Reveal delay={0.15}>
+        <div className="mt-12 border-t border-border-soft/60 pt-6">
+          <ShareButtons url={`${siteUrl}/blog/${post.slug}`} title={post.title} />
         </div>
       </Reveal>
     </div>

@@ -1,5 +1,6 @@
 import Reveal from "@/components/Reveal";
 import { bio, brand, hobbies, skills } from "@/data/site";
+import { profilePageJsonLd } from "@/lib/schema";
 import type { Metadata } from "next";
 import Image from "next/image";
 
@@ -7,11 +8,19 @@ export const metadata: Metadata = {
   title: "About Arun Kumar — React Native Developer & Software Engineer",
   description:
     "Arun Kumar, the React Native developer and software engineer behind Techtiten (Tech Titan) — based in Jaipur, India. Background, skills, and what's next.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-20">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(profilePageJsonLd()),
+        }}
+      />
       <Reveal>
         <p className="mono-label mb-3 text-xs text-mint">About</p>
         <h1 className="font-display text-4xl font-bold text-ink md:text-5xl">

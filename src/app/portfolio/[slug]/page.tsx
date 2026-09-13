@@ -5,23 +5,35 @@ import { ArrowLeft } from "lucide-react";
 import ProjectMedia from "@/components/ProjectMedia";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
 import Reveal from "@/components/Reveal";
-import { projects, brand } from "@/data/site";
+import { brand } from "@/data/site";
+import { getProjectsForBuild } from "@/lib/projects";
 
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  // Best-effort at build time, same reasoning as blog/[slug] — if
+  // Firestore can't be reached, fall back to no pre-rendered projects
+  // rather than failing the build; `revalidate` fetches them on request.
+  try {
+    const projects = await getProjectsForBuild();
+    return projects.map((project) => ({ slug: project.slug }));
+  } catch {
+    return [];
+  }
 }
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-function getProject(slug: string) {
+async function getProject(slug: string) {
+  const projects = await getProjectsForBuild();
   return projects.find((p) => p.slug === slug);
 }
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProject(slug);
+  const project = await getProject(slug);
   if (!project) return {};
 
   const title = `${project.title} — React Native Case Study`;
@@ -30,6 +42,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   return {
     title,
     description,
+    alternates: { canonical: `/portfolio/${project.slug}` },
     openGraph: {
       title: `${project.title} · Techtiten`,
       description,
@@ -40,7 +53,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = getProject(slug);
+  const [project, projects] = await Promise.all([getProject(slug), getProjectsForBuild()]);
   if (!project) notFound();
 
   const others = projects.filter((p) => p.slug !== project.slug).slice(0, 2);
@@ -62,9 +75,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </h1>
             <p className="mono-label mt-2 text-xs text-ink-faint">{project.status}</p>
           </div>
-          {project.featured && (
+          {project.currentlyWorkingOn && (
             <span className="mono-label rounded-full bg-gradient-to-r from-mint to-violet px-3 py-1 text-[11px] text-bg">
-              Flagship
+              Currently building
             </span>
           )}
         </div>

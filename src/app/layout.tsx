@@ -20,8 +20,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default:
-      "Techtiten — Arun Kumar, React Native Developer & Software Engineer in Jaipur, India",
+    // Kept short enough not to truncate in search results (~60 chars is
+    // the rough budget) — location and the rest of the pitch still live
+    // in the description below, which has more room.
+    default: "Techtiten — Arun Kumar, React Native Developer & Software Engineer",
     template: "%s · Techtiten",
   },
   description:
@@ -30,6 +32,11 @@ export const metadata: Metadata = {
   authors: [{ name: brand.founder, url: siteUrl }],
   creator: brand.founder,
   publisher: brand.name,
+  alternates: {
+    types: {
+      "application/rss+xml": "/rss.xml",
+    },
+  },
   openGraph: {
     type: "website",
     url: siteUrl,

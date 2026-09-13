@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { ImagePlus, X } from "lucide-react";
 import {
   createPost,
@@ -12,6 +10,7 @@ import {
   type Post,
   type PostStatus,
 } from "@/lib/posts";
+import RichTextEditor from "./RichTextEditor";
 
 type PostEditorProps = {
   post: Post | null; // null = creating a new post
@@ -30,7 +29,6 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
 
   function handleTitleChange(value: string) {
     setTitle(value);
@@ -158,29 +156,12 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between">
-        <p className="text-xs text-ink-faint">Content (Markdown)</p>
-        <button
-          type="button"
-          onClick={() => setShowPreview((v) => !v)}
-          className="mono-label text-[11px] text-ink-faint hover:text-mint"
-        >
-          {showPreview ? "Edit" : "Preview"}
-        </button>
-      </div>
-
-      {showPreview ? (
-        <div className="markdown-content mt-1.5 min-h-[240px] rounded-lg border border-border bg-bg px-4 py-3 text-sm text-ink-soft">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content || "*Nothing yet.*"}</ReactMarkdown>
+      <div className="mt-4">
+        <p className="text-xs text-ink-faint">Content</p>
+        <div className="mt-1.5">
+          <RichTextEditor value={content} onChange={setContent} slug={slug || slugify(title)} />
         </div>
-      ) : (
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={14}
-          className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 font-mono text-sm text-ink outline-none focus:border-mint"
-        />
-      )}
+      </div>
 
       {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
 
