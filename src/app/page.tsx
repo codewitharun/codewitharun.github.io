@@ -88,10 +88,15 @@ export default function Home() {
                     </span>
                   ))}
                 </div>
-                <ProjectLinkButtons
-                  links={flagship.links}
-                  className="mt-6 flex flex-wrap gap-5"
-                />
+                <div className="mt-6 flex flex-wrap items-center gap-5">
+                  <Link
+                    href={`/portfolio/${flagship.slug}`}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-mint hover:underline"
+                  >
+                    View case study <ArrowUpRight size={15} />
+                  </Link>
+                  <ProjectLinkButtons links={flagship.links} className="flex flex-wrap gap-5" />
+                </div>
               </div>
               <ProjectMedia
                 project={flagship}

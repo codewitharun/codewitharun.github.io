@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import ProjectMedia from "@/components/ProjectMedia";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
@@ -34,7 +36,11 @@ export default function PortfolioPage() {
                 showFlagshipBadge
               />
               <div className="flex flex-1 flex-col p-6">
-                <h2 className="font-display text-xl font-bold text-ink">{project.title}</h2>
+                <Link href={`/portfolio/${project.slug}`} className="group/title w-fit">
+                  <h2 className="font-display text-xl font-bold text-ink group-hover/title:text-mint">
+                    {project.title}
+                  </h2>
+                </Link>
                 <p className="mono-label mt-1 text-[11px] text-ink-faint">{project.status}</p>
                 <p className="mt-3 flex-1 text-sm text-ink-soft">{project.description}</p>
                 <div className="mt-4 flex flex-wrap gap-1.5">
@@ -47,7 +53,15 @@ export default function PortfolioPage() {
                     </span>
                   ))}
                 </div>
-                <ProjectLinkButtons links={project.links} className="mt-5 flex flex-wrap gap-4" />
+                <div className="mt-5 flex flex-wrap items-center gap-4">
+                  <Link
+                    href={`/portfolio/${project.slug}`}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-mint hover:underline"
+                  >
+                    View details <ArrowUpRight size={14} />
+                  </Link>
+                  <ProjectLinkButtons links={project.links} className="flex flex-wrap gap-4" />
+                </div>
               </div>
             </article>
           </Reveal>
