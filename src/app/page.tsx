@@ -94,7 +94,8 @@ export default async function Home() {
       <section className="border-t border-border-soft/60">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <Reveal>
-            <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-[1fr_auto]">
+            <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-[auto_1fr]">
+              <BrandIcon className="hidden h-32 w-32 shrink-0 opacity-90 md:block lg:h-40 lg:w-40" />
               <div>
                 <p className="mono-label mb-3 text-xs text-mint">About the studio</p>
                 <p className="max-w-2xl text-ink-soft">
@@ -110,7 +111,6 @@ export default async function Home() {
                   the occasional experiment that may or may not go anywhere.
                 </p>
               </div>
-              <BrandIcon className="hidden h-32 w-32 shrink-0 opacity-90 md:block lg:h-40 lg:w-40" />
             </div>
           </Reveal>
         </div>

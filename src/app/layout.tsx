@@ -72,7 +72,18 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full">
+    <html
+      lang="en"
+      className="h-full"
+      // Browser extensions like Grammarly/LanguageTool inject attributes
+      // (e.g. data-lt-installed) into <html> before React hydrates, which
+      // otherwise trips a hydration-mismatch warning for something
+      // entirely outside our control. suppressHydrationWarning only
+      // silences the warning for THIS element's own attributes — it does
+      // not hide mismatches anywhere inside <body>, so real bugs there
+      // still surface normally.
+      suppressHydrationWarning
+    >
       <head>
         {/* Firebase Analytics lazy-loads gtag.js from this origin; ImageKit
             serves every uploaded post/project image from ik.imagekit.io.

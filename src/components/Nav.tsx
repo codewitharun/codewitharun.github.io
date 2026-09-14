@@ -1,9 +1,9 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Home" },
@@ -12,27 +12,42 @@ const links = [
   { href: "/blog", label: "Blog" },
 ];
 
+// Nav lives in the root layout, which Next.js statically prerenders once
+// and reuses across every route (that's what makes shared layouts fast).
+// Because of that, usePathname()'s value baked into the static HTML for
+// a hard/direct page load doesn't reliably reflect the actual route —
+// verified on the live site: hitting https://techtiten.com/ directly
+// always rendered every nav link (including Home) as inactive, even
+// though clicking between pages client-side highlighted the right one
+// correctly every time. window.location.pathname is always accurate the
+// moment the component mounts, regardless of what the static shell
+// assumed, so it's used to set the true initial value; the effect
+// re-reads it whenever usePathname()'s value changes too, so real
+// client-side navigations (which do update correctly) keep working.
+function useActivePathname() {
+  const routerPathname = usePathname();
+  const [pathname, setPathname] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPathname(window.location.pathname);
+  }, [routerPathname]);
+
+  return pathname;
+}
+
 export default function Nav() {
-  const pathname = usePathname();
+  const pathname = useActivePathname();
   const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-soft/80 bg-bg/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link
-          href="/"
-          className="flex items-center"
-          aria-label="Techtiten home"
-        >
+        <Link href="/" className="flex items-center" aria-label="Techtiten home">
           {/* Plain <img>, not next/image — this SVG is already vector/tiny
               (see README's imaging section), so there's nothing the image
               optimizer would meaningfully improve, and it sidesteps
               next/image's extra config needed to serve SVGs at all. */}
-          <img
-            src="/images/techtiten-logo.svg"
-            alt="Techtiten"
-            className="h-16 w-auto"
-          />
+          <img src="/images/techtiten-logo.svg" alt="Techtiten" className="h-8 w-auto" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

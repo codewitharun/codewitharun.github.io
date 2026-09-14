@@ -7,6 +7,15 @@
 
 import { brand, siteUrl, socials } from "@/data/site";
 
+// GitHub is the one profile that's genuinely "Techtiten" the studio
+// (the code itself lives there) rather than a personal-only account —
+// singled out so both Person and Organization schemas can point at it,
+// the same reciprocal-link setup (site → github via sameAs, github
+// profile → site via its own "website" field) that got the old
+// arun.codes site and its GitHub profile showing up together for
+// "arun codes" / "code with arun" searches.
+const githubUrl = socials.find((s) => s.label === "GitHub")?.href;
+
 export const personId = `${siteUrl}/#person`;
 export const orgId = `${siteUrl}/#organization`;
 
@@ -61,6 +70,11 @@ export const organizationSchema = {
   url: siteUrl,
   logo: `${siteUrl}/images/techtiten-logo.svg`,
   founder: { "@id": personId },
+  // Previously only the Person schema carried sameAs — the Organization
+  // (the "Techtiten" entity specifically) had no off-site corroboration
+  // of its own. GitHub is where Techtiten's actual code lives, so it
+  // belongs here too, not just on the Person.
+  sameAs: githubUrl ? [githubUrl] : undefined,
   location: {
     "@type": "Place",
     name: brand.location,

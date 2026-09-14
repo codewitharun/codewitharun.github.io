@@ -18,6 +18,25 @@ work still ships and still gets better in public.
 - Structured data (`src/lib/schema.ts`) linking a `Person` (Arun Kumar) and `Organization`
   (Techtiten) entity for Google — see the SEO section below
 
+## Brand assets
+
+The logo (icon + wordmark) is set in **Plus Jakarta Sans** (bold/extrabold) — this is a
+design-time detail baked into the SVGs themselves, not a web font loaded at runtime, so it isn't
+in the `@fontsource` list above. If the logo ever needs to be redrawn, re-exported, or extended
+(e.g. a new lockup or size), match text back to Plus Jakarta Sans first.
+
+Logo files, all in `public/images/`:
+
+- `techtiten-logo.svg` — full logo (dino icon + "Techtiten" wordmark together). Used in the header
+  and footer.
+- `techtiten-icon.svg` — icon only (the dino mark), transparent background, cream fill. Extracted
+  from `techtiten-logo.svg`'s own paths rather than the uploaded `TechtitenBundle` icon files,
+  which ship with a solid colored background square baked in and don't blend into the site's dark
+  background. Used by `BrandIcon.tsx`, the small animated accent on the homepage.
+- `techtiten-wordmark.svg` — text only ("Techtiten", no icon), same source paths as the full logo.
+  Used on `/about` in place of a gradient-text re-setting of the brand name, so the page always
+  matches the actual logo rather than an approximation of it in a web font.
+
 ## Content
 
 All real copy and project data lives in one place: `src/data/site.ts`. Edit that file to update
@@ -126,3 +145,11 @@ fail with a permission error on submit.
 - Update the GitHub/LinkedIn/X profile links and the Play Store developer display name to mention
   Techtiten too — the on-site structured data only does half the work; off-site consistency is
   what actually builds the entity association in Google over time.
+  - **GitHub specifically** — this is what got `arun.codes` and the GitHub profile showing up
+    together for "arun codes" / "code with arun" searches, and the same reciprocal link is now set
+    up for Techtiten: the site's `Person` and `Organization` JSON-LD both list
+    `https://github.com/codewitharun` under `sameAs` (see `src/lib/schema.ts`), and the footer's
+    GitHub link carries `rel="me"`. The other half lives on GitHub's side and has to be kept
+    current there directly (not from this repo): the profile's "Website" field pointing at
+    `techtiten.com`, and ideally a mention of "Techtiten" somewhere in the profile README/bio too,
+    since Google's entity-matching leans on the name appearing on both ends, not just the URL.
