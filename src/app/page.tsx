@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import BrandIcon from "@/components/BrandIcon";
 import ContactForm from "@/components/ContactForm";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
@@ -8,7 +7,9 @@ import TitanShape from "@/components/three/TitanShapeLazy";
 import { brand, miniBio } from "@/data/site";
 import { getProjectsForBuild } from "@/lib/projects";
 import { ArrowUpRight, FileDown, Mail } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { FaWhatsapp } from "react-icons/fa6";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -97,18 +98,22 @@ export default async function Home() {
             <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-[auto_1fr]">
               <BrandIcon className="hidden h-32 w-32 shrink-0 opacity-90 md:block lg:h-40 lg:w-40" />
               <div>
-                <p className="mono-label mb-3 text-xs text-mint">About the studio</p>
+                <p className="mono-label mb-3 text-xs text-mint">
+                  About the studio
+                </p>
                 <p className="max-w-2xl text-ink-soft">
-                  Techtiten isn&apos;t a company in the traditional sense — it&apos;s the
-                  name for everything {brand.founder.split(" ")[0]} ships outside a day
-                  job. Some of it is polished and already live on the App Store and
-                  Play Store; some of it is a half-working idea shipped anyway,
-                  because waiting for perfect is how most side projects die quietly
-                  in a drafts folder instead. The throughline across all of it is
-                  React Native, TypeScript, and Firebase — the same stack behind
-                  production apps built for clients like Federal Bank and Ageas
-                  Federal, now turned toward personal products, freelance work, and
-                  the occasional experiment that may or may not go anywhere.
+                  Techtiten isn&apos;t a company in the traditional sense —
+                  it&apos;s the name for everything{" "}
+                  {brand.founder.split(" ")[0]} ships outside a day job. Some of
+                  it is polished and already live on the App Store and Play
+                  Store; some of it is a half-working idea shipped anyway,
+                  because waiting for perfect is how most side projects die
+                  quietly in a drafts folder instead. The throughline across all
+                  of it is React Native, TypeScript, and Firebase — the same
+                  stack behind production apps built for clients like Federal
+                  Bank and Ageas Federal, now turned toward personal products,
+                  freelance work, and the occasional experiment that may or may
+                  not go anywhere.
                 </p>
               </div>
             </div>
@@ -146,7 +151,10 @@ export default async function Home() {
                   >
                     View case study <ArrowUpRight size={15} />
                   </Link>
-                  <ProjectLinkButtons links={current.links} className="flex flex-wrap gap-5" />
+                  <ProjectLinkButtons
+                    links={current.links}
+                    className="flex flex-wrap gap-5"
+                  />
                 </div>
               </div>
               <ProjectMedia
@@ -200,9 +208,16 @@ export default async function Home() {
               <Link
                 href={brand.resumeUrl}
                 target="_blank"
-                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-mint hover:text-mint"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-mint hover:text-mint hover:scale-105"
               >
                 <FileDown size={16} /> Resume
+              </Link>
+              <Link
+                href="https://wa.me/918601279944"
+                target="_blank"
+                className="inline-flex items-center gap-2 rounded-full bg-mint border border-border px-6 py-3 text-sm font-semibold text-bg transition-colors hover:scale-105"
+              >
+                <FaWhatsapp size={16} /> Whatsapp
               </Link>
             </div>
 

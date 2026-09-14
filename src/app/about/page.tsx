@@ -17,7 +17,9 @@ export default function AboutPage() {
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd()) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(profilePageJsonLd()),
+        }}
       />
       <Reveal>
         <p className="mono-label mb-3 text-xs text-mint">About</p>
@@ -34,7 +36,10 @@ export default function AboutPage() {
         </h1>
       </Reveal>
 
-      <Reveal delay={0.1} className="mt-10 flex flex-col gap-10 md:flex-row md:items-start">
+      <Reveal
+        delay={0.1}
+        className="mt-10 flex flex-col gap-10 md:flex-row md:items-start"
+      >
         <div className="mx-auto w-40 shrink-0 overflow-hidden rounded-2xl border border-border shadow-[0_0_60px_-20px_rgba(166,104,255,0.4)] md:mx-0">
           {/* Same width as the original crop (10rem) — height now follows
               the photo's own full-length aspect ratio instead of being
