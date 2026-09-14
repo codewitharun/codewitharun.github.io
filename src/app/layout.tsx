@@ -94,7 +94,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://ik.imagekit.io" crossOrigin="anonymous" />
       </head>
-      <body className="flex min-h-full flex-col bg-bg text-ink">
+      <body
+        className="flex min-h-full flex-col bg-bg text-ink"
+        // Same story as <html> above, different extension: ColorZilla
+        // injects cz-shortcut-listen onto <body> before React hydrates.
+        // There's no way to enumerate every extension that touches the
+        // DOM pre-hydration, so both known trouble spots are covered
+        // rather than chasing them one report at a time.
+        suppressHydrationWarning
+      >
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger
