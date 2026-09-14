@@ -76,7 +76,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <p className="mono-label mt-2 text-xs text-ink-faint">{project.status}</p>
           </div>
           {project.currentlyWorkingOn && (
-            <span className="mono-label rounded-full bg-gradient-to-r from-mint to-violet px-3 py-1 text-[11px] text-bg">
+            <span className="mono-label rounded-full bg-mint px-3 py-1 text-[11px] text-bg">
               Currently building
             </span>
           )}

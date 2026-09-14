@@ -80,7 +80,7 @@ function PostsPanel() {
       <button
         type="button"
         onClick={() => setEditing("new")}
-        className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2 text-sm font-semibold text-bg transition-transform hover:scale-105"
+        className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-mint px-4 py-2 text-sm font-semibold text-bg transition-transform hover:scale-105"
       >
         <Plus size={15} /> New post
       </button>
@@ -166,7 +166,7 @@ function ProjectsPanel() {
         <button
           type="button"
           onClick={() => setEditing("new")}
-          className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2 text-sm font-semibold text-bg transition-transform hover:scale-105"
+          className="inline-flex items-center gap-1.5 rounded-full bg-mint px-4 py-2 text-sm font-semibold text-bg transition-transform hover:scale-105"
         >
           <Plus size={15} /> New project
         </button>

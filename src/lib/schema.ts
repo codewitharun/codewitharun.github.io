@@ -28,6 +28,9 @@ export const personSchema = {
   ],
   worksFor: { "@id": orgId },
   url: siteUrl,
+  // Was pointing at self.png, a file that no longer exists (renamed to
+  // self.jpeg when the /about page was built) — Google would have quietly
+  // dropped this image from search results.
   image: `${siteUrl}/images/self.jpeg`,
   sameAs: socials.map((s) => s.href),
   address: {
@@ -56,6 +59,7 @@ export const organizationSchema = {
   name: brand.name,
   alternateName: brand.alternateName,
   url: siteUrl,
+  logo: `${siteUrl}/images/techtiten-logo.svg`,
   founder: { "@id": personId },
   location: {
     "@type": "Place",

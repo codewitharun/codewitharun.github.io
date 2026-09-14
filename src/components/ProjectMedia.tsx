@@ -36,7 +36,7 @@ export default function ProjectMedia({ project, className, showStatusBadge }: Pr
         </div>
       )}
       {showStatusBadge && project.currentlyWorkingOn && (
-        <span className="mono-label absolute right-4 top-4 z-10 rounded-full bg-gradient-to-r from-mint to-violet px-2.5 py-1 text-[10px] text-bg">
+        <span className="mono-label absolute right-4 top-4 z-10 rounded-full bg-mint px-2.5 py-1 text-[10px] text-bg">
           Currently building
         </span>
       )}

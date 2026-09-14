@@ -44,7 +44,7 @@ export default function Nav() {
           })}
           <Link
             href="/#contact"
-            className="rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2 text-xs font-semibold text-bg transition-transform hover:scale-105"
+            className="rounded-full bg-mint px-4 py-2 text-xs font-semibold text-bg transition-transform hover:scale-105"
           >
             Hire Me
           </Link>
@@ -75,7 +75,7 @@ export default function Nav() {
           <Link
             href="/#contact"
             onClick={() => setOpen(false)}
-            className="mt-2 rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2 text-center text-xs font-semibold text-bg"
+            className="mt-2 rounded-full bg-mint px-4 py-2 text-center text-xs font-semibold text-bg"
           >
             Hire Me
           </Link>

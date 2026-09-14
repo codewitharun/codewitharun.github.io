@@ -28,7 +28,7 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
             <div className="flex flex-wrap items-center gap-2">
               <p className="truncate font-display text-sm font-bold text-ink">{project.title}</p>
               {project.currentlyWorkingOn && (
-                <span className="mono-label shrink-0 rounded-full bg-gradient-to-r from-mint to-violet px-2 py-0.5 text-[10px] text-bg">
+                <span className="mono-label shrink-0 rounded-full bg-mint px-2 py-0.5 text-[10px] text-bg">
                   Currently working on
                 </span>
               )}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import BrandIcon from "@/components/BrandIcon";
 import ContactForm from "@/components/ContactForm";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
 import ProjectMedia from "@/components/ProjectMedia";
@@ -29,18 +30,25 @@ export default async function Home() {
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 pt-16 pb-20 md:grid-cols-2 md:pt-24 md:pb-28">
           <Reveal>
-            <p className="mono-label mb-4 text-xs text-mint">{brand.tagline}</p>
+            <p className="mono-label mb-4 text-xs text-mint">
+              {brand.name} · {brand.founder}
+            </p>
+            {/* The wordmark now lives in the header logo, so the hero's
+                giant headline carries the studio's actual pitch (the
+                motto) instead of just repeating the brand name a second
+                time right below it. */}
             <h1 className="font-display text-5xl font-extrabold leading-[1.05] tracking-tight text-ink md:text-6xl">
-              Tech<span className="text-gradient">titen</span>
+              Not perfect.
+              <br />
+              <span className="text-gradient">Building anyway.</span>
             </h1>
             <p className="mt-3 max-w-md text-sm font-medium text-ink-soft">
               {brand.founder} · {brand.founderRoles.join(" & ")} ·{" "}
               {brand.location}
             </p>
             <p className="mt-5 max-w-md text-lg text-ink-soft">
-              {brand.longTagline} A titan intentionally spelled wrong, standing
-              in for a studio that ships while still figuring it out. Built by{" "}
-              {brand.founder}, a {brand.founderRoles[0].toLowerCase()} and{" "}
+              {brand.longTagline} Built by {brand.founder}, a{" "}
+              {brand.founderRoles[0].toLowerCase()} and{" "}
               {brand.founderRoles[1].toLowerCase()} working out of{" "}
               {brand.location}.
             </p>
@@ -60,7 +68,7 @@ export default async function Home() {
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href="#contact"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-mint to-violet px-6 py-3 text-sm font-semibold text-bg transition-transform hover:scale-105"
+                className="inline-flex items-center gap-2 rounded-full bg-mint px-6 py-3 text-sm font-semibold text-bg transition-transform hover:scale-105"
               >
                 Hire Me <ArrowUpRight size={16} />
               </Link>
@@ -80,23 +88,30 @@ export default async function Home() {
       </section>
 
       {/* About the studio — genuine prose, not just a tagline, so the
-          home page has actual depth for both readers and search engines */}
+          home page has actual depth for both readers and search engines.
+          The icon fills what was previously dead space beside a fairly
+          short, narrow text block on wide viewports. */}
       <section className="border-t border-border-soft/60">
-        <div className="mx-auto max-w-3xl px-6 py-16">
+        <div className="mx-auto max-w-5xl px-6 py-16">
           <Reveal>
-            <p className="mono-label mb-3 text-xs text-mint">About the studio</p>
-            <p className="text-ink-soft">
-              Techtiten isn&apos;t a company in the traditional sense — it&apos;s the
-              name for everything {brand.founder.split(" ")[0]} ships outside a day
-              job. Some of it is polished and already live on the App Store and
-              Play Store; some of it is a half-working idea shipped anyway,
-              because waiting for perfect is how most side projects die quietly
-              in a drafts folder instead. The throughline across all of it is
-              React Native, TypeScript, and Firebase — the same stack behind
-              production apps built for clients like Federal Bank and Ageas
-              Federal, now turned toward personal products, freelance work, and
-              the occasional experiment that may or may not go anywhere.
-            </p>
+            <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-[1fr_auto]">
+              <div>
+                <p className="mono-label mb-3 text-xs text-mint">About the studio</p>
+                <p className="max-w-2xl text-ink-soft">
+                  Techtiten isn&apos;t a company in the traditional sense — it&apos;s the
+                  name for everything {brand.founder.split(" ")[0]} ships outside a day
+                  job. Some of it is polished and already live on the App Store and
+                  Play Store; some of it is a half-working idea shipped anyway,
+                  because waiting for perfect is how most side projects die quietly
+                  in a drafts folder instead. The throughline across all of it is
+                  React Native, TypeScript, and Firebase — the same stack behind
+                  production apps built for clients like Federal Bank and Ageas
+                  Federal, now turned toward personal products, freelance work, and
+                  the occasional experiment that may or may not go anywhere.
+                </p>
+              </div>
+              <BrandIcon className="hidden h-32 w-32 shrink-0 opacity-90 md:block lg:h-40 lg:w-40" />
+            </div>
           </Reveal>
         </div>
       </section>
@@ -178,7 +193,7 @@ export default async function Home() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href={`mailto:${brand.email}`}
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-mint to-violet px-6 py-3 text-sm font-semibold text-bg transition-transform hover:scale-105"
+                className="inline-flex items-center gap-2 rounded-full bg-mint px-6 py-3 text-sm font-semibold text-bg transition-transform hover:scale-105"
               >
                 <Mail size={16} /> {brand.email}
               </Link>

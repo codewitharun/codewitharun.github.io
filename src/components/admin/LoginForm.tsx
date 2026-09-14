@@ -67,7 +67,7 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-6 w-full rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2.5 text-sm font-semibold text-bg transition-opacity disabled:opacity-60"
+          className="mt-6 w-full rounded-full bg-mint px-4 py-2.5 text-sm font-semibold text-bg transition-opacity disabled:opacity-60"
         >
           {submitting ? "Signing in…" : "Sign in"}
         </button>

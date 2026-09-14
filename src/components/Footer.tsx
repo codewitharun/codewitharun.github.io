@@ -5,9 +5,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border-soft/80 py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 text-center">
-        <p className="font-display text-sm font-semibold text-ink">
-          Tech<span className="text-gradient">titen</span>
-        </p>
+        <img src="/images/techtiten-logo.svg" alt="Techtiten" className="h-6 w-auto" />
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           {socials.map((s) => (
             <Link

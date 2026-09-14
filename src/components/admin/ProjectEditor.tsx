@@ -320,7 +320,7 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
           type="button"
           disabled={saving}
           onClick={handleSave}
-          className="rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2 text-sm font-semibold text-bg transition-opacity disabled:opacity-60"
+          className="rounded-full bg-mint px-4 py-2 text-sm font-semibold text-bg transition-opacity disabled:opacity-60"
         >
           {saving ? "Saving…" : "Save project"}
         </button>

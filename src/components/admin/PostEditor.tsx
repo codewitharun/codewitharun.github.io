@@ -196,7 +196,7 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
           type="button"
           disabled={saving}
           onClick={() => handleSave("published")}
-          className="rounded-full bg-gradient-to-r from-mint to-violet px-4 py-2 text-sm font-semibold text-bg transition-opacity disabled:opacity-60"
+          className="rounded-full bg-mint px-4 py-2 text-sm font-semibold text-bg transition-opacity disabled:opacity-60"
         >
           {status === "published" ? "Save & keep published" : "Publish"}
         </button>

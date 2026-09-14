@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -46,12 +46,28 @@ export const metadata: Metadata = {
     title: "Techtiten — Arun Kumar, React Native Developer & Software Engineer",
     description:
       "Arun Kumar — React Native Developer & Software Engineer from Jaipur, India — building under the Techtiten name. Not perfect. Building anyway.",
+    // Rendered from the new logo bundle (Techtiten dark.svg) — previously
+    // there was no og:image at all, so links shared to Slack/WhatsApp/
+    // Twitter/etc. showed no preview image.
+    images: [{ url: "/images/og-image.png", width: 1200, height: 675, alt: "Techtiten" }],
   },
   twitter: {
     card: "summary_large_image",
     site: "@arunk4it",
     creator: "@arunk4it",
+    images: ["/images/og-image.png"],
   },
+};
+
+// The favicon/app-icon files themselves (favicon.ico, icon0.svg, icon1.png,
+// apple-icon.png — plus manifest.json) live directly in this app/ folder
+// and are picked up automatically by Next's file-based metadata
+// convention; nothing needs wiring up here for those. themeColor, though,
+// moved out of the `metadata` export into its own `viewport` export in
+// recent Next versions — this is what tints mobile browser chrome (and
+// the PWA splash) with the brand's logo green rather than a default color.
+export const viewport: Viewport = {
+  themeColor: "#18362c",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
