@@ -1,29 +1,31 @@
 "use client";
 
-import LoginForm from "@/components/admin/LoginForm";
-import PostEditor from "@/components/admin/PostEditor";
-import PostList from "@/components/admin/PostList";
-import ProjectEditor from "@/components/admin/ProjectEditor";
-import ProjectList from "@/components/admin/ProjectList";
+import { useEffect, useState, useCallback } from "react";
+import { LogOut, Plus, Download } from "lucide-react";
+import { useAdminAuth } from "@/lib/useAdminAuth";
+import { getAllPosts, deletePost, deleteCoverImage, type Post } from "@/lib/posts";
 import {
-  deleteCoverImage,
-  deletePost,
-  getAllPosts,
-  type Post,
-} from "@/lib/posts";
-import {
+  getAllProjects,
   deleteProject,
   deleteProjectImage,
-  getAllProjects,
   importFallbackProjectsIfEmpty,
   type ProjectDoc,
 } from "@/lib/projects";
+import {
+  getAllMessages,
+  setMessageRead,
+  deleteMessage,
+  type ContactMessage,
+} from "@/lib/messages";
 import { revalidatePaths } from "@/lib/revalidate";
-import { useAdminAuth } from "@/lib/useAdminAuth";
-import { Download, LogOut, Plus } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import LoginForm from "@/components/admin/LoginForm";
+import PostList from "@/components/admin/PostList";
+import PostEditor from "@/components/admin/PostEditor";
+import ProjectList from "@/components/admin/ProjectList";
+import ProjectEditor from "@/components/admin/ProjectEditor";
+import MessageList from "@/components/admin/MessageList";
 
-type Tab = "posts" | "projects";
+type Tab = "posts" | "projects" | "messages";
 
 function PostsPanel() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -175,8 +177,7 @@ function ProjectsPanel() {
             onClick={handleImport}
             className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:border-mint hover:text-mint disabled:opacity-60"
           >
-            <Download size={15} />{" "}
-            {importing ? "Importing…" : "Import starter projects"}
+            <Download size={15} /> {importing ? "Importing…" : "Import starter projects"}
           </button>
         )}
       </div>
@@ -185,14 +186,67 @@ function ProjectsPanel() {
         {loading ? (
           <p className="text-sm text-ink-faint">Loading projects…</p>
         ) : (
-          <ProjectList
-            projects={projects}
-            onEdit={setEditing}
-            onDelete={handleDelete}
-          />
+          <ProjectList projects={projects} onEdit={setEditing} onDelete={handleDelete} />
         )}
       </div>
     </>
+  );
+}
+
+function MessagesPanel() {
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      setMessages(await getAllMessages());
+      setError(null);
+    } catch {
+      setError("Couldn't load messages — check Firestore rules are deployed.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refresh();
+  }, [refresh]);
+
+  async function handleToggleRead(message: ContactMessage, read: boolean) {
+    // Optimistic update — this is a read/unread flip a person clicks
+    // through repeatedly, and waiting on a round trip for something this
+    // small would make the list feel sluggish.
+    setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, read } : m)));
+    try {
+      await setMessageRead(message.id, read);
+    } catch {
+      setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, read: !read } : m)));
+    }
+  }
+
+  async function handleDelete(message: ContactMessage) {
+    if (!confirm(`Delete the message from "${message.name}"? This can't be undone.`)) return;
+    await deleteMessage(message.id);
+    refresh();
+  }
+
+  if (error) return <p className="mt-6 text-sm text-red-400">{error}</p>;
+
+  return (
+    <div className="mt-6">
+      {loading ? (
+        <p className="text-sm text-ink-faint">Loading messages…</p>
+      ) : (
+        <MessageList
+          messages={messages}
+          onToggleRead={handleToggleRead}
+          onDelete={handleDelete}
+        />
+      )}
+    </div>
   );
 }
 
@@ -218,7 +272,7 @@ export default function AdminPage() {
         <div>
           <p className="mono-label text-xs text-mint">Admin</p>
           <h1 className="font-display text-2xl font-bold text-ink">
-            {tab === "posts" ? "Posts" : "Projects"}
+            {tab === "posts" ? "Posts" : tab === "projects" ? "Projects" : "Messages"}
           </h1>
         </div>
         <button
@@ -231,7 +285,7 @@ export default function AdminPage() {
       </div>
 
       <div className="mt-6 flex gap-2 border-b border-border-soft">
-        {(["posts", "projects"] as const).map((t) => (
+        {(["posts", "projects", "messages"] as const).map((t) => (
           <button
             key={t}
             type="button"
@@ -242,12 +296,18 @@ export default function AdminPage() {
                 : "border-transparent text-ink-faint hover:text-ink"
             }`}
           >
-            {t === "posts" ? "Posts" : "Projects"}
+            {t === "posts" ? "Posts" : t === "projects" ? "Projects" : "Messages"}
           </button>
         ))}
       </div>
 
-      {tab === "posts" ? <PostsPanel /> : <ProjectsPanel />}
+      {tab === "posts" ? (
+        <PostsPanel />
+      ) : tab === "projects" ? (
+        <ProjectsPanel />
+      ) : (
+        <MessagesPanel />
+      )}
     </div>
   );
 }

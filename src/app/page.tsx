@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ContactForm from "@/components/ContactForm";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
 import ProjectMedia from "@/components/ProjectMedia";
 import Reveal from "@/components/Reveal";
@@ -188,6 +189,16 @@ export default async function Home() {
               >
                 <FileDown size={16} /> Resume
               </Link>
+            </div>
+
+            <div className="mt-10 flex items-center gap-4 text-ink-faint">
+              <span className="h-px flex-1 bg-border-soft" />
+              <span className="mono-label text-xs">Or send a message</span>
+              <span className="h-px flex-1 bg-border-soft" />
+            </div>
+
+            <div className="mt-8 rounded-2xl border border-border bg-bg-card p-6 md:p-8">
+              <ContactForm />
             </div>
           </Reveal>
         </div>

@@ -88,7 +88,7 @@ size.
 
 ## Analytics
 
-Firebase Analytics (GA4, `measurementId` in `src/lib/firebase.ts`) is wired up: every route change
+Firebase Analytics (GA4, `measurementId` in `src/lib/firebase-analytics.ts`) is wired up: every route change
 fires a `page_view` event via `src/components/AnalyticsTracker.tsx`, mounted once in the root layout.
 It only initializes in the browser and only if `firebase/analytics`'s `isSupported()` check passes
 (so it no-ops during SSR, in ad-blocked browsers, or unsupported environments, rather than throwing).
@@ -100,6 +100,20 @@ Google processes the data. If the console shows no data at all after a real visi
 **Project Settings → Integrations → Google Analytics** is linked for `devarun-1d87a` — the
 `measurementId` already being in the config strongly suggests it is, but it's the one thing that has
 to be set up from the console rather than code.
+
+## Contact form
+
+The "Get in touch" section on `/` (`src/components/ContactForm.tsx`) writes straight to Firestore's
+`messages` collection with no auth — visitors submit name, email, phone, and a message. A hidden
+honeypot field filters out the simplest bots. `/admin`'s **Messages** tab
+(`src/components/admin/MessageList.tsx`) lists them newest-first with a read/unread indicator
+(opening a message marks it read), search, an unread filter, and reply-by-email/call shortcuts.
+
+This only works once `firestore.rules` is redeployed — the `messages` match block is new, and the
+existing rules default-deny everything not explicitly allowed. Same process as any other rules
+change: paste the file into the Firebase console's Rules tab (swap in your real admin email for
+`ADMIN_EMAIL`) or run `firebase deploy --only firestore:rules`. Until that's done, the form will
+fail with a permission error on submit.
 
 ## Before going live on techtiten.com
 
