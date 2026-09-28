@@ -142,6 +142,11 @@ export type Project = {
    * home page's "Currently working on" section instead of a permanent
    * "flagship" label, since what's current changes over time. */
   currentlyWorkingOn?: boolean;
+  /** Optional bullet list of standout capabilities, shown on the project's
+   * case-study page (/portfolio/[slug]) under its own "Features" section.
+   * Not shown on the homepage teaser or the /portfolio grid card — those
+   * stay to `description` alone so they don't get crowded. */
+  features?: string[];
 };
 
 // The site's original hardcoded project list. Projects now live in
@@ -154,7 +159,7 @@ export const fallbackProjects: Project[] = [
     slug: "ezysplit",
     title: "EzySplit",
     description:
-      "Expense splitting and personal finance tracking app built to simplify group expenses and settlements. Create groups, track shared expenses, calculate balances, and settle up with a UPI deep link when the group's in India — built for real daily use, not a demo.",
+      "Expense splitting and personal finance tracking, built for real daily use — not a demo. Create a group, split any bill by equal share, exact amount, percentage, or custom shares, and a live balance ledger keeps track of exactly who owes who. Settle up with a UPI deep link prefilled to the exact amount, or mark it settled manually — plus personal groups for solo tracking and guest members for people outside your usual circle.",
     links: {
       playStore:
         "https://play.google.com/store/apps/details?id=com.techtitens.ezysplit",
@@ -171,6 +176,17 @@ export const fallbackProjects: Project[] = [
     ],
     status: "Live on Play Store",
     currentlyWorkingOn: true,
+    features: [
+      "Flexible splitting — equal share, exact amount, percentage, or custom shares per expense",
+      "Real-time balances — a live “who owes who” ledger, recalculated the moment anyone adds an expense",
+      "UPI settle-up — one tap opens GPay/PhonePe with the amount prefilled, or mark a payment settled manually",
+      "Personal groups — solo expense tracking with no invite codes or UPI prompts in the way",
+      "Guest members — split with people who don’t want to create a full account",
+      "Edit history — every change to an expense is timestamped and attributed, nothing moves silently",
+      "PDF & Excel export — pull any group’s ledger out for a report or a spreadsheet",
+      "Push notifications — new expenses, settlements, and group activity land instantly",
+      "Multi-currency groups — not locked to INR",
+    ],
   },
   {
     slug: "ageas-federal-life-insurance",

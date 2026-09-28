@@ -35,6 +35,8 @@ export async function generateMetadata({
   const post = await getPostBySlug(slug);
   if (!post || post.status !== "published") return {};
 
+  console.log(post);
+
   return {
     title: post.title,
     description: post.excerpt,
@@ -68,7 +70,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <div className="mx-auto max-w-3xl px-6 py-20">
       <script
         type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(blogPostingJsonLd(post)),
         }}
@@ -119,7 +120,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             raw HTML. */}
         <div
           className="markdown-content mt-8"
-          // eslint-disable-next-line react/no-danger -- sanitized below
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(post.content, {
               ADD_ATTR: ["style", "data-align"],

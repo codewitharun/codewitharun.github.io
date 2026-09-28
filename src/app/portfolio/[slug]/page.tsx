@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 import ProjectMedia from "@/components/ProjectMedia";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
 import Reveal from "@/components/Reveal";
@@ -106,6 +106,25 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         <ProjectLinkButtons links={project.links} className="mt-8 flex flex-wrap gap-5" />
       </Reveal>
+
+      {project.features && project.features.length > 0 && (
+        <Reveal delay={0.12}>
+          <div className="mt-16 border-t border-border-soft/60 pt-10">
+            <p className="mono-label mb-6 text-xs text-mint">Features</p>
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {project.features.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex items-start gap-3 rounded-xl border border-border bg-bg-card p-4"
+                >
+                  <Check size={16} className="mt-0.5 shrink-0 text-mint" />
+                  <span className="text-sm text-ink-soft">{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
+      )}
 
       {others.length > 0 && (
         <Reveal delay={0.15}>

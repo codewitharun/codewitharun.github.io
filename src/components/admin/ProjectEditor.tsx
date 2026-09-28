@@ -31,6 +31,7 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
   const [description, setDescription] = useState(project?.description ?? "");
   const [status, setStatus] = useState(project?.status ?? "In Development");
   const [tech, setTech] = useState((project?.tech ?? []).join(", "));
+  const [features, setFeatures] = useState((project?.features ?? []).join("\n"));
   const [playStore, setPlayStore] = useState(project?.links.playStore ?? "");
   const [appStore, setAppStore] = useState(project?.links.appStore ?? "");
   const [website, setWebsite] = useState(project?.links.website ?? "");
@@ -105,6 +106,10 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
         tech: tech
           .split(",")
           .map((t) => t.trim())
+          .filter(Boolean),
+        features: features
+          .split("\n")
+          .map((f) => f.trim())
           .filter(Boolean),
         links,
         image: image.trim(),
@@ -212,6 +217,17 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
           value={tech}
           onChange={(e) => setTech(e.target.value)}
           placeholder="React Native, TypeScript, Firebase"
+          className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-mint"
+        />
+      </label>
+
+      <label className="mt-4 block text-xs text-ink-faint">
+        Features (one per line — shown on the project&apos;s case-study page)
+        <textarea
+          value={features}
+          onChange={(e) => setFeatures(e.target.value)}
+          rows={4}
+          placeholder={"Flexible splitting — equal, exact, percentage, or custom shares\nReal-time balances, recalculated the moment anyone adds an expense"}
           className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-mint"
         />
       </label>

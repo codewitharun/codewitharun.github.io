@@ -38,6 +38,7 @@ type ProjectFirestoreDoc = {
   tech: string[];
   status: string;
   currentlyWorkingOn?: boolean;
+  features?: string[];
   published: boolean;
   order: number;
   createdAt: Timestamp;
@@ -55,6 +56,7 @@ function fromDoc(id: string, data: ProjectFirestoreDoc): ProjectDoc {
     tech: data.tech ?? [],
     status: data.status,
     currentlyWorkingOn: data.currentlyWorkingOn ?? false,
+    features: data.features ?? [],
     published: data.published ?? true,
     order: data.order ?? 0,
     createdAt: data.createdAt?.toMillis?.() ?? 0,
@@ -132,6 +134,7 @@ export type ProjectInput = {
   tech: string[];
   status: string;
   currentlyWorkingOn: boolean;
+  features: string[];
   published: boolean;
   order: number;
 };
@@ -177,6 +180,7 @@ export function projectDocToInput(
     tech: p.tech,
     status: p.status,
     currentlyWorkingOn: p.currentlyWorkingOn ?? false,
+    features: p.features ?? [],
     published: p.published,
     order: p.order,
     ...overrides,
