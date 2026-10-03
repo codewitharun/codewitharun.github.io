@@ -26,12 +26,12 @@
     "browser-image-compression": "^2.0.2",
     "firebase": "^12.19.0",
     "framer-motion": "^13.2.0",
-    "isomorphic-dompurify": "^4.2.0",
     "lucide-react": "^1.45.0",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-icons": "^5.7.0",
+    "sanitize-html": "^2.18.0",
     "three": "^0.186.0"
   },
   "devDependencies": {
@@ -39,6 +39,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sanitize-html": "^2.16.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",

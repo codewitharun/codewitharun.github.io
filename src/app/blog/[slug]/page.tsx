@@ -3,7 +3,7 @@ import ShareButtons from "@/components/ShareButtons";
 import { brand, siteUrl } from "@/data/site";
 import { getPostBySlug, getPublishedPosts } from "@/lib/publicContent";
 import { blogPostingJsonLd } from "@/lib/schema";
-import DOMPurify from "isomorphic-dompurify";
+import { sanitizePostHtml } from "@/lib/sanitizePost";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -120,9 +120,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div
           className="markdown-content mt-8"
           dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(post.content, {
-              ADD_ATTR: ["style", "data-align"],
-            }),
+            __html: sanitizePostHtml(post.content),
           }}
         />
       </Reveal>
