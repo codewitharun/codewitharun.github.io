@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { firebaseConfig } from "./firebaseConfig";
 
 // Analytics lives in its own module (lib/firebase-analytics.ts) with a
 // minimal import graph (firebase/app + firebase/analytics only) — see the
@@ -24,16 +25,7 @@ export { getFirebaseAnalytics } from "./firebase-analytics";
 // got blocked, so image uploads now go through ImageKit instead (see
 // src/lib/imageUpload.ts and src/app/api/upload-image/route.ts).
 // storage.rules is no longer deployed/needed.
-const firebaseConfig = {
-  apiKey: "AIzaSyAMretNVnf_DODRgjLpAPR1NmTASngLAXA",
-  authDomain: "devarun-1d87a.firebaseapp.com",
-  databaseURL: "https://devarun-1d87a-default-rtdb.firebaseio.com",
-  projectId: "devarun-1d87a",
-  storageBucket: "devarun-1d87a.appspot.com",
-  messagingSenderId: "81700495261",
-  appId: "1:81700495261:web:f700b61d80b7e4eb5d9974",
-  measurementId: "G-FMV5TG9E4X",
-};
+// The config object itself lives in ./firebaseConfig.ts.
 
 // Guard against re-initializing on hot reload / repeated server imports.
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);

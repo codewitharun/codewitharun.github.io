@@ -5,7 +5,7 @@ import ProjectMedia from "@/components/ProjectMedia";
 import Reveal from "@/components/Reveal";
 import TitanShape from "@/components/three/TitanShapeLazy";
 import { brand, miniBio } from "@/data/site";
-import { getProjectsForBuild } from "@/lib/projects";
+import { getProjectsForBuild } from "@/lib/publicContent";
 import { ArrowUpRight, FileDown, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";

@@ -1,6 +1,5 @@
 import { siteUrl } from "@/data/site";
-import { getPublishedPosts } from "@/lib/posts";
-import { getProjectsForBuild } from "@/lib/projects";
+import { getProjectsForBuild, getPublishedPosts } from "@/lib/publicContent";
 import type { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

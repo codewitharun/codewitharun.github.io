@@ -1,4 +1,4 @@
-import { getPublishedPosts } from "@/lib/posts";
+import { getPublishedPosts } from "@/lib/publicContent";
 import { brand, siteUrl } from "@/data/site";
 
 // A plain RSS 2.0 feed at /rss.xml — the one distribution channel that

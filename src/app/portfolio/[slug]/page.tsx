@@ -6,7 +6,7 @@ import ProjectMedia from "@/components/ProjectMedia";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
 import Reveal from "@/components/Reveal";
 import { brand } from "@/data/site";
-import { getProjectsForBuild } from "@/lib/projects";
+import { getProjectsForBuild } from "@/lib/publicContent";
 
 export const revalidate = 300;
 

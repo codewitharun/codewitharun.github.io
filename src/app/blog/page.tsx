@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import BlogList from "@/components/BlogList";
-import { getPublishedPosts } from "@/lib/posts";
+import { getPublishedPosts } from "@/lib/publicContent";
 
 export const metadata: Metadata = {
   title: "Blog",

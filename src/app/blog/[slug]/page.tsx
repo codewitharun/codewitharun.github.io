@@ -1,7 +1,7 @@
 import Reveal from "@/components/Reveal";
 import ShareButtons from "@/components/ShareButtons";
 import { brand, siteUrl } from "@/data/site";
-import { getPostBySlug, getPublishedPosts } from "@/lib/posts";
+import { getPostBySlug, getPublishedPosts } from "@/lib/publicContent";
 import { blogPostingJsonLd } from "@/lib/schema";
 import DOMPurify from "isomorphic-dompurify";
 import { ArrowLeft } from "lucide-react";
@@ -35,7 +35,6 @@ export async function generateMetadata({
   const post = await getPostBySlug(slug);
   if (!post || post.status !== "published") return {};
 
-  console.log(post);
 
   return {
     title: post.title,

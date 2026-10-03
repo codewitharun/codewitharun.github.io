@@ -1,4 +1,5 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { POSTS_TAG, PROJECTS_TAG } from "@/lib/publicContent";
 
 /**
  * Posts and projects are written straight from the browser via the
@@ -24,6 +25,11 @@ export async function POST(request: Request) {
     );
   }
 
+  // Expire the cached Firestore reads (see lib/publicContent.ts) right
+  // away - { expire: 0 } instead of a cacheLife profile, so the very next
+  // visit gets fresh data rather than one more stale copy - then the pages.
+  revalidateTag(POSTS_TAG, { expire: 0 });
+  revalidateTag(PROJECTS_TAG, { expire: 0 });
   for (const path of paths) {
     revalidatePath(path);
   }
