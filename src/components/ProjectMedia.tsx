@@ -1,5 +1,6 @@
 import DeviceFrame from "@/components/DeviceFrame";
-import { getProjectImage } from "@/lib/projectImage";
+import IPhoneFrame from "@/components/IPhoneFrame";
+import { getShowcase } from "@/lib/projectImage";
 import type { Project } from "@/data/site";
 
 type ProjectMediaProps = {
@@ -7,31 +8,51 @@ type ProjectMediaProps = {
   /** Outer wrapper classes — background, border, rounding for the card. */
   className?: string;
   showStatusBadge?: boolean;
+  /** case-study hero: bigger phones, eager images */
+  hero?: boolean;
 };
 
 /**
- * Picks the right presentation per project: a live screenshot goes through
- * DeviceFrame's CSS laptop/phone mockup, while a pre-composited mock image
- * (which already draws its own laptop + phone) renders flat, at native
- * crop, so it isn't framed a second time.
+ * Picks the right presentation per project (see getShowcase):
+ *  - app with screenshots -> 1-3 iPhones, the middle one in front
+ *  - website -> laptop (desktop render) + iPhone (mobile render)
+ *  - otherwise -> the uploaded cover image, flat (it may already be a
+ *    composed graphic, so it isn't framed a second time)
  */
-export default function ProjectMedia({ project, className, showStatusBadge }: ProjectMediaProps) {
-  const { src, isLive } = getProjectImage(project);
+export default function ProjectMedia({ project, className, showStatusBadge, hero }: ProjectMediaProps) {
+  const show = getShowcase(project);
+  const alt = `${project.title} preview`;
 
   return (
     <div className={className ?? "relative"}>
-      {isLive ? (
+      {show.kind === "devices" && (
         <div className="px-6 pt-6 pb-10 md:px-8 md:pt-8 md:pb-12">
-          <DeviceFrame src={src} alt={`${project.title} preview`} />
+          <DeviceFrame src={show.desktop} phoneSrc={show.phone} alt={alt} eager={hero} />
         </div>
-      ) : (
-        <div className="relative aspect-video overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element -- static asset, kept as a plain img so this branch stays consistent with the live-screenshot one */}
+      )}
+      {show.kind === "phones" && (
+        <div className={`phone-stage ${hero ? "phone-stage--hero" : ""}`}>
+          <div className={`phone-fan phone-fan--${show.shots.length}`}>
+            {show.shots.map((src, i) => (
+              <IPhoneFrame
+                key={src + i}
+                src={src}
+                alt={i === 0 ? alt : ""}
+                className={`phone-fan__item phone-fan__item--${i}`}
+                eager={hero}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+      {show.kind === "cover" && (
+        <div className="relative aspect-video overflow-hidden rounded-[inherit]">
+          {/* eslint-disable-next-line @next/next/no-img-element -- uploaded cover or static mock */}
           <img
-            src={src}
-            alt={`${project.title} preview`}
+            src={show.src}
+            alt={alt}
             className="h-full w-full object-cover"
-            loading="lazy"
+            loading={hero ? "eager" : "lazy"}
           />
         </div>
       )}

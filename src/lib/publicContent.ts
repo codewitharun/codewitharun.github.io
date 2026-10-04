@@ -141,6 +141,14 @@ export function toProject(d: Record<string, unknown>): ProjectDoc {
     status: String(d.status ?? ""),
     currentlyWorkingOn: Boolean(d.currentlyWorkingOn),
     features: (d.features as string[]) ?? [],
+    platform: ["mobile", "web", "both"].includes(String(d.platform))
+      ? (d.platform as ProjectDoc["platform"])
+      : undefined,
+    screenshots: (d.screenshots as string[]) ?? [],
+    tagline: String(d.tagline ?? ""),
+    role: String(d.role ?? ""),
+    year: String(d.year ?? ""),
+    highlights: (d.highlights as string[]) ?? [],
     published: d.published !== false,
     order: Number(d.order ?? 0) || 0,
     createdAt: Number(d.createdAt ?? 0) || 0,

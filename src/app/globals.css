@@ -171,45 +171,59 @@ h1, h2, h3, h4 {
   border-radius: 0 0 6px 6px;
 }
 
-.device-frame__phone {
+.device-frame .device-frame__iphone {
   position: absolute;
-  left: 5%;
-  bottom: -3%;
-  /* Sized against the laptop, not the card — a phone this size in front
-     of a laptop should read as an accent, not a second equal-sized
-     screen. Height comes out well short of the laptop's, on purpose. */
-  width: 15%;
+  left: 4%;
+  bottom: -4%;
+  /* Sized against the laptop: an accent in front of it, not a second
+     equal-sized screen. */
+  width: 17%;
+  z-index: 2;
+}
+
+@media (max-width: 640px) {
+  .device-frame {
+    padding-top: 70%;
+  }
+  .device-frame .device-frame__iphone {
+    width: 24%;
+  }
+}
+
+/* ---- iPhone mockup (IPhoneFrame.tsx) ------------------------------------
+   Everything is sized in container-query units of the phone's own width
+   (cqw), so it stays proportional from a 60px accent to a 320px hero. */
+.iphone {
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
   aspect-ratio: 9 / 19.5;
-  background: #08080c;
-  border: 1px solid #34333f;
-  border-radius: 16px;
-  overflow: hidden;
-  padding: 8px 4px;
-  box-shadow: 0 25px 45px -18px rgba(0, 0, 0, 0.7);
+  filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.55));
 }
 
-.device-frame__phone-notch {
+.iphone__body {
   position: absolute;
-  top: 3px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 34%;
-  height: 5px;
-  background: #08080d;
-  border-radius: 4px;
-  z-index: 1;
+  inset: 0;
+  border-radius: 16cqw;
+  padding: 2.6cqw;
+  /* titanium band: lighter edge, darker inner rim */
+  background:
+    linear-gradient(145deg, #5b5b66 0%, #2b2b33 22%, #1a1a20 50%, #2b2b33 78%, #6a6a75 100%);
+  box-shadow:
+    inset 0 0 0 0.5cqw rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1.4cqw #0b0b0f;
 }
 
-.device-frame__phone-bezel {
+.iphone__screen {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 8px;
   overflow: hidden;
-  background: var(--bg-raised);
+  border-radius: 13.6cqw;
+  background: #000;
 }
 
-.device-frame__phone-bezel img {
+.iphone__screen img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -217,13 +231,124 @@ h1, h2, h3, h4 {
   display: block;
 }
 
-@media (max-width: 640px) {
-  .device-frame {
-    padding-top: 70%;
-  }
-  .device-frame__phone {
-    width: 22%;
-  }
+.iphone__island {
+  position: absolute;
+  top: 3.2cqw;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 31cqw;
+  height: 9cqw;
+  border-radius: 999px;
+  background: #000;
+  box-shadow: inset 0 0 0 0.4cqw rgba(255, 255, 255, 0.04);
+  z-index: 2;
+}
+
+.iphone__island::after {
+  /* camera lens */
+  content: "";
+  position: absolute;
+  right: 18%;
+  top: 50%;
+  width: 3.4cqw;
+  height: 3.4cqw;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2c3a55 0 30%, #0b0d14 60%);
+}
+
+.iphone__glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0) 38%);
+  z-index: 1;
+}
+
+.iphone__btn {
+  position: absolute;
+  width: 1.1cqw;
+  border-radius: 1cqw;
+  background: linear-gradient(90deg, #3a3a44, #61616c);
+}
+.iphone__btn--action { left: -0.9cqw; top: 19%; height: 6%; }
+.iphone__btn--vol-up { left: -0.9cqw; top: 28%; height: 10%; }
+.iphone__btn--vol-down { left: -0.9cqw; top: 40%; height: 10%; }
+.iphone__btn--power { right: -0.9cqw; top: 30%; height: 15%; }
+
+/* ---- Phone fan (app projects: 1-3 screenshots) ------------------------ */
+.phone-stage {
+  position: relative;
+  overflow: hidden;
+  padding: 2.25rem 1rem 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(60% 70% at 50% 100%, rgba(0, 255, 164, 0.14), transparent 70%),
+    radial-gradient(50% 60% at 85% 0%, rgba(166, 104, 255, 0.18), transparent 70%);
+}
+
+.phone-fan {
+  position: relative;
+  margin: 0 auto;
+  height: 22rem;
+  max-width: 36rem;
+}
+
+.phone-stage--hero .phone-fan {
+  height: clamp(17.5rem, 58vw, 34rem);
+}
+
+.phone-fan .phone-fan__item {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 10.5rem;
+  transform-origin: 50% 100%;
+}
+
+.phone-stage--hero .phone-fan .phone-fan__item {
+  width: clamp(7.5rem, 26vw, 15rem);
+}
+
+/* front phone, centred */
+.phone-fan__item--0 {
+  z-index: 3;
+  transform: translateX(-50%);
+}
+/* back phones, tilted out to either side and a little smaller */
+.phone-fan__item--1 {
+  z-index: 2;
+  transform: translateX(-118%) translateY(8%) rotate(-9deg) scale(0.86);
+  opacity: 0.92;
+}
+.phone-fan__item--2 {
+  z-index: 1;
+  transform: translateX(18%) translateY(8%) rotate(9deg) scale(0.86);
+  opacity: 0.92;
+}
+
+/* only two screenshots: side by side, slightly overlapping */
+.phone-fan--2 .phone-fan__item--0 {
+  transform: translateX(-88%) rotate(-4deg);
+}
+.phone-fan--2 .phone-fan__item--1 {
+  transform: translateX(-12%) translateY(6%) rotate(5deg) scale(0.94);
+}
+
+/* ---- Screens gallery (case-study page) -------------------------------- */
+.screen-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(9.5rem, 38vw, 13rem);
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0.5rem 0.25rem 2.5rem;
+  scrollbar-width: thin;
+}
+
+.screen-strip > * {
+  scroll-snap-align: start;
 }
 
 /* Rendered Markdown — used for both the admin content preview and public

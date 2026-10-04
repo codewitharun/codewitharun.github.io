@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, ImagePlus, Loader2, X } from "lucide-react";
 import {
   createProject,
   updateProject,
@@ -12,7 +12,7 @@ import {
   type ProjectInput,
 } from "@/lib/projects";
 import { revalidatePaths } from "@/lib/revalidate";
-import type { ProjectLinks } from "@/data/site";
+import type { ProjectLinks, ProjectPlatform } from "@/data/site";
 
 type ProjectEditorProps = {
   project: ProjectDoc | null; // null = creating a new project
@@ -41,6 +41,13 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
     project?.currentlyWorkingOn ?? false
   );
   const [published, setPublished] = useState(project?.published ?? true);
+  const [platform, setPlatform] = useState<ProjectPlatform | "auto">(project?.platform ?? "auto");
+  const [tagline, setTagline] = useState(project?.tagline ?? "");
+  const [role, setRole] = useState(project?.role ?? "");
+  const [year, setYear] = useState(project?.year ?? "");
+  const [highlights, setHighlights] = useState((project?.highlights ?? []).join("\n"));
+  const [screenshots, setScreenshots] = useState<string[]>(project?.screenshots ?? []);
+  const [shotsUploading, setShotsUploading] = useState(0);
 
   // `projects` is already sorted by order — everyone except the project
   // being edited (if any), in their current display order.
@@ -74,6 +81,36 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
       setUploading(false);
       e.target.value = "";
     }
+  }
+
+  async function handleScreenshots(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (!files.length) return;
+    setError(null);
+    setShotsUploading(files.length);
+    const base = slug || slugifyProject(title) || "project";
+    // upload in order, so the screenshots keep the order they were picked in
+    for (const file of files) {
+      try {
+        const url = await uploadProjectImage(`${base}-screen`, file);
+        setScreenshots((prev) => [...prev, url]);
+      } catch {
+        setError("A screenshot failed to upload — try that one again.");
+      } finally {
+        setShotsUploading((n) => n - 1);
+      }
+    }
+  }
+
+  function moveShot(i: number, dir: -1 | 1) {
+    setScreenshots((prev) => {
+      const j = i + dir;
+      if (j < 0 || j >= prev.length) return prev;
+      const next = [...prev];
+      [next[i], next[j]] = [next[j], next[i]];
+      return next;
+    });
   }
 
   async function handleSave() {
@@ -113,6 +150,15 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
           .filter(Boolean),
         links,
         image: image.trim(),
+        ...(platform !== "auto" ? { platform } : {}),
+        screenshots,
+        tagline: tagline.trim(),
+        role: role.trim(),
+        year: year.trim(),
+        highlights: highlights
+          .split("\n")
+          .map((h) => h.trim())
+          .filter(Boolean),
         currentlyWorkingOn,
         published,
         order,
@@ -186,6 +232,61 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
         />
       </label>
 
+      <label className="mt-4 block text-xs text-ink-faint">
+        Tagline (one line under the title on the project page)
+        <input
+          value={tagline}
+          onChange={(e) => setTagline(e.target.value)}
+          placeholder="Split bills with friends and settle up over UPI in one tap."
+          className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-mint"
+        />
+      </label>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <label className="block text-xs text-ink-faint">
+          Platform (picks the preview style)
+          <select
+            value={platform}
+            onChange={(e) => setPlatform(e.target.value as ProjectPlatform | "auto")}
+            className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-mint"
+          >
+            <option value="auto">Auto (from the links)</option>
+            <option value="mobile">Mobile app (iPhone frames)</option>
+            <option value="web">Website (laptop + iPhone)</option>
+            <option value="both">Mobile + web</option>
+          </select>
+        </label>
+        <label className="block text-xs text-ink-faint">
+          Your role
+          <input
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            placeholder="Solo developer — design, app, backend"
+            className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-mint"
+          />
+        </label>
+        <label className="block text-xs text-ink-faint">
+          Timeline
+          <input
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            placeholder="2025 – now"
+            className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-mint"
+          />
+        </label>
+      </div>
+
+      <label className="mt-4 block text-xs text-ink-faint">
+        Highlights (up to 4, one per line as &quot;value | label&quot;)
+        <textarea
+          value={highlights}
+          onChange={(e) => setHighlights(e.target.value)}
+          rows={3}
+          placeholder={"2.4 | Latest version on Play\n100+ | Active users"}
+          className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-mint"
+        />
+      </label>
+
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         <label className="block text-xs text-ink-faint">
           Status label (shown on the card, e.g. &quot;Live on Play Store&quot;)
@@ -250,7 +351,7 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
           />
         </label>
         <label className="block text-xs text-ink-faint">
-          Website (also used for a live screenshot, if set)
+          Website (live laptop + phone screenshot — not your techtiten.com page)
           <input
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
@@ -269,8 +370,59 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
 
       <div className="mt-4">
         <p className="text-xs text-ink-faint">
-          Cover image (skipped automatically if a website link is set above — that gets a live
-          screenshot instead)
+          Phone screenshots (portrait, in order — the first one is the front phone; shown in
+          iPhone frames and a swipeable &quot;Screens&quot; gallery)
+        </p>
+        <div className="mt-1.5 flex flex-wrap items-end gap-3">
+          {screenshots.map((src, i) => (
+            <div key={src + i} className="w-16">
+              {/* eslint-disable-next-line @next/next/no-img-element -- uploaded screenshot URL */}
+              <img
+                src={src}
+                alt={`Screenshot ${i + 1}`}
+                className="aspect-[9/19.5] w-16 rounded-lg border border-border object-cover"
+              />
+              <div className="mt-1 flex justify-between text-ink-faint">
+                <button type="button" aria-label="Move left" onClick={() => moveShot(i, -1)} className="hover:text-ink">
+                  <ArrowLeft size={13} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Remove"
+                  onClick={() => setScreenshots((prev) => prev.filter((_, j) => j !== i))}
+                  className="hover:text-red-400"
+                >
+                  <X size={13} />
+                </button>
+                <button type="button" aria-label="Move right" onClick={() => moveShot(i, 1)} className="hover:text-ink">
+                  <ArrowRight size={13} />
+                </button>
+              </div>
+            </div>
+          ))}
+          <label
+            className={`inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-ink-soft transition-colors ${
+              shotsUploading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-mint hover:text-mint"
+            }`}
+          >
+            {shotsUploading ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />}
+            {shotsUploading ? `Uploading ${shotsUploading}…` : "Add screenshots"}
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              disabled={shotsUploading > 0}
+              onChange={handleScreenshots}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <p className="text-xs text-ink-faint">
+          Cover image (used when there are no phone screenshots and no website — also the
+          social share image)
         </p>
         <div className="mt-1.5 flex items-center gap-3">
           {image && (
@@ -334,7 +486,7 @@ export default function ProjectEditor({ project, projects, onDone, onCancel }: P
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <button
           type="button"
-          disabled={saving}
+          disabled={saving || shotsUploading > 0}
           onClick={handleSave}
           className="rounded-full bg-mint px-4 py-2 text-sm font-semibold text-bg transition-opacity disabled:opacity-60"
         >

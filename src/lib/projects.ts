@@ -1,4 +1,4 @@
-import { fallbackProjects, type Project, type ProjectLinks } from "@/data/site";
+import { fallbackProjects, type Project, type ProjectLinks, type ProjectPlatform } from "@/data/site";
 import { db } from "@/lib/firebase";
 import { uploadImage } from "@/lib/imageUpload";
 import {
@@ -39,6 +39,12 @@ type ProjectFirestoreDoc = {
   status: string;
   currentlyWorkingOn?: boolean;
   features?: string[];
+  platform?: ProjectPlatform;
+  screenshots?: string[];
+  tagline?: string;
+  role?: string;
+  year?: string;
+  highlights?: string[];
   published: boolean;
   order: number;
   createdAt: Timestamp;
@@ -57,6 +63,12 @@ function fromDoc(id: string, data: ProjectFirestoreDoc): ProjectDoc {
     status: data.status,
     currentlyWorkingOn: data.currentlyWorkingOn ?? false,
     features: data.features ?? [],
+    platform: data.platform,
+    screenshots: data.screenshots ?? [],
+    tagline: data.tagline ?? "",
+    role: data.role ?? "",
+    year: data.year ?? "",
+    highlights: data.highlights ?? [],
     published: data.published ?? true,
     order: data.order ?? 0,
     createdAt: data.createdAt?.toMillis?.() ?? 0,
@@ -135,6 +147,12 @@ export type ProjectInput = {
   status: string;
   currentlyWorkingOn: boolean;
   features: string[];
+  platform?: ProjectPlatform;
+  screenshots: string[];
+  tagline: string;
+  role: string;
+  year: string;
+  highlights: string[];
   published: boolean;
   order: number;
 };
@@ -181,6 +199,12 @@ export function projectDocToInput(
     status: p.status,
     currentlyWorkingOn: p.currentlyWorkingOn ?? false,
     features: p.features ?? [],
+    ...(p.platform ? { platform: p.platform } : {}),
+    screenshots: p.screenshots ?? [],
+    tagline: p.tagline ?? "",
+    role: p.role ?? "",
+    year: p.year ?? "",
+    highlights: p.highlights ?? [],
     published: p.published,
     order: p.order,
     ...overrides,

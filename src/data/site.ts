@@ -147,7 +147,24 @@ export type Project = {
    * Not shown on the homepage teaser or the /portfolio grid card — those
    * stay to `description` alone so they don't get crowded. */
   features?: string[];
+  /** What the project is, for picking the right preview on its page:
+   * "mobile" = phone app (iPhone frames), "web" = site (laptop + phone),
+   * "both". Inferred from the links when not set. */
+  platform?: ProjectPlatform;
+  /** Phone screenshots (portrait, in order) — shown in iPhone frames in
+   * the hero and the "Screens" gallery of the case-study page. */
+  screenshots?: string[];
+  /** One-line pitch under the title on the case-study page. */
+  tagline?: string;
+  /** e.g. "Solo developer — design, app and backend". */
+  role?: string;
+  /** e.g. "2025 – now". */
+  year?: string;
+  /** Headline numbers, one per entry as "value | label", e.g. "500+ | Active users". */
+  highlights?: string[];
 };
+
+export type ProjectPlatform = "mobile" | "web" | "both";
 
 // The site's original hardcoded project list. Projects now live in
 // Firestore (see src/lib/projects.ts) and are editable from /admin — this
