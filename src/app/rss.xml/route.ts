@@ -52,7 +52,12 @@ export async function GET() {
 
   return new Response(xml, {
     headers: {
-      "Content-Type": "application/rss+xml; charset=utf-8",
+      // application/xml (not application/rss+xml): Safari hands rss+xml to a
+      // feed-reader app, or the App Store when none is installed, so the
+      // link never opened in the browser. Feed readers detect RSS from the
+      // content either way, and the <link rel="alternate"> in the layout
+      // still announces it as an RSS feed.
+      "Content-Type": "application/xml; charset=utf-8",
     },
   });
 }
