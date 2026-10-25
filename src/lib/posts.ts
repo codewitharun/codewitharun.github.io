@@ -23,6 +23,9 @@ export type Post = {
   content: string; // HTML, produced by the admin rich text editor
   coverImage: string | null;
   status: PostStatus;
+  /** Which app this post is about (src/content/projects.ts slug).
+   *  "" = work it out from the post (lib/relatedPosts.ts), "none" = no app. */
+  relatedProject: string;
   createdAt: number; // epoch ms, for easy sorting/serializing to Client Components
   updatedAt: number;
 };
@@ -36,6 +39,7 @@ type PostDoc = {
   content: string;
   coverImage: string | null;
   status: PostStatus;
+  relatedProject?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 };
@@ -49,6 +53,7 @@ function fromDoc(id: string, data: PostDoc): Post {
     content: data.content,
     coverImage: data.coverImage ?? null,
     status: data.status,
+    relatedProject: data.relatedProject ?? "",
     createdAt: data.createdAt?.toMillis?.() ?? 0,
     updatedAt: data.updatedAt?.toMillis?.() ?? 0,
   };
@@ -93,6 +98,7 @@ export type PostInput = {
   content: string;
   coverImage: string | null;
   status: PostStatus;
+  relatedProject: string;
 };
 
 export async function createPost(input: PostInput): Promise<string> {

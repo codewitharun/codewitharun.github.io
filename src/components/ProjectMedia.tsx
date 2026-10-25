@@ -45,9 +45,21 @@ export default function ProjectMedia({ project, className, showStatusBadge, hero
           <img src={show.src} alt={alt} className="h-full w-full object-cover" loading={hero ? "eager" : "lazy"} />
         </div>
       )}
+      {show.kind === "web-phone" && (
+        <div className="web-phone">
+          {/* eslint-disable-next-line @next/next/no-img-element -- static screenshot in public/projects */}
+          <img src={show.web} alt={alt} className="web-phone__web" loading={hero ? "eager" : "lazy"} />
+          <IPhoneFrame src={show.phone} alt="" className="web-phone__phone" eager={hero} />
+        </div>
+      )}
       {show.kind === "tile" && (
         <div className={`project-tile ${hero ? "project-tile--hero" : ""}`} aria-hidden>
-          <span className="project-tile__mark">{project.title.charAt(0)}</span>
+          {project.icon ? (
+            // eslint-disable-next-line @next/next/no-img-element -- static icon in public/projects
+            <img src={project.icon} alt="" className="project-tile__icon" loading={hero ? "eager" : "lazy"} />
+          ) : (
+            <span className="project-tile__mark">{project.title.charAt(0)}</span>
+          )}
           <span className="project-tile__meta">{project.tech.slice(0, 3).join(" · ")}</span>
         </div>
       )}

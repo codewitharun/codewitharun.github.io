@@ -11,6 +11,8 @@ import {
   type PostStatus,
 } from "@/lib/posts";
 import { revalidatePaths } from "@/lib/revalidate";
+import { projects } from "@/content/projects";
+import { autoProjectForPost } from "@/lib/relatedPosts";
 import RichTextEditor from "./RichTextEditor";
 
 type PostEditorProps = {
@@ -27,6 +29,9 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
   const [content, setContent] = useState(post?.content ?? "");
   const [coverImage, setCoverImage] = useState<string | null>(post?.coverImage ?? null);
   const [status, setStatus] = useState<PostStatus>(post?.status ?? "draft");
+  const [relatedProject, setRelatedProject] = useState(post?.relatedProject ?? "");
+  // what "Automatic" would pick right now, shown next to the picker
+  const autoPick = autoProjectForPost({ title, content });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +71,7 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
       content,
       coverImage,
       status: nextStatus,
+      relatedProject,
     };
     try {
       if (post) {
@@ -80,6 +86,8 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
       // the old one, so a renamed post doesn't leave a stale copy behind.
       const pathsToRevalidate = new Set(["/blog", `/blog/${input.slug}`, "/rss.xml"]);
       if (post && post.slug !== input.slug) pathsToRevalidate.add(`/blog/${post.slug}`);
+      // the app's case study lists its posts
+      for (const p of projects) pathsToRevalidate.add(`/portfolio/${p.slug}`);
       revalidatePaths(Array.from(pathsToRevalidate));
       onDone();
     } catch {
@@ -124,6 +132,23 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
           }}
           className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 font-mono text-sm text-ink outline-none focus:border-mint"
         />
+      </label>
+
+      <label className="mt-4 block text-xs text-ink-faint">
+        Related app (shown on its case study, and as a card at the end of the post)
+        <select
+          value={relatedProject}
+          onChange={(e) => setRelatedProject(e.target.value)}
+          className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-mint"
+        >
+          <option value="">Automatic{autoPick ? ` (now: ${autoPick.title})` : " (now: none)"}</option>
+          {projects.map((p) => (
+            <option key={p.slug} value={p.slug}>
+              {p.title}
+            </option>
+          ))}
+          <option value="none">None</option>
+        </select>
       </label>
 
       <label className="mt-4 block text-xs text-ink-faint">
