@@ -3,7 +3,7 @@ import { getProjectsForBuild, getPublishedPosts } from "@/lib/publicContent";
 import type { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const routes = ["", "/about", "/portfolio", "/blog"];
+  const routes = ["", "/about", "/portfolio", "/apps", "/blog"];
   const staticEntries: MetadataRoute.Sitemap = routes.map((route) => ({
     url: `${siteUrl}${route}`,
     lastModified: new Date(),
