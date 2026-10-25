@@ -231,6 +231,12 @@ h1, h2, h3, h4 {
   display: block;
 }
 
+.iphone--inset .iphone__screen img {
+  box-sizing: border-box;
+  padding-top: 13cqw;
+  background: #0b0d0c;
+}
+
 .iphone__island {
   position: absolute;
   top: 3.2cqw;
@@ -333,6 +339,50 @@ h1, h2, h3, h4 {
 }
 .phone-fan--2 .phone-fan__item--1 {
   transform: translateX(-12%) translateY(6%) rotate(5deg) scale(0.94);
+}
+
+/* ---- Title tile (projects without public images) --------------------- */
+.project-tile {
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.6rem;
+  height: 22rem;
+  padding: 2rem;
+  overflow: hidden;
+  border-radius: inherit;
+  text-align: center;
+  background:
+    radial-gradient(60% 70% at 50% 110%, rgba(0, 255, 164, 0.12), transparent 70%),
+    radial-gradient(50% 60% at 85% 0%, rgba(166, 104, 255, 0.16), transparent 70%);
+}
+.project-tile--hero {
+  height: clamp(16rem, 40vw, 24rem);
+}
+.project-tile__mark {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 1.4rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  color: var(--color-mint);
+  font-family: var(--font-display, inherit);
+  font-size: 2rem;
+  font-weight: 700;
+}
+.project-tile__name {
+  color: var(--color-ink);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+.project-tile__meta {
+  color: var(--color-ink-faint);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* ---- Screens gallery (case-study page) -------------------------------- */

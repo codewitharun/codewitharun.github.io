@@ -9,11 +9,13 @@ type IPhoneFrameProps = {
   className?: string;
   /** above-the-fold hero images load eagerly */
   eager?: boolean;
+  /** the screenshot has no status bar: push it below the Dynamic Island */
+  inset?: boolean;
 };
 
-export default function IPhoneFrame({ src, alt, className, eager }: IPhoneFrameProps) {
+export default function IPhoneFrame({ src, alt, className, eager, inset }: IPhoneFrameProps) {
   return (
-    <div className={`iphone ${className ?? ""}`}>
+    <div className={`iphone ${inset ? "iphone--inset" : ""} ${className ?? ""}`}>
       <div className="iphone__body">
         <span className="iphone__btn iphone__btn--action" aria-hidden />
         <span className="iphone__btn iphone__btn--vol-up" aria-hidden />

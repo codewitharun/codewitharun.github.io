@@ -16,12 +16,12 @@
 // The queries filter on status/published so they satisfy firestore.rules
 // for anonymous readers (posts: status == "published"; projects:
 // published == true). Sorting happens here, so no composite index needed.
-// The admin panel keeps using posts.ts / projects.ts in the browser.
+// The admin panel keeps using posts.ts in the browser.
 import { unstable_cache } from "next/cache";
-import { fallbackProjects } from "@/data/site";
+import type { Project } from "@/data/site";
+import { projects as codeProjects } from "@/content/projects";
 import { firebaseConfig } from "@/lib/firebaseConfig";
 import type { Post } from "@/lib/posts";
-import type { ProjectDoc } from "@/lib/projects";
 
 export const POSTS_TAG = "posts";
 export const PROJECTS_TAG = "projects";
@@ -128,64 +128,15 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 // ---- Projects -------------------------------------------------------------------
+// Projects live in code (src/content/projects.ts) since Oct 2026, not in
+// Firestore, so these are plain reads of that list. The old Firestore
+// `projects` collection is left in place untouched, but nothing reads it.
 
-export function toProject(d: Record<string, unknown>): ProjectDoc {
-  return {
-    id: String(d.id),
-    slug: String(d.slug ?? ""),
-    title: String(d.title ?? ""),
-    description: String(d.description ?? ""),
-    links: (d.links as ProjectDoc["links"]) ?? {},
-    image: String(d.image ?? ""),
-    tech: (d.tech as string[]) ?? [],
-    status: String(d.status ?? ""),
-    currentlyWorkingOn: Boolean(d.currentlyWorkingOn),
-    features: (d.features as string[]) ?? [],
-    platform: ["mobile", "web", "both"].includes(String(d.platform))
-      ? (d.platform as ProjectDoc["platform"])
-      : undefined,
-    screenshots: (d.screenshots as string[]) ?? [],
-    tagline: String(d.tagline ?? ""),
-    role: String(d.role ?? ""),
-    year: String(d.year ?? ""),
-    highlights: (d.highlights as string[]) ?? [],
-    published: d.published !== false,
-    order: Number(d.order ?? 0) || 0,
-    createdAt: Number(d.createdAt ?? 0) || 0,
-    updatedAt: Number(d.updatedAt ?? 0) || 0,
-  };
-}
+export type ProjectDoc = Project & { id: string; order: number; updatedAt: number };
 
-const getPublishedProjectsCached = unstable_cache(
-  async (): Promise<ProjectDoc[]> => {
-    const docs = await queryWhereEquals("projects", "published", { booleanValue: true });
-    return docs.map(toProject).sort((a, b) => a.order - b.order);
-  },
-  ["public-published-projects"],
-  { revalidate: REVALIDATE_SECONDS, tags: [PROJECTS_TAG] },
-);
+const BUILT_AT = Date.now();
 
-function fallbackProjectDocs(): ProjectDoc[] {
-  return fallbackProjects.map((project, index) => ({
-    ...project,
-    id: project.slug,
-    published: true,
-    order: index,
-    createdAt: 0,
-    updatedAt: 0,
-  }));
-}
-
-/**
- * Published projects, falling back to the hardcoded list when Firestore
- * can't be reached or has none yet (same behaviour as before).
- */
+/** Every project, in display order (hobby apps first, then work). */
 export async function getProjectsForBuild(): Promise<ProjectDoc[]> {
-  try {
-    const projects = await getPublishedProjectsCached();
-    return projects.length > 0 ? projects : fallbackProjectDocs();
-  } catch (error) {
-    console.error("Projects: falling back to the built-in list:", error);
-    return fallbackProjectDocs();
-  }
+  return codeProjects.map((p, i) => ({ ...p, id: p.slug, order: i, updatedAt: BUILT_AT }));
 }

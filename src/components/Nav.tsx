@@ -9,6 +9,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/portfolio", label: "Portfolio" },
+  { href: "/apps", label: "Apps" },
   { href: "/blog", label: "Blog" },
 ];
 
@@ -38,6 +39,24 @@ function useActivePathname() {
 export default function Nav() {
   const pathname = useActivePathname();
   const [open, setOpen] = useState(false);
+
+  // The admin gets a plain header: logo + a way back to the site, not the
+  // public menu and its "Say hi" button.
+  if (pathname?.startsWith("/admin")) {
+    return (
+      <header className="sticky top-0 z-50 border-b border-border-soft/80 bg-bg/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">
+          <Link href="/" className="flex items-center" aria-label="Techtiten home">
+            {/* eslint-disable-next-line @next/next/no-img-element -- tiny static SVG logo */}
+            <img src="/images/techtiten-logo.svg" alt="Techtiten" className="h-10 w-auto" />
+          </Link>
+          <Link href="/" className="mono-label text-xs text-ink-faint transition-colors hover:text-ink">
+            View site ↗
+          </Link>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-soft/80 bg-bg/80 backdrop-blur-md">
@@ -77,7 +96,7 @@ export default function Nav() {
             href="/#contact"
             className="rounded-full bg-mint px-4 py-2 text-xs font-semibold text-bg transition-transform hover:scale-105"
           >
-            Hire Me
+            Say hi
           </Link>
         </nav>
 
@@ -108,7 +127,7 @@ export default function Nav() {
             onClick={() => setOpen(false)}
             className="mt-2 rounded-full bg-mint px-4 py-2 text-center text-xs font-semibold text-bg"
           >
-            Hire Me
+            Say hi
           </Link>
         </nav>
       )}

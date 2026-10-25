@@ -1,45 +1,38 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check } from "lucide-react";
 import IPhoneFrame from "@/components/IPhoneFrame";
 import ProjectMedia from "@/components/ProjectMedia";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
 import Reveal from "@/components/Reveal";
-import { brand } from "@/data/site";
+import { brand, type Project } from "@/data/site";
 import { platformOf } from "@/lib/projectImage";
-import { getProjectsForBuild } from "@/lib/publicContent";
+import { projectBySlug, projects } from "@/content/projects";
 
-export const revalidate = 300;
+// Every project is in code, so every case study is built ahead of time.
+export const dynamicParams = false;
 
-export async function generateStaticParams() {
-  // Best-effort at build time, same reasoning as blog/[slug] — if
-  // Firestore can't be reached, fall back to no pre-rendered projects
-  // rather than failing the build; `revalidate` fetches them on request.
-  try {
-    const projects = await getProjectsForBuild();
-    return projects.map((project) => ({ slug: project.slug }));
-  } catch {
-    return [];
-  }
+export function generateStaticParams() {
+  return projects.map((project) => ({ slug: project.slug }));
 }
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-async function getProject(slug: string) {
-  const projects = await getProjectsForBuild();
-  return projects.find((p) => p.slug === slug);
-}
-
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = await getProject(slug);
+  const project = projectBySlug(slug);
   if (!project) return {};
 
   const title = `${project.title} — React Native Case Study`;
-  const description = `${project.description} Built by ${brand.founder}, a React Native developer and software engineer in Jaipur, India, under Techtiten.`;
+  const by =
+    project.kind === "hobby"
+      ? `A hobby app built by ${brand.founder}, a React Native developer in Jaipur, India, under Techtiten.`
+      : `Built at work by ${brand.founder}, a React Native developer in Jaipur, India.`;
+  const description = `${project.tagline ?? project.description} ${by}`;
+  const image = project.cover ?? project.screenshots?.[0];
 
   return {
     title,
@@ -48,11 +41,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     openGraph: {
       title: `${project.title} · Techtiten`,
       description,
-      images: project.image
-        ? [{ url: project.image }]
-        : project.screenshots?.[0]
-          ? [{ url: project.screenshots[0] }]
-          : undefined,
+      images: image ? [{ url: image }] : undefined,
     },
   };
 }
@@ -65,12 +54,42 @@ function parseHighlight(line: string) {
   return { value: value.trim(), label: rest.join("|").trim() };
 }
 
+function RelatedCard({ project }: { project: Project }) {
+  return (
+    <Link
+      href={`/portfolio/${project.slug}`}
+      className="group flex h-full items-start gap-4 rounded-2xl border border-border bg-bg-card p-4 transition-colors hover:border-mint/60"
+    >
+      <span className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl border border-border bg-bg-raised font-display text-xl font-bold text-mint">
+        {project.icon ? (
+          // eslint-disable-next-line @next/next/no-img-element -- static icon in public/projects
+          <img src={project.icon} alt="" className="h-full w-full object-cover" loading="lazy" />
+        ) : (
+          project.title.charAt(0)
+        )}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center justify-between gap-2">
+          <span className="font-display font-bold text-ink group-hover:text-mint">{project.title}</span>
+          <ArrowUpRight size={14} className="shrink-0 text-ink-faint group-hover:text-mint" />
+        </span>
+        <span className="mono-label mt-1 block text-[10px] text-ink-faint">{project.status}</span>
+        {project.tagline ? <span className="mt-2 block text-sm text-ink-soft">{project.tagline}</span> : null}
+      </span>
+    </Link>
+  );
+}
+
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const [project, projects] = await Promise.all([getProject(slug), getProjectsForBuild()]);
+  const project = projectBySlug(slug);
   if (!project) notFound();
 
-  const others = projects.filter((p) => p.slug !== project.slug).slice(0, 3);
+  // related: the same kind first (hobby next to hobby), then the rest
+  const others = [
+    ...projects.filter((p) => p.slug !== project.slug && p.kind === project.kind),
+    ...projects.filter((p) => p.slug !== project.slug && p.kind !== project.kind),
+  ].slice(0, 3);
   const highlights = (project.highlights ?? []).map(parseHighlight).filter((h) => h.value);
   const screenshots = (project.screenshots ?? []).filter(Boolean);
   const facts = [
@@ -85,7 +104,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       {/* ── Hero ─────────────────────────────────────────────── */}
       <Reveal>
         <Link
-          href="/portfolio"
+          href={project.kind === "work" ? "/portfolio#work" : "/portfolio"}
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-mint"
         >
           <ArrowLeft size={14} /> All projects
@@ -93,20 +112,27 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <span className="mono-label rounded-full border border-border px-3 py-1 text-[11px] text-ink-faint">
+            {project.kind === "hobby" ? "Hobby project" : "Built at work"}
+          </span>
+          <span className="mono-label rounded-full border border-border px-3 py-1 text-[11px] text-ink-faint">
             {project.status}
           </span>
           {project.currentlyWorkingOn && (
-            <span className="mono-label rounded-full bg-mint px-3 py-1 text-[11px] text-bg">
-              Currently building
-            </span>
+            <span className="mono-label rounded-full bg-mint px-3 py-1 text-[11px] text-bg">Currently building</span>
           )}
         </div>
-        <h1 className="mt-4 font-display text-5xl font-bold tracking-tight text-ink md:text-6xl">
-          {project.title}
-        </h1>
-        {project.tagline ? (
-          <p className="mt-4 max-w-2xl text-xl text-ink-soft md:text-2xl">{project.tagline}</p>
-        ) : null}
+        <div className="mt-4 flex items-center gap-4">
+          {project.icon ? (
+            // eslint-disable-next-line @next/next/no-img-element -- static icon in public/projects
+            <img
+              src={project.icon}
+              alt=""
+              className="h-14 w-14 rounded-2xl border border-border md:h-16 md:w-16"
+            />
+          ) : null}
+          <h1 className="font-display text-5xl font-bold tracking-tight text-ink md:text-6xl">{project.title}</h1>
+        </div>
+        {project.tagline ? <p className="mt-4 max-w-2xl text-xl text-ink-soft md:text-2xl">{project.tagline}</p> : null}
         <ProjectLinkButtons links={project.links} className="mt-6 flex flex-wrap gap-5" />
       </Reveal>
 
@@ -132,36 +158,28 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </Reveal>
       )}
 
-      {/* ── Overview + facts ────────────────────────────────── */}
+      {/* ── Overview, then facts as one row (no empty column beside the text) ── */}
       <Reveal delay={0.1}>
-        <div className="mt-16 grid gap-10 md:grid-cols-[1fr_16rem]">
-          <div>
-            <p className="mono-label mb-4 text-xs text-mint">Overview</p>
-            <p className="text-lg leading-relaxed text-ink-soft">{project.description}</p>
-          </div>
-          <dl className="space-y-5 rounded-2xl border border-border bg-bg-card p-5">
+        <div className="mt-16">
+          <p className="mono-label mb-4 text-xs text-mint">Overview</p>
+          <p className="max-w-3xl text-lg leading-relaxed text-ink-soft">{project.description}</p>
+          <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-4">
             {facts.map((f) => (
-              <div key={f.label}>
+              <div key={f.label} className="bg-bg-card p-4">
                 <dt className="mono-label text-[10px] text-ink-faint">{f.label}</dt>
                 <dd className="mt-1 text-sm font-semibold text-ink">{f.value}</dd>
               </div>
             ))}
-            {project.tech.length > 0 && (
-              <div>
-                <dt className="mono-label text-[10px] text-ink-faint">Stack</dt>
-                <dd className="mt-2 flex flex-wrap gap-1.5">
-                  {project.tech.map((t) => (
-                    <span
-                      key={t}
-                      className="mono-label rounded-full border border-border px-2.5 py-1 text-[10px] text-ink-soft"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </dd>
-              </div>
-            )}
           </dl>
+          {project.tech.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {project.tech.map((t) => (
+                <span key={t} className="mono-label rounded-full border border-border px-2.5 py-1 text-[10px] text-ink-soft">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </Reveal>
 
@@ -175,7 +193,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </div>
             <div className="screen-strip">
               {screenshots.map((src, i) => (
-                <IPhoneFrame key={src + i} src={src} alt={`${project.title} screen ${i + 1}`} />
+                <IPhoneFrame
+                  key={src + i}
+                  src={src}
+                  alt={`${project.title} screen ${i + 1}`}
+                  inset={project.screenshotsInset}
+                />
               ))}
             </div>
           </div>
@@ -189,10 +212,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <p className="mono-label mb-6 text-xs text-mint">What it does</p>
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {project.features.map((feature) => (
-                <li
-                  key={feature}
-                  className="flex items-start gap-3 rounded-xl border border-border bg-bg-card p-4"
-                >
+                <li key={feature} className="flex items-start gap-3 rounded-xl border border-border bg-bg-card p-4">
                   <Check size={16} className="mt-0.5 shrink-0 text-mint" />
                   <span className="text-sm text-ink-soft">{feature}</span>
                 </li>
@@ -206,20 +226,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       {others.length > 0 && (
         <Reveal delay={0.15}>
           <div className="mt-24 border-t border-border-soft/60 pt-10">
-            <p className="mono-label mb-6 text-xs text-violet">More from Techtiten</p>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <p className="mono-label mb-6 text-xs text-violet">More projects</p>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {others.map((p) => (
-                <Link
-                  key={p.slug}
-                  href={`/portfolio/${p.slug}`}
-                  className="group overflow-hidden rounded-2xl border border-border bg-bg-card transition-colors hover:border-mint/60"
-                >
-                  <ProjectMedia project={p} className="relative border-b border-border" />
-                  <div className="p-4">
-                    <p className="font-display font-bold text-ink group-hover:text-mint">{p.title}</p>
-                    <p className="mono-label mt-1 text-[10px] text-ink-faint">{p.status}</p>
-                  </div>
-                </Link>
+                <RelatedCard key={p.slug} project={p} />
               ))}
             </div>
           </div>
