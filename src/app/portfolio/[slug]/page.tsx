@@ -46,6 +46,9 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   };
 }
 
+// one column per fact, so a 3-fact project has no empty cell
+const FACT_COLS: Record<number, string> = { 2: "md:grid-cols-2", 3: "md:grid-cols-3", 4: "md:grid-cols-4" };
+
 const PLATFORM_LABEL = { mobile: "Mobile app", web: "Web app", both: "Mobile + web" } as const;
 
 /** "570K+ | Active users" -> { value, label } */
@@ -163,7 +166,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <div className="mt-16">
           <p className="mono-label mb-4 text-xs text-mint">Overview</p>
           <p className="max-w-3xl text-lg leading-relaxed text-ink-soft">{project.description}</p>
-          <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-4">
+          <dl
+            className={`mt-8 grid ${facts.length % 2 ? "grid-cols-1" : "grid-cols-2"} gap-px overflow-hidden rounded-2xl border border-border bg-border ${FACT_COLS[facts.length] ?? "md:grid-cols-4"}`}
+          >
             {facts.map((f) => (
               <div key={f.label} className="bg-bg-card p-4">
                 <dt className="mono-label text-[10px] text-ink-faint">{f.label}</dt>

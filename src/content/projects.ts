@@ -100,18 +100,29 @@ const ezysplit: Project = {
   ],
 };
 
-const taskflow: Project = {
-  slug: "taskflow",
+
+const studymark: Project = {
+  slug: "studymark",
   kind: "hobby",
-  title: "TaskFlow",
-  tagline: "Tasks, water and daily routines in one calm app.",
+  title: "Studymark",
+  tagline: "Plan your study day, focus, and keep each other honest.",
   description:
-    "A small productivity app for tasks, hydration reminders and daily routines. A playground for clean UI, notification-based reminders and keeping screens fast.",
+    "A study app for students and friend squads. Plan the day with a week and month planner, start a focus session that hides the social tabs and holds notifications (and on Android blocks the apps you pick), then share proof with your squad, who grade it. Streaks, a squad leaderboard, chat and a community feed keep everyone going. Built with Supabase.",
   status: "In development",
-  role: "Solo",
+  role: "Solo: design, app and backend",
+  year: "2026 – now",
   platform: "mobile",
-  links: { github: "https://github.com/codewitharun/Taskflow" },
-  tech: ["React Native", "TypeScript", "Push Notifications", "Local Storage"],
+  links: {},
+  tech: ["React Native", "Expo", "TypeScript", "Supabase", "Postgres", "Kotlin"],
+  features: [
+    "Planner with week, month and list views, a day timeline and auto-plan",
+    "Focus sessions that hide Squad and Feed and hold chat notifications until you're done",
+    "Android app blocker: apps you pick send you back to Studymark while you focus",
+    "Study reminders for sessions, classes, due tasks, exams and revision",
+    "Squads: share your day, get graded by friends, streaks and a leaderboard",
+    "Squad chat, friends, profiles, report and block",
+    "Community feed",
+  ],
 };
 
 const ageas: Project = {
@@ -120,15 +131,19 @@ const ageas: Project = {
   title: "Ageas Federal Life Insurance",
   tagline: "The insurer's customer app for policies, payments and claims.",
   description:
-    "The customer app for Ageas Federal Life Insurance, built at my job. I built it from scratch and now lead its second phase: policy management, premium payments, fund tracking, claims, and secure access to policy documents, on iOS and Android.",
+    "The customer app for Ageas Federal Life Insurance, built at my job. I built it from scratch and now lead its second phase: policy management, premium payments, fund tracking, claims, and secure access to policy documents. One React Native codebase runs the iOS and Android apps and, through React Native Web, the responsive customer portal at mypolicy.ageasfederal.com.",
   status: "Live on App Store & Google Play",
   role: "Built at work",
-  platform: "mobile",
+  platform: "both",
+  // the live customer portal (React Native Web, same codebase as the apps);
+  // everything past login is private policy data, so only the login screen
+  cover: "/projects/ageas/web-login.webp",
   links: {
+    website: "https://mypolicy.ageasfederal.com",
     appStore: "https://apps.apple.com/in/app/ageas-federal-life-insurance/id6756178483",
     playStore: "https://play.google.com/store/apps/details?id=com.ageasfederal.customer",
   },
-  tech: ["React Native", "TypeScript", "Firebase", "Payments"],
+  tech: ["React Native", "React Native Web", "TypeScript", "Firebase", "Payments"],
 };
 
 const sodality: Project = {
@@ -160,6 +175,20 @@ const liveStreaming: Project = {
   tech: ["React Native", "Vision Camera", "Skia", "Live Streaming", "Video Calls", "Play Billing"],
 };
 
+const penn: Project = {
+  slug: "penn-ai",
+  kind: "work",
+  title: "Penn AI",
+  tagline: "Record meetings and chats, get a transcript sorted by speaker.",
+  description:
+    "An iOS and Android app for Penn AI, built at my earlier job. It recorded meetings and conversations, transcribed them, split the transcript by voice (Speaker 1, 2, 3…) and kept every recording organised day by day. The company has since moved to a different product, so the app is no longer listed.",
+  status: "No longer listed",
+  role: "Built at work",
+  platform: "mobile",
+  links: {},
+  tech: ["React Native", "Audio Recording", "Speech-to-Text", "Speaker Labels", "iOS", "Android"],
+};
+
 const sociable: Project = {
   slug: "sociable",
   kind: "work",
@@ -187,7 +216,17 @@ const shippity: Project = {
 };
 
 /** Display order: hobby apps first, then work. */
-export const projects: Project[] = [fitprep, ezysplit, taskflow, ageas, sodality, liveStreaming, sociable, shippity];
+export const projects: Project[] = [
+  fitprep,
+  ezysplit,
+  studymark,
+  ageas,
+  sodality,
+  penn,
+  liveStreaming,
+  sociable,
+  shippity,
+];
 
 export const hobbyProjects = projects.filter((p) => p.kind === "hobby");
 export const workProjects = projects.filter((p) => p.kind === "work");
