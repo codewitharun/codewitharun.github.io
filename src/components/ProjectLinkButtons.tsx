@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FaApple, FaGooglePlay, FaGithub, FaGlobe } from "react-icons/fa";
+import { FaApple, FaGooglePlay, FaGithub, FaGlobe, FaLifeRing, FaShieldAlt } from "react-icons/fa";
 import type { IconType } from "react-icons";
 import type { ProjectLinks } from "@/data/site";
 
@@ -12,17 +12,23 @@ const LINK_META: Record<keyof ProjectLinks, { label: string; Icon: IconType }> =
   playStore: { label: "Play Store", Icon: FaGooglePlay },
   website: { label: "Website", Icon: FaGlobe },
   github: { label: "Source", Icon: FaGithub },
+  support: { label: "Help & support", Icon: FaLifeRing },
+  privacy: { label: "Privacy", Icon: FaShieldAlt },
 };
 
 const ORDER: (keyof ProjectLinks)[] = ["appStore", "playStore", "website", "github"];
+// For people who already use the app: only on its own case-study page.
+const HELP: (keyof ProjectLinks)[] = ["support", "privacy"];
 
 type ProjectLinkButtonsProps = {
   links: ProjectLinks;
   className?: string;
+  /** Also show Help & support and Privacy (case-study page). */
+  withHelp?: boolean;
 };
 
-export default function ProjectLinkButtons({ links, className }: ProjectLinkButtonsProps) {
-  const keys = ORDER.filter((key) => links[key]);
+export default function ProjectLinkButtons({ links, className, withHelp = false }: ProjectLinkButtonsProps) {
+  const keys = (withHelp ? [...ORDER, ...HELP] : ORDER).filter((key) => links[key]);
   if (keys.length === 0) return null;
 
   return (

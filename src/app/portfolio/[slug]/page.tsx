@@ -45,6 +45,8 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     title,
     description,
     alternates: { canonical: `/portfolio/${project.slug}` },
+    // the app's own icon in the tab, so FitPrep and EzySplit tabs differ
+    icons: project.icon ? { icon: project.icon, apple: project.icon } : undefined,
     openGraph: {
       title: `${project.title} · Techtiten`,
       description,
@@ -185,7 +187,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <h1 className="font-display text-5xl font-bold tracking-tight text-ink md:text-6xl">{project.title}</h1>
         </div>
         {project.tagline ? <p className="mt-4 max-w-2xl text-xl text-ink-soft md:text-2xl">{project.tagline}</p> : null}
-        <ProjectLinkButtons links={project.links} className="mt-6 flex flex-wrap gap-5" />
+        <ProjectLinkButtons links={project.links} withHelp className="mt-6 flex flex-wrap gap-5" />
       </Reveal>
 
       <Reveal delay={0.05}>

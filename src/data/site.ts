@@ -128,6 +128,10 @@ export type ProjectLinks = {
   website?: string;
   /** Public source code repository */
   github?: string;
+  /** Help & support page (shown on the case-study page only) */
+  support?: string;
+  /** Privacy policy (shown on the case-study page only) */
+  privacy?: string;
 };
 
 export type Project = {

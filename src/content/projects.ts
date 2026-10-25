@@ -49,6 +49,8 @@ const fitprep: Project = {
   ],
   links: {
     playStore: "https://play.google.com/store/apps/details?id=com.arun.fitprep",
+    support: "https://fitprep.techtiten.com/support",
+    privacy: "https://fitprep.techtiten.com/privacy",
   },
   tech: ["React Native", "Expo", "TypeScript", "Reanimated", "Fastify", "Firebase", "Google Gemini", "Vercel"],
   features: [
@@ -92,6 +94,8 @@ const ezysplit: Project = {
   ],
   links: {
     playStore: "https://play.google.com/store/apps/details?id=com.techtitens.ezysplit",
+    support: "https://ezysplit.techtiten.com/support",
+    privacy: "https://ezysplit.techtiten.com/privacy",
   },
   tech: ["React Native", "Expo", "TypeScript", "Firebase", "Firestore", "Cloud Messaging", "Node.js", "Express", "Vercel", "Gemini"],
   features: [
