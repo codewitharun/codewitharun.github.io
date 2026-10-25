@@ -137,7 +137,7 @@ export default function ContactForm() {
           name="message"
           required
           rows={4}
-          placeholder="Feedback, a bug, an idea, or just hi…"
+          placeholder="What's on your mind?"
           className={`${inputClass} resize-none`}
         />
       </div>

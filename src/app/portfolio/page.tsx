@@ -16,9 +16,20 @@ export const metadata: Metadata = {
 
 // Work apps have no public screenshots, so their cards skip the big media
 // area and lead with a small mark instead (no tall empty tiles).
-function ProjectCard({ project, index, compact }: { project: Project; index: number; compact?: boolean }) {
+function ProjectCard({
+  project,
+  index,
+  compact,
+  wide,
+}: {
+  project: Project;
+  index: number;
+  compact?: boolean;
+  /** span both columns (a work app with a picture, among compact cards) */
+  wide?: boolean;
+}) {
   return (
-    <Reveal delay={(index % 2) * 0.1}>
+    <Reveal delay={(index % 2) * 0.1} className={wide ? "md:col-span-2" : undefined}>
       <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-bg-card transition-colors hover:border-mint/60">
         {compact ? null : (
           <ProjectMedia
@@ -101,7 +112,13 @@ export default function PortfolioPage() {
         </Reveal>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {workProjects.map((p, i) => (
-            <ProjectCard key={p.slug} project={p} index={i} compact />
+            <ProjectCard
+              key={p.slug}
+              project={p}
+              index={i}
+              compact={!p.cover && !p.screenshots?.length}
+              wide={Boolean(p.cover || p.screenshots?.length)}
+            />
           ))}
         </div>
       </section>

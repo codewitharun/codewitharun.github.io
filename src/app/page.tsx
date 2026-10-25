@@ -193,12 +193,11 @@ export default function Home() {
           <Reveal>
             <p className="mono-label mb-3 text-xs text-mint">Say hi</p>
             <h2 className="font-display text-3xl font-bold text-ink md:text-4xl">
-              Tried one of my apps? Tell me.
+              Let&apos;s chat.
             </h2>
             <p className="mt-4 text-ink-soft">
-              Feedback, a bug you found, an idea for FitPrep or EzySplit, or
-              just a chat about React Native: my inbox is open. Recruiters, my
-              resume is right here.
+              About anything: an app of mine, an idea, React Native, or just
+              to say hi. My inbox is open.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link
@@ -212,7 +211,7 @@ export default function Home() {
                 target="_blank"
                 className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-mint hover:text-mint hover:scale-105"
               >
-                <FileDown size={16} /> Resume (for recruiters)
+                <FileDown size={16} /> Resume
               </Link>
             </div>
 
