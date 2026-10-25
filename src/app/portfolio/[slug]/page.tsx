@@ -6,7 +6,8 @@ import IPhoneFrame from "@/components/IPhoneFrame";
 import ProjectMedia from "@/components/ProjectMedia";
 import ProjectLinkButtons from "@/components/ProjectLinkButtons";
 import Reveal from "@/components/Reveal";
-import { brand, type Project } from "@/data/site";
+import { brand, siteUrl, type Project } from "@/data/site";
+import { orgId, personId } from "@/lib/schema";
 import { platformOf } from "@/lib/projectImage";
 import { projectBySlug, projects } from "@/content/projects";
 import { getPublishedPosts } from "@/lib/publicContent";
@@ -30,12 +31,14 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   const project = projectBySlug(slug);
   if (!project) return {};
 
-  const title = `${project.title} — React Native Case Study`;
+  // Live apps get a title for people searching for the app; the rest stay
+  // case studies.
+  const title = project.seoTitle ?? `${project.title} — React Native Case Study`;
   const by =
     project.kind === "hobby"
       ? `A hobby app built by ${brand.founder}, a React Native developer in Jaipur, India, under Techtiten.`
       : `Built at work by ${brand.founder}, a React Native developer in Jaipur, India.`;
-  const description = `${project.tagline ?? project.description} ${by}`;
+  const description = project.seoDescription ?? `${project.tagline ?? project.description} ${by}`;
   const image = project.cover ?? project.screenshots?.[0];
 
   return {
@@ -87,6 +90,41 @@ function RelatedCard({ project }: { project: Project }) {
   );
 }
 
+/** App + breadcrumb structured data, so Google knows this page is the app's
+ * home and links it to the Play listing and to Techtiten. */
+function projectJsonLd(project: Project) {
+  const url = `${siteUrl}/portfolio/${project.slug}`;
+  const store = project.links.playStore ?? project.links.appStore;
+  const graph: Record<string, unknown>[] = [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Portfolio", item: `${siteUrl}/portfolio` },
+        { "@type": "ListItem", position: 2, name: project.title, item: url },
+      ],
+    },
+  ];
+  if (project.kind === "hobby" && store) {
+    graph.push({
+      "@type": "MobileApplication",
+      "@id": `${url}#app`,
+      name: project.title,
+      url,
+      description: project.seoDescription ?? project.description,
+      operatingSystem: project.links.appStore && project.links.playStore ? "Android, iOS" : project.links.playStore ? "Android" : "iOS",
+      applicationCategory: project.appCategory ?? "UtilitiesApplication",
+      installUrl: store,
+      sameAs: [project.links.playStore, project.links.appStore].filter(Boolean),
+      image: project.icon ? `${siteUrl}${project.icon}` : undefined,
+      screenshot: (project.screenshots ?? []).slice(0, 4).map((s) => `${siteUrl}${s}`),
+      offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+      author: { "@id": personId },
+      publisher: { "@id": orgId },
+    });
+  }
+  return { "@context": "https://schema.org", "@graph": graph };
+}
+
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
   const project = projectBySlug(slug);
@@ -111,6 +149,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectJsonLd(project)) }}
+      />
       {/* ── Hero ─────────────────────────────────────────────── */}
       <Reveal>
         <Link
@@ -136,7 +178,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             // eslint-disable-next-line @next/next/no-img-element -- static icon in public/projects
             <img
               src={project.icon}
-              alt=""
+              alt={`${project.title} app icon`}
               className="h-14 w-14 rounded-2xl border border-border md:h-16 md:w-16"
             />
           ) : null}
@@ -171,7 +213,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       {/* ── Overview, then facts as one row (no empty column beside the text) ── */}
       <Reveal delay={0.1}>
         <div className="mt-16">
-          <p className="mono-label mb-4 text-xs text-mint">Overview</p>
+          <h2 className="mono-label mb-4 text-xs text-mint">Overview</h2>
           <p className="max-w-3xl text-lg leading-relaxed text-ink-soft">{project.description}</p>
           <dl
             className={`mt-8 grid ${facts.length % 2 ? "grid-cols-1" : "grid-cols-2"} gap-px overflow-hidden rounded-2xl border border-border bg-border ${FACT_COLS[facts.length] ?? "md:grid-cols-4"}`}
@@ -200,7 +242,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <Reveal delay={0.1}>
           <div className="mt-20">
             <div className="mb-6 flex items-end justify-between gap-4">
-              <p className="mono-label text-xs text-mint">Screens</p>
+              <h2 className="mono-label text-xs text-mint">Screens</h2>
               <p className="text-xs text-ink-faint">Swipe to see more →</p>
             </div>
             <div className="screen-strip">
@@ -221,7 +263,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       {project.features && project.features.length > 0 && (
         <Reveal delay={0.12}>
           <div className="mt-16">
-            <p className="mono-label mb-6 text-xs text-mint">What it does</p>
+            <h2 className="mono-label mb-6 text-xs text-mint">What it does</h2>
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {project.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-3 rounded-xl border border-border bg-bg-card p-4">
@@ -239,7 +281,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <Reveal delay={0.14}>
           <div className="mt-20">
             <div className="mb-6 flex items-end justify-between gap-4">
-              <p className="mono-label text-xs text-mint">Written about {project.title}</p>
+              <h2 className="mono-label text-xs text-mint">Written about {project.title}</h2>
               <Link href="/blog" className="text-xs text-ink-faint hover:text-mint">
                 All notes →
               </Link>
@@ -283,7 +325,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       {others.length > 0 && (
         <Reveal delay={0.15}>
           <div className="mt-24 border-t border-border-soft/60 pt-10">
-            <p className="mono-label mb-6 text-xs text-violet">More projects</p>
+            <h2 className="mono-label mb-6 text-xs text-violet">More projects</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {others.map((p) => (
                 <RelatedCard key={p.slug} project={p} />
