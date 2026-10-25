@@ -25,9 +25,23 @@ type ProjectLinkButtonsProps = {
   className?: string;
   /** Also show Help & support and Privacy (case-study page). */
   withHelp?: boolean;
+  /** "buttons": pill buttons (store link filled) for the case-study hero. */
+  variant?: "text" | "buttons";
 };
 
-export default function ProjectLinkButtons({ links, className, withHelp = false }: ProjectLinkButtonsProps) {
+const STORE: (keyof ProjectLinks)[] = ["appStore", "playStore"];
+const TEXT_CLASS =
+  "inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-mint";
+const PILL = "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors";
+const PILL_FILLED = `${PILL} bg-mint text-bg hover:bg-mint/85`;
+const PILL_OUTLINE = `${PILL} border border-border text-ink hover:border-mint hover:text-mint`;
+
+export default function ProjectLinkButtons({
+  links,
+  className,
+  withHelp = false,
+  variant = "text",
+}: ProjectLinkButtonsProps) {
   const keys = (withHelp ? [...ORDER, ...HELP] : ORDER).filter((key) => links[key]);
   if (keys.length === 0) return null;
 
@@ -41,7 +55,9 @@ export default function ProjectLinkButtons({ links, className, withHelp = false 
             href={links[key]!}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-mint"
+            className={
+              variant === "text" ? TEXT_CLASS : STORE.includes(key) ? PILL_FILLED : PILL_OUTLINE
+            }
           >
             <Icon size={14} /> {label}
           </Link>
