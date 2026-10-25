@@ -2,9 +2,11 @@ import Reveal from "@/components/Reveal";
 import ShareButtons from "@/components/ShareButtons";
 import { brand, siteUrl } from "@/data/site";
 import { getPostBySlug, getPublishedPosts } from "@/lib/publicContent";
+import { projectForPost } from "@/lib/relatedPosts";
 import { blogPostingJsonLd } from "@/lib/schema";
 import { sanitizePostHtml } from "@/lib/sanitizePost";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { FaGooglePlay } from "react-icons/fa";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -64,6 +66,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post || post.status !== "published") notFound();
+  const app = projectForPost(post);
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
@@ -124,6 +127,46 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           }}
         />
       </Reveal>
+
+      {app && (
+        <Reveal delay={0.12}>
+          <aside className="mt-12 flex flex-col gap-4 rounded-2xl border border-border bg-bg-card p-5 sm:flex-row sm:items-center">
+            <span className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border border-border bg-bg-raised font-display text-2xl font-bold text-mint">
+              {app.icon ? (
+                // eslint-disable-next-line @next/next/no-img-element -- static icon in public/projects
+                <img src={app.icon} alt="" className="h-full w-full object-cover" />
+              ) : (
+                app.title.charAt(0)
+              )}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="mono-label text-[10px] text-violet">
+                {app.kind === "hobby" ? "About this app" : "Built at work"}
+              </p>
+              <p className="mt-1 font-display text-lg font-bold text-ink">{app.title}</p>
+              {app.tagline ? <p className="text-sm text-ink-soft">{app.tagline}</p> : null}
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href={`/portfolio/${app.slug}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:border-mint hover:text-mint"
+              >
+                Case study <ArrowUpRight size={14} />
+              </Link>
+              {app.links.playStore ? (
+                <a
+                  href={app.links.playStore}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-mint px-4 py-2 text-sm font-bold text-bg"
+                >
+                  <FaGooglePlay size={13} /> Google Play
+                </a>
+              ) : null}
+            </div>
+          </aside>
+        </Reveal>
+      )}
 
       <Reveal delay={0.15}>
         <div className="mt-12 border-t border-border-soft/60 pt-6">

@@ -107,6 +107,7 @@ export function toPost(d: Record<string, unknown>): Post {
     content: String(d.content ?? ""),
     coverImage: (d.coverImage as string | null | undefined) ?? null,
     status: d.status === "published" ? "published" : "draft",
+    relatedProject: typeof d.relatedProject === "string" ? d.relatedProject : "",
     createdAt: Number(d.createdAt ?? 0) || 0,
     updatedAt: Number(d.updatedAt ?? 0) || 0,
   };

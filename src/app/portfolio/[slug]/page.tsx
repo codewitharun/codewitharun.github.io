@@ -9,9 +9,13 @@ import Reveal from "@/components/Reveal";
 import { brand, type Project } from "@/data/site";
 import { platformOf } from "@/lib/projectImage";
 import { projectBySlug, projects } from "@/content/projects";
+import { getPublishedPosts } from "@/lib/publicContent";
+import { postsForProject } from "@/lib/relatedPosts";
 
 // Every project is in code, so every case study is built ahead of time.
+// Re-checked every 5 minutes (and on a post save) for its blog posts.
 export const dynamicParams = false;
+export const revalidate = 300;
 
 export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }));
@@ -93,6 +97,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     ...projects.filter((p) => p.slug !== project.slug && p.kind === project.kind),
     ...projects.filter((p) => p.slug !== project.slug && p.kind !== project.kind),
   ].slice(0, 3);
+  // Blog posts about this app (best effort: the page still renders if
+  // Firestore can't be reached).
+  const posts = postsForProject(await getPublishedPosts().catch(() => []), project.slug);
   const highlights = (project.highlights ?? []).map(parseHighlight).filter((h) => h.value);
   const screenshots = (project.screenshots ?? []).filter(Boolean);
   const facts = [
@@ -223,6 +230,51 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </li>
               ))}
             </ul>
+          </div>
+        </Reveal>
+      )}
+
+      {/* ── Blog posts about this app ─────────────────────────── */}
+      {posts.length > 0 && (
+        <Reveal delay={0.14}>
+          <div className="mt-20">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <p className="mono-label text-xs text-mint">Written about {project.title}</p>
+              <Link href="/blog" className="text-xs text-ink-faint hover:text-mint">
+                All notes →
+              </Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {posts.slice(0, 4).map((post) => (
+                <Link
+                  key={post.id}
+                  href={`/blog/${post.slug}`}
+                  className="group flex gap-4 overflow-hidden rounded-2xl border border-border bg-bg-card p-4 transition-colors hover:border-mint/60"
+                >
+                  {post.coverImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- post cover (ImageKit)
+                    <img
+                      src={post.coverImage}
+                      alt=""
+                      loading="lazy"
+                      className="h-20 w-28 shrink-0 rounded-xl border border-border object-cover"
+                    />
+                  ) : null}
+                  <span className="min-w-0">
+                    <span className="block font-display font-bold leading-snug text-ink group-hover:text-mint">
+                      {post.title}
+                    </span>
+                    <span className="mono-label mt-2 block text-[10px] text-ink-faint">
+                      {new Date(post.createdAt).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
         </Reveal>
       )}

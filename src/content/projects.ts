@@ -112,6 +112,14 @@ const studymark: Project = {
   role: "Solo: design, app and backend",
   year: "2026 – now",
   platform: "mobile",
+  icon: "/projects/studymark/icon.webp",
+  screenshotsInset: true,
+  screenshots: [
+    "/projects/studymark/today.webp",
+    "/projects/studymark/focus.webp",
+    "/projects/studymark/squad.webp",
+    "/projects/studymark/plan.webp",
+  ],
   links: {},
   tech: ["React Native", "Expo", "TypeScript", "Supabase", "Postgres", "Kotlin"],
   features: [
@@ -138,6 +146,7 @@ const ageas: Project = {
   // the live customer portal (React Native Web, same codebase as the apps);
   // everything past login is private policy data, so only the login screen
   cover: "/projects/ageas/web-login.webp",
+  screenshots: ["/projects/ageas/app-home.webp"],
   links: {
     website: "https://mypolicy.ageasfederal.com",
     appStore: "https://apps.apple.com/in/app/ageas-federal-life-insurance/id6756178483",
