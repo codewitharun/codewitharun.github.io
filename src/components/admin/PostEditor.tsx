@@ -12,7 +12,7 @@ import {
 } from "@/lib/posts";
 import { revalidatePaths } from "@/lib/revalidate";
 import { projects } from "@/content/projects";
-import { autoProjectForPost } from "@/lib/relatedPosts";
+import { suggestProjectForPost } from "@/lib/relatedPosts";
 import RichTextEditor from "./RichTextEditor";
 
 type PostEditorProps = {
@@ -30,8 +30,7 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
   const [coverImage, setCoverImage] = useState<string | null>(post?.coverImage ?? null);
   const [status, setStatus] = useState<PostStatus>(post?.status ?? "draft");
   const [relatedProject, setRelatedProject] = useState(post?.relatedProject ?? "");
-  // what "Automatic" would pick right now, shown next to the picker
-  const autoPick = autoProjectForPost({ title, content });
+  const suggestion = suggestProjectForPost({ title, slug, content });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -135,21 +134,32 @@ export default function PostEditor({ post, onDone, onCancel }: PostEditorProps) 
       </label>
 
       <label className="mt-4 block text-xs text-ink-faint">
-        Related app (shown on its case study, and as a card at the end of the post)
+        Related app (lists the post on that app’s case study, and adds the app’s card at the end of the post)
         <select
           value={relatedProject}
           onChange={(e) => setRelatedProject(e.target.value)}
           className="mt-1.5 block w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-mint"
         >
-          <option value="">Automatic{autoPick ? ` (now: ${autoPick.title})` : " (now: none)"}</option>
+          <option value="">None</option>
           {projects.map((p) => (
             <option key={p.slug} value={p.slug}>
               {p.title}
             </option>
           ))}
-          <option value="none">None</option>
         </select>
       </label>
+      {!relatedProject && suggestion && (
+        <p className="mt-1.5 text-xs text-ink-faint">
+          Looks like it’s about <span className="text-ink">{suggestion.title}</span>.{" "}
+          <button
+            type="button"
+            onClick={() => setRelatedProject(suggestion.slug)}
+            className="font-medium text-mint hover:underline"
+          >
+            Use it
+          </button>
+        </p>
+      )}
 
       <label className="mt-4 block text-xs text-ink-faint">
         Excerpt
