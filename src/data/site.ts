@@ -3,8 +3,8 @@
 // structure of the old CRA site's src/info/Info.js, carried over and
 // rewritten under the Techtiten brand. Real content, not placeholders:
 // this is the actual bio, skill list, and project history from
-// arun.codes, just repositioned as "Techtiten, the studio Arun builds
-// under" rather than a personal-name-only portfolio.
+// arun.codes. Techtiten is the name Arun ships his hobby apps under: no
+// clients, no freelance. Projects themselves live in src/content/projects.ts.
 
 export const brand = {
   name: "Techtiten",
@@ -70,15 +70,15 @@ export const socials = [
 export const miniBio = [
   { emoji: "💻", text: "React Native • TypeScript • Full-Stack" },
   { emoji: "🏢", text: "Senior React Native Developer @ Durapid Technologies" },
-  { emoji: "🤝", text: "Full-Stack Consultant @ Federal Bank / Ageas Federal" },
+  { emoji: "🌙", text: "Hobby apps on Google Play: FitPrep, EzySplit" },
   { emoji: "📍", text: "Jaipur, India" },
 ];
 
-export const bio = `Techtiten is the studio I build under — the name for everything I ship outside a day job: apps, tools, experiments, the occasional idea that only half-works at first. "Titen" instead of "Titan" is on purpose: the whole premise is that unfinished and imperfect still ships, still gets used, still gets better in public.
+export const bio = `Techtiten is the name I put on my hobby projects: apps I build in the evenings and on weekends because I want to use them myself. "Titen" instead of "Titan" is on purpose. The whole idea is that unfinished and imperfect still ships, still gets used, and gets better in public.
 
-By day I'm a Senior React Native Developer at Durapid Technologies, and a Full-Stack Consultant for Federal Bank / Ageas Federal Life Insurance, where I built their customer app from scratch and now run its second phase. Outside that, Techtiten is where the personal projects live — EzySplit chief among them, a group-expense and personal-finance app built for real daily use, not a portfolio piece.
+By day I'm a Senior React Native Developer at Durapid Technologies. At work I built the Ageas Federal Life Insurance customer app from scratch and now lead its second phase. Outside work, Techtiten is where my own apps live: FitPrep, an AI meal-prep and gym tracker, and EzySplit, an expense-splitting app my friends and I use every week. Both are on Google Play.
 
-I specialize in React Native, TypeScript, Firebase, and native integrations, with hands-on experience in live streaming, real-time chat, payment gateways, maps, push notifications, and getting apps through App Store and Play Store review. I've worked across startup-scale and enterprise products, including white-label platforms and consumer-facing apps end to end.`;
+I specialise in React Native, TypeScript, Firebase and native integrations, with hands-on experience in live streaming, real-time chat, payments, maps, push notifications, and getting apps through App Store and Play Store review.`;
 
 export const skills = {
   proficientWith: [
@@ -99,7 +99,7 @@ export const skills = {
     "Modular & Scalable Architecture",
   ],
   learning: [
-    "Beauty Filter Live Streaming (Personal Project)",
+    "Real-time video & beauty filters",
     "Machine Learning Filters",
     "Swift & Kotlin (Native Development)",
     "Cloud Tech (AWS/GCP)",
@@ -132,10 +132,15 @@ export type ProjectLinks = {
 
 export type Project = {
   slug: string;
+  /** "hobby" = my own app under Techtiten; "work" = built at my job */
+  kind: "hobby" | "work";
   title: string;
   description: string;
   links: ProjectLinks;
-  image: string;
+  /** square app icon (small cards) */
+  icon?: string;
+  /** an already-composed graphic (e.g. store feature graphic), shown flat */
+  cover?: string;
   tech: string[];
   status: string;
   /** The one project currently being actively worked on — shown in the
@@ -151,6 +156,9 @@ export type Project = {
    * "mobile" = phone app (iPhone frames), "web" = site (laptop + phone),
    * "both". Inferred from the links when not set. */
   platform?: ProjectPlatform;
+  /** Screenshots start right at the app content (no status bar): leave
+   * room at the top so the Dynamic Island doesn't cover it. */
+  screenshotsInset?: boolean;
   /** Phone screenshots (portrait, in order) — shown in iPhone frames in
    * the hero and the "Screens" gallery of the case-study page. */
   screenshots?: string[];
@@ -165,136 +173,5 @@ export type Project = {
 };
 
 export type ProjectPlatform = "mobile" | "web" | "both";
-
-// The site's original hardcoded project list. Projects now live in
-// Firestore (see src/lib/projects.ts) and are editable from /admin — this
-// array is kept only as the build-time fallback (used when Firestore is
-// unreachable at build time) and as the seed data for the admin's
-// one-time "Import starter projects" button.
-export const fallbackProjects: Project[] = [
-  {
-    slug: "ezysplit",
-    title: "EzySplit",
-    description:
-      "Expense splitting and personal finance tracking, built for real daily use — not a demo. Create a group, split any bill by equal share, exact amount, percentage, or custom shares, and a live balance ledger keeps track of exactly who owes who. Settle up with a UPI deep link prefilled to the exact amount, or mark it settled manually — plus personal groups for solo tracking and guest members for people outside your usual circle.",
-    links: {
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.techtitens.ezysplit",
-      website: "https://techtiten.com/portfolio/ezysplit",
-    },
-    image: "/projects/mock5.png",
-    tech: [
-      "React Native",
-      "TypeScript",
-      "Firebase",
-      "REST APIs",
-      "State Management",
-      "Android",
-    ],
-    status: "Live on Play Store",
-    currentlyWorkingOn: true,
-    features: [
-      "Flexible splitting — equal share, exact amount, percentage, or custom shares per expense",
-      "Real-time balances — a live “who owes who” ledger, recalculated the moment anyone adds an expense",
-      "UPI settle-up — one tap opens GPay/PhonePe with the amount prefilled, or mark a payment settled manually",
-      "Personal groups — solo expense tracking with no invite codes or UPI prompts in the way",
-      "Guest members — split with people who don’t want to create a full account",
-      "Edit history — every change to an expense is timestamped and attributed, nothing moves silently",
-      "PDF & Excel export — pull any group’s ledger out for a report or a spreadsheet",
-      "Push notifications — new expenses, settlements, and group activity land instantly",
-      "Multi-currency groups — not locked to INR",
-    ],
-  },
-  {
-    slug: "ageas-federal-life-insurance",
-    title: "Ageas Federal Life Insurance",
-    description:
-      "Full-stack consultant role. Built the app from scratch, now leading Phase 2. Policy management, premium payments, fund tracking, claims processing, and secure document access.",
-    links: {
-      appStore:
-        "https://apps.apple.com/in/app/ageas-federal-life-insurance/id6756178483",
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.ageasfederal.customer",
-      website: "https://mypolicy.ageasfederal.com",
-    },
-    image: "/projects/mock1.png",
-    tech: [
-      "React Native",
-      "TypeScript",
-      "Full-Stack",
-      "Firebase",
-      "Payment Integration",
-    ],
-    status: "Live — App Store & Play Store",
-  },
-  {
-    slug: "sodality",
-    title: "Sodality",
-    description:
-      "White-label mobile app platform for nonprofits and membership organizations — a branded mobile experience, engagement tools, and architecture built to scale across many client apps from one codebase.",
-    links: {
-      website: "https://sodality.app/",
-    },
-    image: "/projects/mock2.png",
-    tech: ["React Native", "TypeScript", "White-label Platform", "Firebase"],
-    status: "Live — App Store & Play Store",
-  },
-  {
-    slug: "sociable",
-    title: "Sociable",
-    description:
-      "Social media-style application with a feed, likes, comments, shares, real-time chat over Firebase, and Node.js backend services.",
-    links: {},
-    image: "/projects/mock3.png",
-    tech: ["React Native", "Firebase", "Node.js", "Real-time Chat"],
-    status: "Completed",
-  },
-  {
-    slug: "shippity",
-    title: "Shippity — Food Delivery",
-    description:
-      "Food delivery app with real-time order tracking, secure payment integration, and a user-friendly ordering flow end to end.",
-    links: {},
-    image: "/projects/mock4.png",
-    tech: [
-      "React Native",
-      "Google Maps",
-      "Payment Gateways",
-      "Real-time Tracking",
-    ],
-    status: "Completed",
-  },
-  {
-    slug: "taskflow",
-    title: "TaskFlow",
-    description:
-      "Productivity app focused on task management, hydration reminders, and daily routines — clean UI, notification-based reminders, performance-optimized screens.",
-    links: {
-      github: "https://github.com/codewitharun/Taskflow",
-    },
-    image: "/projects/mock1.png",
-    tech: ["React Native", "TypeScript", "Push Notifications", "Local Storage"],
-    status: "In Development",
-  },
-  {
-    slug: "fliptoe",
-    title: "Fliptoe",
-    description:
-      "Personal project — a React Native beauty-filter live streaming app, with advanced ML filters and real-time video processing.",
-    links: {
-      website: "https://fliptoe.com",
-      playStore: "https://play.google.com/store/apps/details?id=com.fliptoe",
-    },
-    image: "/projects/mock2.png",
-    tech: [
-      "React Native",
-      "ML Filters",
-      "Live Streaming",
-      "Vision Camera",
-      "Skia",
-    ],
-    status: "In Development",
-  },
-];
 
 export const siteUrl = "https://techtiten.com";

@@ -80,7 +80,7 @@ export const organizationSchema = {
     name: brand.location,
   },
   description:
-    "Techtiten (Tech Titan) is the software studio of Arun Kumar, a React Native developer and software engineer in Jaipur, India — React Native apps, tools, and experiments, including EzySplit.",
+    "Techtiten (Tech Titan) is the name Arun Kumar, a React Native developer and software engineer in Jaipur, India, ships his hobby apps under: FitPrep and EzySplit.",
 };
 
 export function siteJsonLd() {

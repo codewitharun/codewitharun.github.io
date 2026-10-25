@@ -1,7 +1,6 @@
-// /apps: one link for a LinkedIn / Instagram bio. Every app Arun has built,
-// with its store links, read from the same published projects as
-// /portfolio (Firestore, edited in /admin), so adding a project there adds
-// it here too. Apps with a store listing come first.
+// /apps: one link for a LinkedIn / Instagram bio. My hobby apps first (with
+// store links), then apps built at work. Same list as /portfolio
+// (src/content/projects.ts).
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
@@ -9,13 +8,12 @@ import { FaApple, FaGithub, FaGlobe, FaGooglePlay, FaLinkedin } from "react-icon
 import Reveal from "@/components/Reveal";
 import { brand, socials } from "@/data/site";
 import type { Project } from "@/data/site";
-import { liveSite } from "@/lib/projectImage";
-import { getProjectsForBuild } from "@/lib/publicContent";
+import { hobbyProjects, workProjects } from "@/content/projects";
 
 export const metadata: Metadata = {
   title: "Apps by Arun Kumar",
   description:
-    "Every app Arun Kumar has built and shipped, with Play Store and App Store links: EzySplit, FitPrep and more, under Techtiten.",
+    "Arun Kumar's hobby apps, FitPrep and EzySplit, with Google Play links, plus apps he has built at work.",
   alternates: { canonical: "/apps" },
   openGraph: {
     title: "Apps by Arun Kumar · Techtiten",
@@ -24,28 +22,17 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 300;
-
-const onStore = (p: Project) => Boolean(p.links.playStore || p.links.appStore);
-
-/** A real picture for the tile (screenshot or uploaded cover), never the old mock graphics. */
-function thumbOf(p: Project): string | null {
-  const shot = (p.screenshots ?? []).find(Boolean);
-  if (shot) return shot;
-  if (p.image && !p.image.startsWith("/projects/mock")) return p.image;
-  return null;
-}
 
 function AppCard({ project }: { project: Project }) {
-  const thumb = thumbOf(project);
-  const site = liveSite(project);
+  const thumb = project.icon ?? null;
+  const site = project.links.website;
   const { playStore, appStore, github } = project.links;
   return (
     <article className="flex gap-4 rounded-2xl border border-border bg-bg-card p-4 transition-colors hover:border-mint/60">
       <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl border border-border bg-bg-raised">
         {thumb ? (
           // eslint-disable-next-line @next/next/no-img-element -- uploaded screenshots (ImageKit), not build-time assets
-          <img src={thumb} alt="" loading="lazy" className="h-full w-full object-cover object-top" />
+          <img src={thumb} alt="" loading="lazy" className="h-full w-full object-cover" />
         ) : (
           <div className="grid h-full w-full place-items-center font-display text-2xl font-bold text-mint">
             {project.title.charAt(0)}
@@ -91,10 +78,9 @@ function AppCard({ project }: { project: Project }) {
   );
 }
 
-export default async function AppsPage() {
-  const projects = await getProjectsForBuild();
-  const live = projects.filter(onStore);
-  const more = projects.filter((p) => !onStore(p));
+export default function AppsPage() {
+  const live = hobbyProjects;
+  const more = workProjects;
   const linkedin = socials.find((s) => s.label === "LinkedIn")?.href;
   const github = socials.find((s) => s.label === "GitHub")?.href;
 
@@ -106,14 +92,14 @@ export default async function AppsPage() {
           <img src="/images/self.jpeg" alt={brand.founder} className="h-20 w-20 rounded-full border-2 border-mint/60 object-cover" />
           <h1 className="mt-4 font-display text-3xl font-bold text-ink">Apps by {brand.founder}</h1>
           <p className="mt-2 text-sm text-ink-soft">
-            {brand.founderRoles.join(" · ")} · {brand.city}. Built and shipped under Techtiten. Tap an app to try it.
+            {brand.founderRoles.join(" · ")} · {brand.city}. My hobby apps under Techtiten. Tap one to try it.
           </p>
         </div>
       </Reveal>
 
       {live.length ? (
         <section className="mt-10">
-          <p className="mono-label mb-3 text-xs text-mint">On the stores</p>
+          <p className="mono-label mb-3 text-xs text-mint">My apps</p>
           <div className="grid gap-3">
             {live.map((p, i) => (
               <Reveal key={p.slug} delay={Math.min(i, 4) * 0.05}>
@@ -126,7 +112,7 @@ export default async function AppsPage() {
 
       {more.length ? (
         <section className="mt-10">
-          <p className="mono-label mb-3 text-xs text-mint">More I&apos;ve built</p>
+          <p className="mono-label mb-3 text-xs text-mint">Built at work</p>
           <div className="grid gap-3">
             {more.map((p, i) => (
               <Reveal key={p.slug} delay={Math.min(i, 4) * 0.05}>

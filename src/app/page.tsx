@@ -5,25 +5,19 @@ import ProjectMedia from "@/components/ProjectMedia";
 import Reveal from "@/components/Reveal";
 import TitanShape from "@/components/three/TitanShapeLazy";
 import { brand, miniBio } from "@/data/site";
-import { getProjectsForBuild } from "@/lib/publicContent";
+import { hobbyProjects, workProjects } from "@/content/projects";
 import { ArrowUpRight, FileDown, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FaWhatsapp } from "react-icons/fa6";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-// Revalidated periodically (rather than fully static) so edits made in
-// /admin — adding, editing, or reordering projects — show up on the home
-// page without a redeploy.
-export const revalidate = 300;
-
-export default async function Home() {
-  const projects = await getProjectsForBuild();
-  const current = projects.find((p) => p.currentlyWorkingOn) ?? projects[0];
-  const others = projects.filter((p) => p.slug !== current.slug).slice(0, 3);
+// Projects live in code (src/content/projects.ts), so this page is static.
+export default function Home() {
+  const current = hobbyProjects.find((p) => p.currentlyWorkingOn) ?? hobbyProjects[0];
+  const others = hobbyProjects.filter((p) => p.slug !== current.slug);
 
   return (
     <div>
@@ -68,16 +62,16 @@ export default async function Home() {
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
-                href="#contact"
+                href="/apps"
                 className="inline-flex items-center gap-2 rounded-full bg-mint px-6 py-3 text-sm font-semibold text-bg transition-transform hover:scale-105"
               >
-                Hire Me <ArrowUpRight size={16} />
+                See my apps <ArrowUpRight size={16} />
               </Link>
               <Link
-                href="/portfolio"
+                href="#contact"
                 className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-mint hover:text-mint"
               >
-                See the work
+                Say hi
               </Link>
             </div>
           </Reveal>
@@ -99,21 +93,23 @@ export default async function Home() {
               <BrandIcon className="hidden h-32 w-32 shrink-0 opacity-90 md:block lg:h-40 lg:w-40" />
               <div>
                 <p className="mono-label mb-3 text-xs text-mint">
-                  About the studio
+                  What Techtiten is
                 </p>
                 <p className="max-w-2xl text-ink-soft">
-                  Techtiten isn&apos;t a company in the traditional sense —
-                  it&apos;s the name for everything{" "}
-                  {brand.founder.split(" ")[0]} ships outside a day job. Some of
-                  it is polished and already live on the App Store and Play
-                  Store; some of it is a half-working idea shipped anyway,
-                  because waiting for perfect is how most side projects die
-                  quietly in a drafts folder instead. The throughline across all
-                  of it is React Native, TypeScript, and Firebase — the same
-                  stack behind production apps built for clients like Federal
-                  Bank and Ageas Federal, now turned toward personal products,
-                  freelance work, and the occasional experiment that may or may
-                  not go anywhere.
+                  Techtiten isn&apos;t a company. It&apos;s the name I put on
+                  my hobby projects: apps I build in the evenings and on
+                  weekends because I want to use them myself. Two of them are
+                  live on Google Play and used every day: FitPrep, which plans
+                  my meals around a protein target, and EzySplit, which my
+                  friends and I use to split bills. Some of it is polished, some
+                  of it is a half-working idea shipped anyway, because waiting
+                  for perfect is how side projects quietly die in a drafts
+                  folder. By day I&apos;m a React Native developer, and you can
+                  see apps I&apos;ve built at work in the{" "}
+                  <Link href="/portfolio#work" className="text-mint hover:underline">
+                    portfolio
+                  </Link>
+                  .
                 </p>
               </div>
             </div>
@@ -163,40 +159,46 @@ export default async function Home() {
               />
             </div>
 
-            {others.length > 0 && (
-              <div className="mt-14 border-t border-border-soft/60 pt-8">
-                <p className="mono-label mb-4 text-xs text-ink-faint">
-                  Also shipped under Techtiten
-                </p>
-                <ul className="flex flex-wrap gap-3">
-                  {others.map((project) => (
-                    <li key={project.slug}>
-                      <Link
-                        href={`/portfolio/${project.slug}`}
-                        className="inline-flex items-center rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:border-mint hover:text-mint"
-                      >
-                        {project.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <div className="mt-14 grid gap-8 border-t border-border-soft/60 pt-8 md:grid-cols-2">
+              {[
+                { label: "More hobby projects", list: others },
+                { label: "Built at work", list: workProjects },
+              ].map(({ label, list }) =>
+                list.length ? (
+                  <div key={label}>
+                    <p className="mono-label mb-4 text-xs text-ink-faint">{label}</p>
+                    <ul className="flex flex-wrap gap-3">
+                      {list.map((project) => (
+                        <li key={project.slug}>
+                          <Link
+                            href={`/portfolio/${project.slug}`}
+                            className="inline-flex items-center rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:border-mint hover:text-mint"
+                          >
+                            {project.title}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null,
+              )}
+            </div>
           </Reveal>
         </div>
       </section>
 
-      {/* Contact / Hire Me */}
+      {/* Contact: say hi (feedback, building chat) + resume for recruiters */}
       <section id="contact" className="border-t border-border-soft/60">
         <div className="mx-auto max-w-3xl px-6 py-24 text-center">
           <Reveal>
-            <p className="mono-label mb-3 text-xs text-mint">Get in touch</p>
+            <p className="mono-label mb-3 text-xs text-mint">Say hi</p>
             <h2 className="font-display text-3xl font-bold text-ink md:text-4xl">
-              Building something? Let&apos;s talk.
+              Tried one of my apps? Tell me.
             </h2>
             <p className="mt-4 text-ink-soft">
-              Open to full-time roles, consulting, and interesting problems in
-              React Native, TypeScript, and Firebase.
+              Feedback, a bug you found, an idea for FitPrep or EzySplit, or
+              just a chat about React Native: my inbox is open. Recruiters, my
+              resume is right here.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link
@@ -210,14 +212,7 @@ export default async function Home() {
                 target="_blank"
                 className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-mint hover:text-mint hover:scale-105"
               >
-                <FileDown size={16} /> Resume
-              </Link>
-              <Link
-                href="https://wa.me/918601279944"
-                target="_blank"
-                className="inline-flex items-center gap-2 rounded-full bg-mint border border-border px-6 py-3 text-sm font-semibold text-bg transition-colors hover:scale-105"
-              >
-                <FaWhatsapp size={16} /> Whatsapp
+                <FileDown size={16} /> Resume (for recruiters)
               </Link>
             </div>
 

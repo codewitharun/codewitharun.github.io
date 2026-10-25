@@ -12,8 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === "" ? 1 : route === "/portfolio" ? 0.9 : 0.7,
   }));
 
-  // getProjectsForBuild already falls back to the static project list on
-  // its own if Firestore is unreachable, so this never needs a try/catch.
+  // Projects come from code (src/content/projects.ts), so no try/catch is needed.
   const projects = await getProjectsForBuild();
   const projectEntries: MetadataRoute.Sitemap = projects.map((project) => ({
     url: `${siteUrl}/portfolio/${project.slug}`,

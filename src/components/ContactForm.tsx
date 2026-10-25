@@ -34,16 +34,17 @@ export default function ContactForm() {
     const phone = (data.get("phone") as string)?.trim();
     const message = (data.get("message") as string)?.trim();
 
-    if (!name || !email || !phone || !message) {
+    if (!name || !email || !message) {
       setStatus("error");
-      setErrorMessage("Fill in every field so there's a way to get back to you.");
+      setErrorMessage("Add your name, email and a message so I can get back to you.");
       return;
     }
 
     setStatus("submitting");
     setErrorMessage(null);
     try {
-      await submitContactMessage({ name, email, phone, message });
+      // Phone is optional. Firestore rules still expect a non-empty string.
+      await submitContactMessage({ name, email, phone: phone || "-", message });
       setStatus("success");
       form.reset();
     } catch {
@@ -57,7 +58,7 @@ export default function ContactForm() {
       <div className="rounded-2xl border border-mint/30 bg-mint/10 p-8 text-center">
         <p className="font-display text-lg font-bold text-ink">Message sent.</p>
         <p className="mt-1.5 text-sm text-ink-soft">
-          Thanks for reaching out — I&apos;ll get back to you soon.
+          Thanks for saying hi. I&apos;ll get back to you soon.
         </p>
         <button
           type="button"
@@ -101,13 +102,12 @@ export default function ContactForm() {
         </div>
         <div>
           <label htmlFor="phone" className="mono-label mb-1.5 block text-xs text-ink-faint">
-            Phone
+            Phone (optional)
           </label>
           <input
             type="tel"
             id="phone"
             name="phone"
-            required
             placeholder="+91 98765 43210"
             className={inputClass}
           />
@@ -137,7 +137,7 @@ export default function ContactForm() {
           name="message"
           required
           rows={4}
-          placeholder="What are you building, and how can I help?"
+          placeholder="Feedback, a bug, an idea, or just hi…"
           className={`${inputClass} resize-none`}
         />
       </div>
