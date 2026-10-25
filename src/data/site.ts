@@ -164,6 +164,13 @@ export type Project = {
   screenshots?: string[];
   /** One-line pitch under the title on the case-study page. */
   tagline?: string;
+  /** Search title for a live app, written for people looking for the app
+   * (not for recruiters), e.g. "EzySplit: Split Bills & Settle with UPI". */
+  seoTitle?: string;
+  /** Search snippet for a live app (about 150 characters). */
+  seoDescription?: string;
+  /** schema.org applicationCategory, e.g. "FinanceApplication". */
+  appCategory?: string;
   /** e.g. "Solo developer — design, app and backend". */
   role?: string;
   /** e.g. "2025 – now". */

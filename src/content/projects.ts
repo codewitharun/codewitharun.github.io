@@ -25,6 +25,10 @@ const fitprep: Project = {
   kind: "hobby",
   title: "FitPrep",
   tagline: "High-protein meal prep, made a game.",
+  seoTitle: "FitPrep: Indian High-Protein Diet Plan & Gym App",
+  seoDescription:
+    "FitPrep is a free Android app for Indian high-protein meal plans, an AI diet plan, grocery lists, calorie and protein tracking, and a gym workout log.",
+  appCategory: "HealthApplication",
   description:
     "A high-protein meal prep app that turns eating on plan into a game. Tell it your goal and how you eat, and it plans a week of meals around your protein target, with real Indian food like dal, paneer and rajma (or other cuisines). Prep in one session using the prep-day checklist and a grocery list that counts down as you eat, then tick meals, water and workouts through the day to keep your streak alive, earn XP and level up.",
   status: "Live on Google Play",
@@ -68,6 +72,10 @@ const ezysplit: Project = {
   kind: "hobby",
   title: "EzySplit",
   tagline: "Shared expenses, fair splits, zero awkward reminders.",
+  seoTitle: "EzySplit: Split Bills & Settle Up with UPI",
+  seoDescription:
+    "EzySplit is a free Android app to split bills and group expenses with friends, flatmates and trips, see who owes whom, and settle up by UPI (GPay, PhonePe).",
+  appCategory: "FinanceApplication",
   description:
     "An expense splitting and personal finance app for friends, flatmates and trips. Create groups, add shared expenses with flexible splits, see who owes whom in real time, and settle up through a UPI link that opens Google Pay or PhonePe with the amount filled in. A separate personal tracker covers your own spending. Built for everyday use with my own friends, and live on Google Play.",
   status: "Live on Google Play",
