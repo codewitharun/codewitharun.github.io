@@ -23,8 +23,8 @@ export type Post = {
   content: string; // HTML, produced by the admin rich text editor
   coverImage: string | null;
   status: PostStatus;
-  /** Which app this post is about (src/content/projects.ts slug).
-   *  "" = work it out from the post (lib/relatedPosts.ts), "none" = no app. */
+  /** Which app this post is about (src/content/projects.ts slug), picked in
+   *  /admin. "" = none. */
   relatedProject: string;
   createdAt: number; // epoch ms, for easy sorting/serializing to Client Components
   updatedAt: number;

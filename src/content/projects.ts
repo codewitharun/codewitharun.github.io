@@ -143,6 +143,7 @@ const ageas: Project = {
   status: "Live on App Store & Google Play",
   role: "Built at work",
   platform: "both",
+  icon: "/projects/ageas/icon.webp",
   // the live customer portal (React Native Web, same codebase as the apps);
   // everything past login is private policy data, so only the login screen
   cover: "/projects/ageas/web-login.webp",

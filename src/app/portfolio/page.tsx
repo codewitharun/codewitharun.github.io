@@ -41,8 +41,13 @@ function ProjectCard({
         <div className="flex flex-1 flex-col p-6">
           <div className="flex items-center gap-3">
             {compact ? (
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-border bg-bg-raised font-display text-lg font-bold text-mint">
-                {project.title.charAt(0)}
+              <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-bg-raised font-display text-lg font-bold text-mint">
+                {project.icon ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- static icon in public/projects
+                  <img src={project.icon} alt="" className="h-full w-full object-cover" loading="lazy" />
+                ) : (
+                  project.title.charAt(0)
+                )}
               </span>
             ) : null}
             <Link href={`/portfolio/${project.slug}`} className="group/title w-fit">
