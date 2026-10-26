@@ -42,5 +42,39 @@ export default function AnalyticsTracker() {
     });
   }, [pathname, searchParams]);
 
+  // Clicks on store links anywhere on the site (case studies, /apps, the
+  // app card at the end of a post) -> a `store_click` event with the app
+  // and the page, so Analytics shows which pages bring installs.
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a) return;
+      let url: URL;
+      try {
+        url = new URL(a.href);
+      } catch {
+        return;
+      }
+      const store =
+        url.hostname === "play.google.com" ? "play" : url.hostname === "apps.apple.com" ? "app_store" : null;
+      if (!store) return;
+      const app = url.searchParams.get("id") ?? url.pathname.split("/").filter(Boolean).pop() ?? "";
+      Promise.all([import("@/lib/firebase-analytics"), import("firebase/analytics")]).then(
+        ([{ getFirebaseAnalytics }, { logEvent }]) =>
+          getFirebaseAnalytics().then((analytics) => {
+            if (!analytics) return;
+            logEvent(analytics, "store_click", {
+              store,
+              app_id: app,
+              page_path: window.location.pathname,
+              link_text: (a.textContent ?? "").trim().slice(0, 60),
+            });
+          }),
+      );
+    }
+    document.addEventListener("click", onClick, { capture: true });
+    return () => document.removeEventListener("click", onClick, { capture: true });
+  }, []);
+
   return null;
 }

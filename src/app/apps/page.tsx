@@ -19,7 +19,10 @@ export const metadata: Metadata = {
     title: "Apps by Arun Kumar · Techtiten",
     description: "Every app I've built, with store links. One tap to try them.",
     url: "/apps",
+    // a page-level openGraph replaces the layout's, so the image goes here too
+    images: [{ url: "/images/og-apps.png", width: 1200, height: 630, alt: "Apps by Arun Kumar: FitPrep, EzySplit, Studymark" }],
   },
+  twitter: { card: "summary_large_image", images: ["/images/og-apps.png"] },
 };
 
 
