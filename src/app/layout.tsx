@@ -30,7 +30,8 @@ export const metadata: Metadata = {
     template: "%s · Techtiten",
   },
   description:
-    "Techtiten (also written Tech Titan) is where Arun Kumar, a React Native developer and software engineer in Jaipur, India, ships his hobby apps: FitPrep and EzySplit on Google Play, built imperfect and shipped anyway.",
+    // ~155 chars: Google cuts longer snippets off
+    "Techtiten (Tech Titan) is where Arun Kumar, a React Native developer in Jaipur, India, ships his hobby apps FitPrep and EzySplit on Google Play.",
   keywords: seoKeywords,
   authors: [{ name: brand.founder, url: siteUrl }],
   creator: brand.founder,
