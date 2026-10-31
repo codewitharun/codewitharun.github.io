@@ -11,8 +11,11 @@ import WinsCard from "./WinsCard";
 import Nudges, { buildNudges } from "./Nudges";
 import SettingsSheet from "./SettingsSheet";
 import PipelinesCard, { useCi } from "./PipelinesCard";
+import AppsStrip from "./AppsStrip";
+import { useStatus, type BoardStatus } from "./useStatus";
+import type { Nudge } from "./Nudges";
 import { useBoard, useNow } from "./useBoard";
-import { addDays, dayKey } from "./dates";
+import { addDays, dayKey, daysBetween } from "./dates";
 
 const greeting = (h: number) => (h < 5 ? "Still up" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : h < 22 ? "Good evening" : "Late night");
 
@@ -61,9 +64,10 @@ function BoardInner({ user, logout }: { user: NonNullable<ReturnType<typeof useA
   const [showSettings, setShowSettings] = useState(false);
   const reserved = useReservedSpace();
   const ci = useCi(user);
+  const status = useStatus(user);
   return (
     <>
-      <BoardView {...data} now={now} name={user.displayName?.split(" ")[0] || "Arun"} onSettings={() => setShowSettings(true)} reserved={reserved} ci={ci} />
+      <BoardView {...data} now={now} name={user.displayName?.split(" ")[0] || "Arun"} onSettings={() => setShowSettings(true)} reserved={reserved} ci={ci} status={status} />
       {showSettings && <SettingsSheet settings={data.settings} onClose={() => setShowSettings(false)} onLogout={logout} />}
     </>
   );
@@ -75,10 +79,11 @@ type ViewProps = Pick<ReturnType<typeof useBoard>, "settings" | "tasks" | "days"
   onSettings: () => void;
   reserved?: { left: number; right: number };
   ci?: ReturnType<typeof useCi>;
+  status?: BoardStatus | null;
 };
 
 /** The whole board, from plain data (also what a preview/demo renders). */
-export function BoardView({ settings, tasks, days, wins, error, online, now, name, onSettings, reserved, ci = null }: ViewProps) {
+export function BoardView({ settings, tasks, days, wins, error, online, now, name, onSettings, reserved, ci = null, status = null }: ViewProps) {
 
   const gymDays = useMemo(() => new Set((wins?.gym ?? []).map((g) => dayKey(new Date(g.at)))), [wins]);
   const todayKey = dayKey(now);
@@ -95,13 +100,22 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
   let learnDays = 0;
   for (let i = 0; i < 7; i++) if (isHabitDone(days, gymDays, dayKey(addDays(now, -i)), "learn")) learnDays++;
 
-  const nudges = buildNudges({ tasks, habits: settings.habits, habitsDoneToday, lastLearn, now });
+  const alerts: Nudge[] = [
+    ...(status?.apps ?? [])
+      .filter((a) => a.ok && !a.schedulerAlive)
+      .map((a) => ({ tone: "warn" as const, text: `${a.name} scheduler stopped: scheduled pushes and jobs aren't running. Check cron-job.org.` })),
+    ...(status?.deploys?.failed ?? []).map((d) => ({ tone: "warn" as const, text: `${d.project}: the latest production deploy failed. Open Vercel and check the build log.` })),
+  ];
+  const nudges = buildNudges({ tasks, habits: settings.habits, habitsDoneToday, lastLearn, now, alerts });
 
   return (
     <Shell>
       <div style={reserved && (reserved.left || reserved.right) ? { marginLeft: reserved.left, marginRight: reserved.right, maxWidth: "none" } : undefined} className="board-frame mx-auto flex min-h-[100dvh] max-w-[1600px] flex-col gap-5 px-5 pb-6 pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-8 lg:gap-6 lg:px-12 lg:pb-10 lg:pt-10">
         <header className="flex items-start justify-between gap-6">
-          <Clock now={now} name={name} />
+          <div>
+            <Clock now={now} name={name} extra={settings.countdown && <CountdownChip label={settings.countdown.label} date={settings.countdown.date} now={now} />} />
+          </div>
+          <div className="flex flex-col items-end gap-4">
           <div className="flex items-center gap-2 pt-2">
             <span className={`mono-label flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] ${online && !error ? "border-mint/20 text-mint/90" : "border-amber-300/30 text-amber-300"}`}>
               <span className={`size-1.5 rounded-full ${online && !error ? "animate-pulse bg-mint" : "bg-amber-300"}`} />
@@ -111,19 +125,23 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
               <Settings2 size={16} />
             </button>
           </div>
+          <AppsStrip apps={status?.apps} />
+          </div>
         </header>
 
         {error && <p className="rounded-2xl border border-amber-300/30 bg-amber-300/[0.06] px-4 py-3 text-sm text-amber-100">{error}</p>}
 
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
-          <div className="flex min-h-0 flex-col gap-5 lg:col-span-5 lg:gap-6">
+          <div className="flex min-h-0 flex-col gap-5 overflow-hidden lg:col-span-5 lg:gap-6">
             <FocusCard tasks={tasks} now={now} />
             <Nudges nudges={nudges} />
-            <PipelinesCard ci={ci} now={now} />
           </div>
           <div className="grid min-h-0 grid-cols-1 gap-5 lg:col-span-7 lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-6">
             <HabitsCard habits={settings.habits} days={days} gymDays={gymDays} now={now} />
-            <WinsCard tasks={tasks} wins={wins} learnDays={learnDays} now={now} />
+            <div className="grid min-h-0 grid-cols-1 gap-5 xl:grid-cols-2 lg:gap-6">
+              <WinsCard tasks={tasks} wins={wins} learnDays={learnDays} now={now} />
+              <PipelinesCard ci={ci} deploys={status?.deploys} now={now} />
+            </div>
           </div>
         </div>
 
@@ -133,7 +151,7 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
   );
 }
 
-function Clock({ now, name }: { now: Date; name: string }) {
+function Clock({ now, name, extra }: { now: Date; name: string; extra?: React.ReactNode }) {
   const time = now.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true });
   const [hm, ampm] = time.split(" ");
   return (
@@ -145,9 +163,12 @@ function Clock({ now, name }: { now: Date; name: string }) {
         <span className="text-[clamp(56px,7.5vw,128px)] tabular-nums">{hm}</span>
         <span className="font-mono text-[clamp(14px,1.2vw,20px)] font-medium uppercase tracking-normal text-ink-faint">{ampm}</span>
       </h1>
-      <p className="mt-3 text-[clamp(15px,1.25vw,20px)] text-ink-soft">
-        {greeting(now.getHours())}, <span className="text-gradient font-semibold">{name}</span>. One thing at a time.
-      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <p className="text-[clamp(15px,1.25vw,20px)] text-ink-soft">
+          {greeting(now.getHours())}, <span className="text-gradient font-semibold">{name}</span>. One thing at a time.
+        </p>
+        {extra}
+      </div>
     </div>
   );
 }
@@ -177,5 +198,18 @@ function Reminder({ lines }: { lines: string[] }) {
         </motion.p>
       </AnimatePresence>
     </footer>
+  );
+}
+
+function CountdownChip({ label, date, now }: { label: string; date: string; now: Date }) {
+  const [y, m, d] = date.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const days = daysBetween(now, new Date(y, m - 1, d));
+  const text = days > 1 ? `${days} days` : days === 1 ? "tomorrow" : days === 0 ? "today" : `${-days} days ago`;
+  return (
+    <p className="mono-label inline-flex items-center gap-2 rounded-full border border-violet/30 bg-violet/[0.08] px-3 py-1.5 text-[11px] text-violet">
+      <span className="size-1.5 rounded-full bg-violet" />
+      {label} · <span className="text-ink">{text}</span>
+    </p>
   );
 }
