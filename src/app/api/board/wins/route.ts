@@ -9,7 +9,7 @@ import { firebaseConfig } from "@/lib/firebaseConfig";
 // Env: BOARD_GITHUB_TOKEN (fine-grained, read-only: Contents + Pull requests +
 // Metadata on the repos), BOARD_EMAIL (optional, default below).
 
-const BOARD_EMAIL = (process.env.BOARD_EMAIL || "arunk4it@gmail.com").toLowerCase();
+const BOARD_EMAIL = (process.env.BOARD_EMAIL || "admin@techtiten.com").toLowerCase();
 const GH_USER = "codewitharun";
 
 async function emailFromIdToken(idToken: string): Promise<string | null> {
