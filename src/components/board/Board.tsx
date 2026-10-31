@@ -10,6 +10,7 @@ import HabitsCard, { isHabitDone } from "./HabitsCard";
 import WinsCard from "./WinsCard";
 import Nudges, { buildNudges } from "./Nudges";
 import SettingsSheet from "./SettingsSheet";
+import PipelinesCard, { useCi } from "./PipelinesCard";
 import { useBoard, useNow } from "./useBoard";
 import { addDays, dayKey } from "./dates";
 
@@ -59,9 +60,10 @@ function BoardInner({ user, logout }: { user: NonNullable<ReturnType<typeof useA
   const data = useBoard(user);
   const [showSettings, setShowSettings] = useState(false);
   const reserved = useReservedSpace();
+  const ci = useCi(user);
   return (
     <>
-      <BoardView {...data} now={now} name={user.displayName?.split(" ")[0] || "Arun"} onSettings={() => setShowSettings(true)} reserved={reserved} />
+      <BoardView {...data} now={now} name={user.displayName?.split(" ")[0] || "Arun"} onSettings={() => setShowSettings(true)} reserved={reserved} ci={ci} />
       {showSettings && <SettingsSheet settings={data.settings} onClose={() => setShowSettings(false)} onLogout={logout} />}
     </>
   );
@@ -72,10 +74,11 @@ type ViewProps = Pick<ReturnType<typeof useBoard>, "settings" | "tasks" | "days"
   name: string;
   onSettings: () => void;
   reserved?: { left: number; right: number };
+  ci?: ReturnType<typeof useCi>;
 };
 
 /** The whole board, from plain data (also what a preview/demo renders). */
-export function BoardView({ settings, tasks, days, wins, error, online, now, name, onSettings, reserved }: ViewProps) {
+export function BoardView({ settings, tasks, days, wins, error, online, now, name, onSettings, reserved, ci = null }: ViewProps) {
 
   const gymDays = useMemo(() => new Set((wins?.gym ?? []).map((g) => dayKey(new Date(g.at)))), [wins]);
   const todayKey = dayKey(now);
@@ -116,6 +119,7 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
           <div className="flex min-h-0 flex-col gap-5 lg:col-span-5 lg:gap-6">
             <FocusCard tasks={tasks} now={now} />
             <Nudges nudges={nudges} />
+            <PipelinesCard ci={ci} now={now} />
           </div>
           <div className="grid min-h-0 grid-cols-1 gap-5 lg:col-span-7 lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-6">
             <HabitsCard habits={settings.habits} days={days} gymDays={gymDays} now={now} />
