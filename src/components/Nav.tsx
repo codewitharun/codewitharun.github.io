@@ -40,6 +40,9 @@ export default function Nav() {
   const pathname = useActivePathname();
   const [open, setOpen] = useState(false);
 
+  // The wallpaper board (/board) is full screen: no site header at all.
+  if (pathname?.startsWith("/board")) return null;
+
   // The admin gets a plain header: logo + a way back to the site, not the
   // public menu and its "Say hi" button.
   if (pathname?.startsWith("/admin")) {
