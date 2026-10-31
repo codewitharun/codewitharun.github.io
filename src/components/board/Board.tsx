@@ -41,13 +41,27 @@ function Aurora() {
   );
 }
 
+// Room to leave free for desktop icons / widgets when used as a wallpaper:
+// techtiten.com/board?right=420 (px) keeps the right 420px empty; ?left= too.
+function useReservedSpace() {
+  const [space, setSpace] = useState({ left: 0, right: 0 });
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const px = (k: string) => Math.max(0, Math.min(1200, Number(q.get(k)) || 0));
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- read once from the URL after mount
+    setSpace({ left: px("left"), right: px("right") });
+  }, []);
+  return space;
+}
+
 function BoardInner({ user, logout }: { user: NonNullable<ReturnType<typeof useAdminAuth>["user"]>; logout: () => Promise<void> }) {
   const now = useNow();
   const data = useBoard(user);
   const [showSettings, setShowSettings] = useState(false);
+  const reserved = useReservedSpace();
   return (
     <>
-      <BoardView {...data} now={now} name={user.displayName?.split(" ")[0] || "Arun"} onSettings={() => setShowSettings(true)} />
+      <BoardView {...data} now={now} name={user.displayName?.split(" ")[0] || "Arun"} onSettings={() => setShowSettings(true)} reserved={reserved} />
       {showSettings && <SettingsSheet settings={data.settings} onClose={() => setShowSettings(false)} onLogout={logout} />}
     </>
   );
@@ -57,10 +71,11 @@ type ViewProps = Pick<ReturnType<typeof useBoard>, "settings" | "tasks" | "days"
   now: Date;
   name: string;
   onSettings: () => void;
+  reserved?: { left: number; right: number };
 };
 
 /** The whole board, from plain data (also what a preview/demo renders). */
-export function BoardView({ settings, tasks, days, wins, error, online, now, name, onSettings }: ViewProps) {
+export function BoardView({ settings, tasks, days, wins, error, online, now, name, onSettings, reserved }: ViewProps) {
 
   const gymDays = useMemo(() => new Set((wins?.gym ?? []).map((g) => dayKey(new Date(g.at)))), [wins]);
   const todayKey = dayKey(now);
@@ -81,7 +96,7 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
 
   return (
     <Shell>
-      <div className="board-frame mx-auto flex min-h-[100dvh] max-w-[1600px] flex-col gap-5 px-5 pb-6 pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-8 lg:gap-6 lg:px-12 lg:pb-10 lg:pt-10">
+      <div style={reserved && (reserved.left || reserved.right) ? { marginLeft: reserved.left, marginRight: reserved.right, maxWidth: "none" } : undefined} className="board-frame mx-auto flex min-h-[100dvh] max-w-[1600px] flex-col gap-5 px-5 pb-6 pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-8 lg:gap-6 lg:px-12 lg:pb-10 lg:pt-10">
         <header className="flex items-start justify-between gap-6">
           <Clock now={now} name={name} />
           <div className="flex items-center gap-2 pt-2">
