@@ -1,46 +1,14 @@
-import { firebaseConfig } from "@/lib/firebaseConfig";
+import { gh, isBoardAdmin } from "@/lib/boardServer";
 
 // Auto wins for /board, read-only from GitHub:
 // - JS Gym: every test pass recorded in codewitharun/js-gym web-status.json
 //   (web passes + local Vitest passes, synced by scripts/sync.js)
 // - merged PRs by codewitharun in the last 7 days
-// Private data, so the caller must send the admin's Firebase ID token; it is
-// checked with the Identity Toolkit lookup (no firebase-admin needed).
-// Env: BOARD_GITHUB_TOKEN (fine-grained, read-only: Contents + Pull requests +
-// Metadata on the repos), BOARD_EMAIL (optional, default below).
+// Only for the admin login (see lib/boardServer.ts).
+// Env: BOARD_GITHUB_TOKEN (fine-grained, read-only: Contents, Pull requests,
+// Actions, Metadata on the repos), BOARD_EMAIL (optional).
 
-const BOARD_EMAIL = (process.env.BOARD_EMAIL || "admin@techtiten.com").toLowerCase();
 const GH_USER = "codewitharun";
-
-async function emailFromIdToken(idToken: string): Promise<string | null> {
-  const res = await fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${firebaseConfig.apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken }),
-      cache: "no-store",
-    },
-  );
-  if (!res.ok) return null;
-  const body = await res.json().catch(() => null);
-  const email = body?.users?.[0]?.email;
-  return typeof email === "string" ? email.toLowerCase() : null;
-}
-
-async function gh(path: string, token: string, accept = "application/vnd.github+json") {
-  const res = await fetch(`https://api.github.com${path}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: accept,
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "techtiten-board",
-    },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`GitHub ${res.status} on ${path}`);
-  return accept.includes("raw") ? res.text() : res.json();
-}
 
 type Status = Record<string, { visible?: string; visibleAt?: string; hidden?: string; hiddenAt?: string }>;
 
@@ -70,9 +38,7 @@ async function mergedPrs(token: string) {
 }
 
 export async function GET(request: Request) {
-  const idToken = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
-  const email = idToken ? await emailFromIdToken(idToken) : null;
-  if (email !== BOARD_EMAIL) return Response.json({ error: "Not allowed" }, { status: 401 });
+  if (!(await isBoardAdmin(request))) return Response.json({ error: "Not allowed" }, { status: 401 });
 
   const token = process.env.BOARD_GITHUB_TOKEN;
   if (!token) return Response.json({ configured: false, gym: [], prs: [] });

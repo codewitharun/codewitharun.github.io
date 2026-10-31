@@ -26,7 +26,7 @@ export default function FocusCard({ tasks, now }: { tasks: BoardTask[]; now: Dat
   }
 
   return (
-    <section className="board-card flex min-h-0 flex-col">
+    <section className="board-card flex shrink-0 flex-col">
       <header className="flex items-baseline justify-between gap-4">
         <p className="mono-label text-[11px] text-ink-faint">Today&apos;s focus</p>
         {total > 0 && (
