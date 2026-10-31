@@ -13,14 +13,17 @@ export function buildNudges({
   habitsDoneToday,
   lastLearn,
   now,
+  alerts,
 }: {
   tasks: BoardTask[];
   habits: Habit[];
   habitsDoneToday: number;
   lastLearn: Date | null;
   now: Date;
+  /** urgent system alerts (stopped schedulers, failed deploys): always first */
+  alerts?: Nudge[];
 }): Nudge[] {
-  const out: Nudge[] = [];
+  const out: Nudge[] = [...(alerts ?? [])];
   const open = tasks.filter((t) => !t.done);
   const hour = now.getHours();
 

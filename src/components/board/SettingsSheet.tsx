@@ -7,6 +7,8 @@ import { saveSettings, type BoardSettings } from "@/lib/board";
 export default function SettingsSheet({ settings, onClose, onLogout }: { settings: BoardSettings; onClose: () => void; onLogout: () => void }) {
   const [habits, setHabits] = useState(settings.habits);
   const [reminders, setReminders] = useState(settings.reminders.join("\n"));
+  const [cdLabel, setCdLabel] = useState(settings.countdown?.label ?? "");
+  const [cdDate, setCdDate] = useState(settings.countdown?.date ?? "");
   const [saving, setSaving] = useState(false);
 
   async function save() {
@@ -14,6 +16,7 @@ export default function SettingsSheet({ settings, onClose, onLogout }: { setting
     await saveSettings({
       habits: habits.map((h) => ({ ...h, label: h.label.trim() })).filter((h) => h.label),
       reminders: reminders.split("\n").map((r) => r.trim()).filter(Boolean),
+      countdown: cdDate ? { label: cdLabel.trim() || "Countdown", date: cdDate } : null,
     });
     setSaving(false);
     onClose();
@@ -62,6 +65,23 @@ export default function SettingsSheet({ settings, onClose, onLogout }: { setting
           rows={5}
           className="mt-2 w-full resize-none rounded-xl border border-border bg-bg px-3 py-2.5 text-sm leading-relaxed text-ink outline-none focus:border-mint"
         />
+
+        <p className="mono-label mt-6 text-[11px] text-ink-faint">Countdown (optional)</p>
+        <div className="mt-2 flex gap-2">
+          <input
+            value={cdLabel}
+            onChange={(e) => setCdLabel(e.target.value)}
+            placeholder="Trip ends, launch, exam…"
+            maxLength={40}
+            className="min-w-0 flex-1 rounded-xl border border-border bg-bg px-3 py-2.5 text-sm text-ink outline-none focus:border-mint"
+          />
+          <input
+            type="date"
+            value={cdDate}
+            onChange={(e) => setCdDate(e.target.value)}
+            className="rounded-xl border border-border bg-bg px-3 py-2.5 text-sm text-ink outline-none [color-scheme:dark] focus:border-mint"
+          />
+        </div>
 
         <div className="mt-6 flex items-center justify-between gap-3">
           <button onClick={onLogout} className="flex items-center gap-2 rounded-full px-3 py-2 text-sm text-ink-faint hover:bg-white/5 hover:text-ink">

@@ -44,9 +44,9 @@ export default function WinsCard({ tasks, wins, learnDays, now }: { tasks: Board
         {wins && !wins.configured && <p className="mono-label text-[10px] text-ink-faint/70">GitHub not connected</p>}
       </header>
 
-      <div className="mt-4 grid grid-cols-3 gap-3">
+      <div className="mt-4 grid grid-cols-3 gap-2.5">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+          <div key={s.label} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-3.5 py-3">
             <p className="font-display text-[clamp(26px,2.4vw,40px)] font-extrabold leading-none tabular-nums text-ink">{s.n}</p>
             <p className="mono-label mt-1.5 text-[10px] text-ink-faint">{s.label}</p>
           </div>

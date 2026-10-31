@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { User } from "firebase/auth";
-import { CircleCheck, CircleSlash, CircleX, LoaderCircle, Workflow } from "lucide-react";
+import { CircleCheck, CircleSlash, CircleX, LoaderCircle, Triangle, Workflow } from "lucide-react";
+import type { BoardStatus } from "./useStatus";
 
 type Run = {
   repo: string;
@@ -58,9 +59,12 @@ const ago = (iso: string, now: Date) => {
   return m < 60 ? `${Math.max(m, 1)}m ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : `${Math.round(m / 1440)}d ago`;
 };
 
-export default function PipelinesCard({ ci, now }: { ci: Ci | null; now: Date }) {
+export default function PipelinesCard({ ci, deploys, now }: { ci: Ci | null; deploys?: BoardStatus["deploys"]; now: Date }) {
   const [tick, setTick] = useState(now);
-  const running = !!ci?.active.length;
+  const building = deploys?.building ?? [];
+  const failed = deploys?.failed ?? [];
+  const runningCount = (ci?.active.length ?? 0) + building.length;
+  const running = runningCount > 0;
   // A live seconds counter only while something is running.
   useEffect(() => {
     if (!running) return;
@@ -81,7 +85,7 @@ export default function PipelinesCard({ ci, now }: { ci: Ci | null; now: Date })
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-sky-300 opacity-60" />
               <span className="relative inline-flex size-2 rounded-full bg-sky-300" />
             </span>
-            {ci!.active.length} running
+            {runningCount} running
           </p>
         ) : (
           ci?.configured && <p className="mono-label text-[10px] text-ink-faint/70">All quiet</p>
@@ -93,6 +97,33 @@ export default function PipelinesCard({ ci, now }: { ci: Ci | null; now: Date })
       {ci?.hint && <p className="mt-3 text-sm text-amber-200/90">{ci.hint}</p>}
 
       <ul className="mt-3 flex min-h-0 flex-col gap-1 overflow-hidden [mask-image:linear-gradient(to_bottom,black_80%,transparent)]">
+        {failed.map((d) => (
+          <li key={d.url}>
+            <a href={d.url} target="_blank" rel="noopener noreferrer" className="-mx-2 flex items-center gap-3 rounded-xl bg-red-400/[0.07] px-3 py-2.5 ring-1 ring-red-400/25 transition-colors hover:bg-red-400/10">
+              <CircleX size={18} className="shrink-0 text-red-400" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[14px] font-semibold text-ink">
+                  {d.project} <span className="font-normal text-red-300">· production deploy failed</span>
+                </span>
+                <span className="block truncate text-[12px] text-ink-faint">{d.message || "Open Vercel to see the build log"}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+        {building.map((d) => (
+          <li key={d.url}>
+            <a href={d.url} target="_blank" rel="noopener noreferrer" className="-mx-2 flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2.5 ring-1 ring-white/15 transition-colors hover:bg-white/[0.06]">
+              <Triangle size={15} className="shrink-0 animate-pulse fill-ink text-ink" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[14px] font-semibold text-ink">
+                  {d.project} <span className="font-normal text-ink-faint">· Vercel {d.target === "production" ? "production" : "preview"}</span>
+                </span>
+                <span className="block truncate text-[12px] text-ink-faint">{d.message}</span>
+              </span>
+              <span className="shrink-0 font-mono text-[12px] tabular-nums text-ink-soft">{mins(new Date(d.createdAt).toISOString(), clock)}</span>
+            </a>
+          </li>
+        ))}
         {ci?.active.map((r) => (
           <li key={r.url}>
             <a href={r.url} target="_blank" rel="noopener noreferrer" className="-mx-2 flex items-center gap-3 rounded-xl bg-sky-300/[0.06] px-3 py-2.5 ring-1 ring-sky-300/20 transition-colors hover:bg-sky-300/10">
@@ -123,7 +154,7 @@ export default function PipelinesCard({ ci, now }: { ci: Ci | null; now: Date })
             </li>
           );
         })}
-        {ci?.configured && !ci.active.length && !ci.recent.length && !ci.hint && (
+        {ci?.configured && !ci.active.length && !ci.recent.length && !ci.hint && !building.length && !failed.length && (
           <li className="py-1 text-sm text-ink-faint">No builds in the last 3 days.</li>
         )}
       </ul>
