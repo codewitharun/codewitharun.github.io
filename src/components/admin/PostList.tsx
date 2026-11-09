@@ -1,9 +1,14 @@
 "use client";
 
 import type { Post } from "@/lib/posts";
+import type { PostStat } from "@/app/api/admin/post-stats/route";
 import {
+  BookOpen,
   ChevronLeft,
   ChevronRight,
+  Eye,
+  Globe,
+  MousePointerClick,
   Pencil,
   Search,
   Trash2,
@@ -14,11 +19,37 @@ type PostListProps = {
   posts: Post[];
   onEdit: (post: Post) => void;
   onDelete: (post: Post) => void;
+  /** Per-slug numbers from /api/admin/post-stats (undefined while loading or not set up). */
+  stats?: Record<string, PostStat>;
 };
+
+function StatLine({ stat }: { stat: PostStat | undefined }) {
+  if (!stat) return <p className="mt-1 text-[11px] text-ink-faint">No visits in this range yet</p>;
+  const readPct = stat.views ? Math.round((stat.readToEnd / stat.views) * 100) : 0;
+  const item = "inline-flex items-center gap-1";
+  return (
+    <p className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-ink-soft">
+      <span className={item} title="Page views (readers)">
+        <Eye size={12} /> {stat.views} views ({stat.readers})
+      </span>
+      <span className={`${item} ${stat.storeClicks ? "text-mint" : ""}`} title="Clicks on Play Store links in this post">
+        <MousePointerClick size={12} /> {stat.storeClicks} store clicks
+      </span>
+      <span className={item} title="Readers who scrolled to the end · average engaged time per reader">
+        <BookOpen size={12} /> {readPct}% read · {stat.avgEngagedSec}s
+      </span>
+      <span className={item} title={stat.topQuery ? `Top search: ${stat.topQuery}` : "Google search"}>
+        <Globe size={12} /> {stat.searchImpressions} shown · {stat.searchClicks} clicks
+        {stat.searchPosition != null ? ` · pos ${stat.searchPosition}` : ""}
+        {stat.topQuery ? ` · "${stat.topQuery}"` : ""}
+      </span>
+    </p>
+  );
+}
 
 const PAGE_SIZE = 8;
 
-export default function PostList({ posts, onEdit, onDelete }: PostListProps) {
+export default function PostList({ posts, onEdit, onDelete, stats }: PostListProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
 
@@ -106,6 +137,7 @@ export default function PostList({ posts, onEdit, onDelete }: PostListProps) {
                   <p className="truncate text-xs text-ink-faint">
                     /blog/{post.slug}
                   </p>
+                  {stats && post.status === "published" ? <StatLine stat={stats[post.slug]} /> : null}
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <button

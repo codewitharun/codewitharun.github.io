@@ -153,3 +153,17 @@ fail with a permission error on submit.
     current there directly (not from this repo): the profile's "Website" field pointing at
     `techtiten.com`, and ideally a mention of "Techtiten" somewhere in the profile README/bio too,
     since Google's entity-matching leans on the name appearing on both ends, not just the URL.
+
+## Post stats (admin)
+
+`/admin` → Posts shows real numbers per post: views, readers, Play Store clicks, read-to-end % and engaged time (Google Analytics / Firebase Analytics, already on every page), plus Google search impressions, clicks, average position and top search (Search Console). Server route: `src/app/api/admin/post-stats/route.ts` (admin only, same login check as /board).
+
+One-time setup:
+1. **Google Cloud** (project `devarun-1d87a`): APIs & Services → enable **Google Analytics Data API** and **Google Search Console API**. IAM → Service accounts → create `techtiten-stats` (no roles needed) → Keys → Add key → JSON. Keep the file private, never commit it.
+2. **Google Analytics** (analytics.google.com, the property behind `G-FMV5TG9E4X`): Admin → Property access management → add the service-account email as **Viewer**. Note the numeric **Property ID** (Admin → Property details). Check Admin → Data streams → web stream → Enhanced measurement → **Scrolls** is on (used for read-to-end).
+3. **Search Console** (techtiten.com domain property): Settings → Users and permissions → Add user → service-account email → **Restricted**.
+4. **Vercel** (this project) → Settings → Environment Variables (Production):
+   - `GOOGLE_SERVICE_ACCOUNT` = the whole JSON file content
+   - `GA4_PROPERTY_ID` = the numeric property id
+   - optional `GSC_SITE` (default `sc-domain:techtiten.com`)
+   Then redeploy. Missing pieces show as a yellow line in the admin stats box.
