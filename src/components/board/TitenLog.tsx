@@ -8,9 +8,9 @@ const DOT: Record<TitenLogItem["tone"], string> = {
 };
 
 /** What Titen heard and did lately, newest first. */
-export default function TitenLog({ items, online }: { items: TitenLogItem[]; online: boolean }) {
+export default function TitenLog({ items, online, className = "" }: { items: TitenLogItem[]; online: boolean; className?: string }) {
   return (
-    <section className="board-card flex min-h-0 flex-col overflow-hidden">
+    <section className={`board-card flex min-h-0 flex-col overflow-hidden ${className}`}>
       <header className="flex items-center justify-between">
         <p className="mono-label text-[11px] text-ink-faint">Titen log</p>
         <p className="mono-label text-[10px]" style={{ color: online ? "var(--tc-acc)" : undefined }}>{online ? "● live" : "offline"}</p>
