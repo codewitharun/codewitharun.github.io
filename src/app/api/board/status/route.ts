@@ -56,7 +56,7 @@ async function appStats(key: string): Promise<AppStat[]> {
   );
 }
 
-async function deploys(token: string): Promise<{ building: Deploy[]; failed: Deploy[] }> {
+async function deploys(token: string): Promise<{ building: Deploy[]; failed: Deploy[]; recent: Deploy[] }> {
   const team = process.env.VERCEL_TEAM_ID ? `&teamId=${process.env.VERCEL_TEAM_ID}` : "";
   const res = await fetch(`https://api.vercel.com/v6/deployments?limit=40${team}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -77,6 +77,8 @@ async function deploys(token: string): Promise<{ building: Deploy[]; failed: Dep
   const day = Date.now() - 86_400_000;
   return {
     building: list.filter((d) => d.state === "BUILDING" || d.state === "QUEUED" || d.state === "INITIALIZING"),
+    // finished deploys, newest first: most of Arun's shipping is Vercel, not GitHub Actions
+    recent: list.filter((d) => d.state === "READY" || d.state === "ERROR" || d.state === "CANCELED").slice(0, 6),
     // Only the newest deployment per project counts: a failure already fixed by a later deploy isn't an alert.
     failed: Object.values(
       list

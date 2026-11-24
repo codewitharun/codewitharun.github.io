@@ -73,6 +73,19 @@ export default function PipelinesCard({ ci, deploys, now }: { ci: Ci | null; dep
   }, [running]);
   const clock = running ? tick : now;
 
+  // One timeline of finished work: GitHub Actions runs and Vercel deploys, newest first.
+  type Done = { kind: "gh" | "vercel"; name: string; what: string; at: string; url: string; ok: boolean; skipped: boolean };
+  const history: Done[] = [
+    ...(ci?.recent ?? []).map((r) => ({
+      kind: "gh" as const, name: r.repo, what: r.workflow, at: r.updatedAt, url: r.url,
+      ok: r.conclusion === "success", skipped: r.conclusion === "skipped" || r.conclusion === "cancelled",
+    })),
+    ...(deploys?.recent ?? []).map((d) => ({
+      kind: "vercel" as const, name: d.project, what: `Vercel ${d.target === "production" ? "production" : "preview"}${d.message ? ` · ${d.message}` : ""}`,
+      at: new Date(d.createdAt).toISOString(), url: d.url, ok: d.state === "READY", skipped: d.state === "CANCELED",
+    })),
+  ].sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+
   return (
     <section className="board-card flex min-h-[120px] shrink flex-col overflow-hidden">
       <header className="flex items-center justify-between gap-4">
@@ -138,23 +151,26 @@ export default function PipelinesCard({ ci, deploys, now }: { ci: Ci | null; dep
             </a>
           </li>
         ))}
-        {ci?.recent.slice(0, running ? 2 : 4).map((r) => {
-          const ok = r.conclusion === "success";
-          const skipped = r.conclusion === "skipped" || r.conclusion === "cancelled";
-          const Icon = ok ? CircleCheck : skipped ? CircleSlash : CircleX;
-          return (
-            <li key={r.url}>
-              <a href={r.url} target="_blank" rel="noopener noreferrer" className="-mx-2 flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-white/[0.03]">
-                <Icon size={16} className={`shrink-0 ${ok ? "text-mint" : skipped ? "text-ink-faint" : "text-red-400"}`} />
-                <span className="min-w-0 flex-1 truncate text-[13px] text-ink-soft">
-                  <span className="text-ink">{r.repo}</span> · {r.workflow}
-                </span>
-                <span className="mono-label shrink-0 text-[10px] text-ink-faint/80">{ago(r.updatedAt, now)}</span>
-              </a>
-            </li>
-          );
-        })}
-        {ci?.configured && !ci.active.length && !ci.recent.length && !ci.hint && !building.length && !failed.length && (
+        {history.slice(0, running ? 2 : 4).map((h) => (
+          <li key={h.url}>
+            <a href={h.url} target="_blank" rel="noopener noreferrer" className="-mx-2 flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-white/[0.03]">
+              {h.kind === "vercel" ? (
+                <Triangle size={13} className={`shrink-0 ${h.ok ? "fill-mint text-mint" : h.skipped ? "fill-ink-faint text-ink-faint" : "fill-red-400 text-red-400"}`} />
+              ) : h.ok ? (
+                <CircleCheck size={16} className="shrink-0 text-mint" />
+              ) : h.skipped ? (
+                <CircleSlash size={16} className="shrink-0 text-ink-faint" />
+              ) : (
+                <CircleX size={16} className="shrink-0 text-red-400" />
+              )}
+              <span className="min-w-0 flex-1 truncate text-[13px] text-ink-soft">
+                <span className="text-ink">{h.name}</span> · {h.what}
+              </span>
+              <span className="mono-label shrink-0 text-[10px] text-ink-faint/80">{ago(h.at, now)}</span>
+            </a>
+          </li>
+        ))}
+        {ci?.configured && !ci.active.length && !history.length && !ci.hint && !building.length && !failed.length && (
           <li className="py-1 text-sm text-ink-faint">No builds in the last 3 days.</li>
         )}
       </ul>

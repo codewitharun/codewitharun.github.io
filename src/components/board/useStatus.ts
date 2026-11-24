@@ -6,7 +6,7 @@ import type { AppStat, Deploy } from "@/app/api/board/status/route";
 
 export type BoardStatus = {
   apps: AppStat[] | null;
-  deploys: { building: Deploy[]; failed: Deploy[] } | null;
+  deploys: { building: Deploy[]; failed: Deploy[]; recent?: Deploy[] } | null;
   deployError?: string;
 };
 
