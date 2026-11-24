@@ -14,14 +14,15 @@ type Turn = { id: number; ts: number; request: string; reply: string; source: st
 
 const TOOL_WORDS: Record<string, string> = {
   web_search: "Searching the web", web_fetch: "Reading a page", pipeline_status: "Reading GitHub Actions",
-  watch_pipeline: "Watching the pipeline", fitprep_stats: "Checking FitPrep", ezysplit_stats: "Checking EzySplit",
+  watch_pipeline: "Watching the pipeline", github_prs: "Checking pull requests", github_pr_status: "Checking the PR",
+  github_deploy_status: "Checking the deploy", github_issues: "Reading issues", github_read_file: "Reading GitHub", fitprep_stats: "Checking FitPrep", ezysplit_stats: "Checking EzySplit",
   notion_tasks: "Reading Notion tasks", notion_add_task: "Preparing a Notion task", recall: "Checking memory",
   remember: "Saving to memory", repo_status: "Checking your repos", play_music: "Finding the song",
   code_task: "Handing it to Claude Code", jsgym_progress: "Checking JS Gym", set_reminder: "Setting a reminder",
 };
 /** Which board card a tool is about, so the board can light that card up. */
 export const TOOL_FOCUS: Record<string, "pipes" | "apps"> = {
-  pipeline_status: "pipes", watch_pipeline: "pipes", fitprep_stats: "apps", ezysplit_stats: "apps",
+  pipeline_status: "pipes", watch_pipeline: "pipes", github_deploy_status: "pipes", fitprep_stats: "apps", ezysplit_stats: "apps",
 };
 
 const clean = (s: string) => s.split("[What I actually did:")[0].trim();

@@ -679,7 +679,9 @@ h1, h2, h3, h4 {
 .tc-halo { width: 57%; height: 57%; background: radial-gradient(circle, var(--tc-acc), transparent 66%); opacity: .24; filter: blur(12px); animation: tc-br 4s ease-in-out infinite; }
 [data-titen="talk"] .tc-halo { animation-duration: .5s; }
 @keyframes tc-br { 50% { transform: scale(1.15); opacity: .36; } }
-.tc-disc { width: 59%; height: 59%; background: radial-gradient(circle at 35% 30%, #17202a, #07090d 72%); border: 1px solid rgb(255 255 255 / 0.09); box-shadow: inset 0 0 50px color-mix(in srgb, var(--tc-acc) 24%, transparent), 0 20px 60px rgb(0 0 0 / 0.6); }
+.tc-mesh { position: absolute; inset: 12%; width: 76%; height: 76%; border-radius: 50%; }
+/* a soft dark centre so the dino reads on top of the globe */
+.tc-disc { width: 36%; height: 36%; background: radial-gradient(circle, rgb(5 7 10 / 0.9) 40%, rgb(5 7 10 / 0) 72%); }
 .tc-bob { position: relative !important; border-radius: 0 !important; transition: transform .4s; }
 [data-titen="talk"] .tc-bob { animation: tc-bob .42s ease-in-out infinite alternate; }
 [data-titen="listen"] .tc-bob { transform: rotate(-6deg); }
@@ -701,7 +703,7 @@ h1, h2, h3, h4 {
 @keyframes tc-caret { 50% { opacity: 0; } }
 .tc-spin { width: 11px; height: 11px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--tc-acc) 25%, transparent); border-top-color: var(--tc-acc); animation: tc-spin .7s linear infinite; flex: none; }
 .tc-okdot { width: 9px; height: 9px; border-radius: 50%; background: var(--tc-acc); box-shadow: 0 0 8px var(--tc-acc); flex: none; }
-.tc > *:not(.tc-field) { position: relative; z-index: 1; }
+.tc > * { position: relative; z-index: 1; }
 
 .tc-ask {
   display: flex; align-items: center; gap: 12px; padding: 7px 7px 7px 18px; border-radius: 999px;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import type { TitenMood, TitenStep } from "./useTiten";
@@ -15,30 +15,84 @@ const LABEL: Record<TitenMood, string> = {
 };
 const SUGGEST = ["Check pipelines", "Brief me", "How is FitPrep doing?"];
 
-/** A fixed, seeded neural web around the core: synapses with light travelling along them. */
-const NET = (() => {
-  {
-    let seed = 7;
-    const rnd = () => ((seed = (seed * 9301 + 49297) % 233280), seed / 233280);
-    const cx = 360, cy = 200;
-    const nodes = Array.from({ length: 18 }, () => {
-      const a = rnd() * Math.PI * 2, r = 170 + rnd() * 170;
-      return { x: cx + Math.cos(a) * r * 1.05, y: cy + Math.sin(a) * r * 0.62, r: 1.5 + rnd() * 2 };
+const SPEED: Record<TitenMood, number> = { offline: 0.04, sleep: 0.02, idle: 0.18, listen: 0.45, think: 1.1, talk: 0.6, alert: 0.9 };
+
+/** A rotating 3D globe of points with links between near neighbours, drawn inside the core's rings. */
+function MeshSphere({ mood }: { mood: TitenMood }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const moodRef = useRef(mood);
+  useEffect(() => { moodRef.current = mood; }, [mood]);
+
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const N = 90;
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    const pts = Array.from({ length: N }, (_, i) => {
+      const y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), t = golden * i;
+      return [Math.cos(t) * r, y, Math.sin(t) * r] as const;
     });
-    const lines: { d: string; delay: string }[] = [];
-    nodes.forEach((n, i) => {
-      if (i % 2 === 0) {
-        const mx = (n.x + cx) / 2 + (rnd() - 0.5) * 80, my = (n.y + cy) / 2 + (rnd() - 0.5) * 80;
-        lines.push({ d: `M${cx} ${cy} Q${mx.toFixed(0)} ${my.toFixed(0)} ${n.x.toFixed(0)} ${n.y.toFixed(0)}`, delay: `${(-rnd() * 4).toFixed(2)}s` });
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let angle = 0, raf = 0, last = performance.now(), color = "94,234,212";
+
+    const readColor = () => {
+      const v = getComputedStyle(canvas).getPropertyValue("--tc-acc").trim();
+      const m = v.match(/^#([0-9a-f]{6})$/i);
+      if (m) color = [0, 2, 4].map((i) => parseInt(m[1].slice(i, i + 2), 16)).join(",");
+    };
+
+    const draw = (now: number) => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const size = canvas.clientWidth;
+      if (canvas.width !== Math.round(size * dpr)) { canvas.width = canvas.height = Math.round(size * dpr); }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, size, size);
+      readColor();
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      if (!still) angle += dt * SPEED[moodRef.current];
+      const R = size * 0.46, c = size / 2, tilt = 0.35;
+      const ca = Math.cos(angle), sa = Math.sin(angle), ct = Math.cos(tilt), st = Math.sin(tilt);
+      const proj = pts.map(([x, y, z]) => {
+        const x1 = x * ca + z * sa, z1 = -x * sa + z * ca;
+        const y2 = y * ct - z1 * st, z2 = y * st + z1 * ct;
+        return [c + x1 * R, c + y2 * R, z2] as const;
+      });
+      ctx.lineWidth = 0.8;
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          const dx = pts[i][0] - pts[j][0], dy = pts[i][1] - pts[j][1], dz = pts[i][2] - pts[j][2];
+          if (dx * dx + dy * dy + dz * dz > 0.16) continue;
+          const depth = (proj[i][2] + proj[j][2]) / 2;
+          ctx.strokeStyle = `rgba(${color},${(0.12 + (depth + 1) * 0.24).toFixed(3)})`;
+          ctx.beginPath();
+          ctx.moveTo(proj[i][0], proj[i][1]);
+          ctx.lineTo(proj[j][0], proj[j][1]);
+          ctx.stroke();
+        }
       }
-      if (i % 3 === 0) {
-        const m = nodes[(i + 3) % nodes.length];
-        lines.push({ d: `M${n.x.toFixed(0)} ${n.y.toFixed(0)} L${m.x.toFixed(0)} ${m.y.toFixed(0)}`, delay: `${(-rnd() * 4).toFixed(2)}s` });
+      for (const [x, y, z] of proj) {
+        const a = 0.25 + (z + 1) * 0.37;
+        ctx.fillStyle = `rgba(${color},${a.toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(x, y, 1.2 + (z + 1) * 1.3, 0, Math.PI * 2);
+        ctx.fill();
       }
-    });
-    return { nodes, lines };
-  }
-})();
+      if (!still) raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+    const onVis = () => {
+      cancelAnimationFrame(raf);
+      if (!document.hidden) { last = performance.now(); raf = requestAnimationFrame(draw); }
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { cancelAnimationFrame(raf); document.removeEventListener("visibilitychange", onVis); };
+  }, []);
+
+  return <canvas ref={ref} className="tc-mesh" aria-hidden />;
+}
 
 type Props = {
   mood: TitenMood;
@@ -53,7 +107,6 @@ type Props = {
 };
 
 export default function TitenCore({ mood, configured, heard, reply, steps, privateMode, onAsk, idleLine, titenUrl }: Props) {
-  const net = NET;
   const [draft, setDraft] = useState("");
   const offline = mood === "offline" || mood === "sleep";
   const line = mood === "sleep"
@@ -70,24 +123,15 @@ export default function TitenCore({ mood, configured, heard, reply, steps, priva
 
   return (
     <section className="tc relative flex flex-col items-center gap-4" aria-label={`Titen, ${LABEL[mood]}`}>
-      <svg className="tc-field" viewBox="0 0 720 520" aria-hidden>
-        {net.lines.map((l, i) => (
-          <g key={i}>
-            <path className="tc-syn" d={l.d} />
-            <path className="tc-pulse" d={l.d} pathLength={126} style={{ animationDelay: l.delay }} />
-          </g>
-        ))}
-        {net.nodes.map((n, i) => <circle key={i} className="tc-node" cx={n.x} cy={n.y} r={n.r} />)}
-      </svg>
-
       <a href={titenUrl || undefined} target="_blank" rel="noreferrer" className="tc-core" title={titenUrl ? "Open Titen" : undefined}>
         <span className="tc-orbit" />
         <span className="tc-dots tc-dots-b" />
         <span className="tc-dots" />
         <span className="tc-halo" />
+        <MeshSphere mood={mood} />
         <span className="tc-disc" />
         <span className="tc-bob">
-          <svg width="116" height="98" viewBox="60 71 207 176" aria-hidden>
+          <svg width="92" height="78" viewBox="60 71 207 176" aria-hidden>
             <path className="tc-body" fillRule="evenodd" clipRule="evenodd" d={DINO} />
             <path className="tc-eye" d={EYE} />
           </svg>
