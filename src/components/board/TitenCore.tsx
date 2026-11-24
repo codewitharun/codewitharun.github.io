@@ -11,7 +11,7 @@ const EYE =
   "M192.045 122.104C192.045 123.523 191.407 124.885 190.274 125.889C189.14 126.893 187.603 127.456 186 127.456C184.397 127.456 182.859 126.893 181.725 125.889C180.592 124.885 179.956 123.523 179.955 122.104H192.045Z";
 
 const LABEL: Record<TitenMood, string> = {
-  offline: "offline", idle: "ready", listen: "listening", think: "thinking", talk: "speaking", alert: "heads up",
+  offline: "offline", sleep: "asleep", idle: "ready", listen: "listening", think: "thinking", talk: "speaking", alert: "heads up",
 };
 const SUGGEST = ["Check pipelines", "Brief me", "How is FitPrep doing?"];
 
@@ -55,10 +55,12 @@ type Props = {
 export default function TitenCore({ mood, configured, heard, reply, steps, privateMode, onAsk, idleLine, titenUrl }: Props) {
   const net = NET;
   const [draft, setDraft] = useState("");
-  const offline = mood === "offline";
-  const line = offline
-    ? configured ? "I'm offline. The Mac is asleep, Titen is stopped, or this device isn't on Tailscale." : "Add Titen's Tailscale address in settings to bring me here."
-    : reply || idleLine;
+  const offline = mood === "offline" || mood === "sleep";
+  const line = mood === "sleep"
+    ? "I'm asleep. Mic off, nothing running. Wake me from Titen's page."
+    : mood === "offline"
+      ? configured ? "I'm offline. The Mac is asleep, Titen is stopped, or this device isn't on Tailscale." : "Add Titen's Tailscale address in settings to bring me here."
+      : reply || idleLine;
 
   const send = (text: string) => {
     if (!text.trim() || offline) return;
@@ -139,7 +141,7 @@ export default function TitenCore({ mood, configured, heard, reply, steps, priva
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder={offline ? "Titen is offline" : "Ask Titen anything…"}
+          placeholder={mood === "sleep" ? "Titen is asleep" : offline ? "Titen is offline" : "Ask Titen anything…"}
           disabled={offline}
           aria-label="Ask Titen"
           className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-ink-faint disabled:opacity-60"

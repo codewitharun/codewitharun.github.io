@@ -139,10 +139,10 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
         {error && <p className="rounded-2xl border border-amber-300/30 bg-amber-300/[0.06] px-4 py-3 text-sm text-amber-100">{error}</p>}
 
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
-          <div className="order-2 flex min-h-0 flex-col gap-5 overflow-hidden lg:order-1 lg:col-span-4 lg:gap-6">
+          <div className="order-2 flex min-h-0 flex-col gap-5 lg:order-1 lg:col-span-4 lg:gap-6">
             <FocusCard tasks={tasks} now={now} />
             <Nudges nudges={nudges} />
-            <WinsCard tasks={tasks} wins={wins} learnDays={learnDays} now={now} />
+            <WinsCard tasks={tasks} wins={wins} learnDays={learnDays} now={now} limit={3} />
           </div>
           <div className="order-1 flex min-h-0 justify-center pt-2 lg:order-2 lg:col-span-4">
             <TitenCore
@@ -180,7 +180,7 @@ function Clock({ now, name, extra }: { now: Date; name: string; extra?: React.Re
         {now.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
       </p>
       <h1 className="mt-1 flex items-baseline gap-3 font-display font-extrabold leading-[0.9] tracking-[-0.04em] text-ink">
-        <span className="text-[clamp(56px,7.5vw,128px)] tabular-nums">{hm}</span>
+        <span className="text-[clamp(56px,min(7.5vw,11vh),128px)] tabular-nums">{hm}</span>
         <span className="font-mono text-[clamp(14px,1.2vw,20px)] font-medium uppercase tracking-normal text-ink-faint">{ampm}</span>
       </h1>
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">

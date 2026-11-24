@@ -16,7 +16,7 @@ const ICON = {
 const prettyExercise = (id: string) =>
   (id.split("/").pop() ?? id).replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 
-export default function WinsCard({ tasks, wins, learnDays, now }: { tasks: BoardTask[]; wins: Wins | null; learnDays: number; now: Date }) {
+export default function WinsCard({ tasks, wins, learnDays, now, limit = 8 }: { tasks: BoardTask[]; wins: Wins | null; learnDays: number; now: Date; limit?: number }) {
   const weekAgo = now.getTime() - 7 * 86_400_000;
   const items: Win[] = [];
   tasks.forEach((t) => {
@@ -53,11 +53,11 @@ export default function WinsCard({ tasks, wins, learnDays, now }: { tasks: Board
         ))}
       </div>
 
-      <ul className="mt-4 flex min-h-0 flex-1 flex-col gap-0.5 overflow-hidden [mask-image:linear-gradient(to_bottom,black_75%,transparent)]">
+      <ul className="mt-4 flex flex-col gap-0.5 [@media(max-height:900px)]:hidden">
         {items.length === 0 && (
           <li className="py-3 text-sm text-ink-faint">Nothing yet this week. The first win is the hardest; make it a small one.</li>
         )}
-        {items.slice(0, 8).map((w, i) => {
+        {items.slice(0, limit).map((w, i) => {
           const body = (
             <>
               <span className="mt-0.5 shrink-0">{ICON[w.kind]}</span>

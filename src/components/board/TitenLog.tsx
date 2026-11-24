@@ -18,7 +18,7 @@ export default function TitenLog({ items, online }: { items: TitenLogItem[]; onl
       <ul className="mt-3 flex min-h-0 flex-col gap-0.5 overflow-hidden [mask-image:linear-gradient(to_bottom,black_80%,transparent)]">
         {!items.length && <li className="py-1 text-sm text-ink-faint">{online ? "Nothing yet. Say “Hey Titen”." : "Titen's activity shows here when it's reachable."}</li>}
         <AnimatePresence initial={false}>
-          {items.slice(0, 6).map((it) => (
+          {items.slice(0, 5).map((it) => (
             <motion.li
               key={it.id}
               layout
