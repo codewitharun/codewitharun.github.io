@@ -61,6 +61,14 @@ function useReservedSpace() {
   return space;
 }
 
+/** The old CRA site left a service worker on some phones; it breaks the board's calls to Titen. Remove it. */
+function useNoOldServiceWorker() {
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((r) => r.unregister())).catch(() => {});
+  }, []);
+}
+
 function BoardInner({ user, logout }: { user: NonNullable<ReturnType<typeof useAdminAuth>["user"]>; logout: () => Promise<void> }) {
   const now = useNow();
   const data = useBoard(user);
@@ -69,6 +77,7 @@ function BoardInner({ user, logout }: { user: NonNullable<ReturnType<typeof useA
   const ci = useCi(user);
   const status = useStatus(user);
   const titen = useTiten(data.settings.titenUrl);
+  useNoOldServiceWorker();
   return (
     <>
       <BoardView {...data} now={now} name={user.displayName?.split(" ")[0] || "Arun"} onSettings={() => setShowSettings(true)} reserved={reserved} ci={ci} status={status} titen={titen} />
@@ -138,14 +147,16 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
 
         {error && <p className="rounded-2xl border border-amber-300/30 bg-amber-300/[0.06] px-4 py-3 text-sm text-amber-100">{error}</p>}
 
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
-          <div className="order-2 flex min-h-0 flex-col gap-5 lg:order-1 lg:col-span-4 lg:gap-6">
+        <div className="grid min-h-0 grid-cols-1 content-start gap-5 lg:grid-cols-12 lg:gap-6">
+          {/* left column runs the full height; Titen + pipelines/log on top, habits under them,
+              so no column leaves a hole under it */}
+          <div className="order-2 flex min-h-0 flex-col gap-5 lg:order-1 lg:col-span-4 lg:row-span-2 lg:gap-6">
             <FocusCard tasks={tasks} now={now} />
             {/* when Titen is up it already says the first nudge, so don't repeat it here */}
             <Nudges nudges={titen?.online && mood !== "sleep" ? nudges.slice(1) : nudges} />
-            <WinsCard tasks={tasks} wins={wins} learnDays={learnDays} now={now} limit={3} />
+            <WinsCard tasks={tasks} wins={wins} learnDays={learnDays} now={now} limit={8} className="lg:flex-1" />
           </div>
-          <div className="order-1 flex min-h-0 justify-center pt-2 lg:order-2 lg:col-span-4">
+          <div className="order-1 flex min-h-0 items-start justify-center pt-2 lg:order-2 lg:col-span-4">
             <TitenCore
               mood={mood}
               configured={!!titen?.configured}
@@ -161,11 +172,12 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
           </div>
           <div className="order-3 flex min-h-0 flex-col gap-5 lg:col-span-4 lg:gap-6">
             <div className={`flex min-h-0 flex-col ${focusClass("pipes")}`}><PipelinesCard ci={ci} deploys={status?.deploys} now={now} /></div>
-            <TitenLog items={titen?.log ?? []} online={!!titen?.online} />
+            <TitenLog items={titen?.log ?? []} online={!!titen?.online} className="lg:flex-1" />
+          </div>
+          <div className="order-4 min-w-0 lg:col-span-8 lg:col-start-5">
+            <HabitsCard habits={settings.habits} days={days} gymDays={gymDays} now={now} />
           </div>
         </div>
-
-        <HabitsCard habits={settings.habits} days={days} gymDays={gymDays} now={now} />
 
         <Reminder lines={settings.reminders} />
       </div>

@@ -48,7 +48,11 @@ export default function HabitsCard({ habits, days, gymDays, now }: Props) {
       </header>
 
       <div className="mt-4 flex flex-col gap-5 xl:flex-row xl:items-start xl:gap-8">
-      <div className="grid gap-2.5 xl:w-[44%] xl:shrink-0" style={{ gridTemplateColumns: `repeat(${Math.max(habits.length, 1)}, minmax(0, 1fr))` }}>
+      {/* side by side on phones and tablets; on big screens a vertical list as tall as the heatmap */}
+      <div
+        className="grid grid-cols-[repeat(var(--habits),minmax(0,1fr))] gap-2.5 xl:w-[30%] xl:shrink-0 xl:grid-cols-1"
+        style={{ "--habits": Math.max(habits.length, 1) } as React.CSSProperties}
+      >
         {habits.map((h) => {
           const manual = !!days[todayKey]?.has(h.id);
           const auto = h.id === "learn" && gymDays.has(todayKey);
@@ -60,28 +64,28 @@ export default function HabitsCard({ habits, days, gymDays, now }: Props) {
               onClick={() => setHabit(todayKey, h.id, !manual)}
               disabled={auto && !manual}
               title={auto && !manual ? "Ticked automatically: you passed a JS Gym exercise today" : undefined}
-              className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition-all duration-300 ${
+              className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition-all duration-300 xl:flex xl:items-center xl:gap-3 xl:py-3 ${
                 done
                   ? "border-mint/40 bg-mint/[0.08]"
                   : "border-white/[0.07] bg-white/[0.02] hover:border-white/20"
               }`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between xl:contents">
                 <span
-                  className={`grid size-7 place-items-center rounded-full border-2 transition-all duration-300 ${
+                  className={`grid size-7 shrink-0 place-items-center rounded-full border-2 transition-all duration-300 ${
                     done ? "border-transparent bg-mint text-bg" : "border-white/20 text-transparent group-hover:border-mint/70"
                   }`}
                 >
                   <Check size={14} strokeWidth={3} />
                 </span>
-                <span className={`flex items-center gap-1 font-mono text-xs ${s > 0 ? "text-amber-300" : "text-ink-faint/50"}`}>
+                <span className={`flex items-center gap-1 font-mono text-xs xl:order-3 ${s > 0 ? "text-amber-300" : "text-ink-faint/50"}`}>
                   <Flame size={13} className={s > 0 ? "fill-amber-300/30" : ""} />
                   {s}
                 </span>
               </div>
-              <p className={`mt-3 font-display text-[15px] font-semibold leading-tight ${done ? "text-ink" : "text-ink-soft"}`}>{h.label}</p>
+              <p className={`mt-3 font-display text-[15px] font-semibold leading-tight xl:order-2 xl:mt-0 xl:flex-1 ${done ? "text-ink" : "text-ink-soft"}`}>{h.label}</p>
               {auto && (
-                <p className="mono-label mt-1 flex items-center gap-1 text-[9px] text-mint/80">
+                <p className="mono-label mt-1 flex items-center gap-1 text-[9px] text-mint/80 xl:hidden">
                   <Sparkles size={10} /> via JS Gym
                 </p>
               )}

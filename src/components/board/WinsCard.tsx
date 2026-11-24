@@ -16,7 +16,7 @@ const ICON = {
 const prettyExercise = (id: string) =>
   (id.split("/").pop() ?? id).replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 
-export default function WinsCard({ tasks, wins, learnDays, now, limit = 8 }: { tasks: BoardTask[]; wins: Wins | null; learnDays: number; now: Date; limit?: number }) {
+export default function WinsCard({ tasks, wins, learnDays, now, limit = 8, className = "" }: { tasks: BoardTask[]; wins: Wins | null; learnDays: number; now: Date; limit?: number; className?: string }) {
   const weekAgo = now.getTime() - 7 * 86_400_000;
   const items: Win[] = [];
   tasks.forEach((t) => {
@@ -36,7 +36,7 @@ export default function WinsCard({ tasks, wins, learnDays, now, limit = 8 }: { t
   ];
 
   return (
-    <section className="board-card flex min-h-0 flex-col">
+    <section className={`board-card flex min-h-0 flex-col ${className}`}>
       <header className="flex items-center justify-between gap-4">
         <p className="mono-label flex items-center gap-2 text-[11px] text-ink-faint">
           <Trophy size={13} className="text-amber-300" /> Hall of fame · this week
@@ -53,7 +53,7 @@ export default function WinsCard({ tasks, wins, learnDays, now, limit = 8 }: { t
         ))}
       </div>
 
-      <ul className="mt-4 flex flex-col gap-0.5 [@media(max-height:900px)]:hidden">
+      <ul className="mt-4 flex min-h-0 flex-col gap-0.5 overflow-hidden lg:h-0 lg:flex-1 lg:[mask-image:linear-gradient(to_bottom,black_80%,transparent)]">
         {items.length === 0 && (
           <li className="py-3 text-sm text-ink-faint">Nothing yet this week. The first win is the hardest; make it a small one.</li>
         )}
