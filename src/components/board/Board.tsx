@@ -207,7 +207,8 @@ function CountdownChip({ label, date, now }: { label: string; date: string; now:
   const [y, m, d] = date.split("-").map(Number);
   if (!y || !m || !d) return null;
   const days = daysBetween(now, new Date(y, m - 1, d));
-  const text = days > 1 ? `${days} days` : days === 1 ? "tomorrow" : days === 0 ? "today" : `${-days} days ago`;
+  if (days < 0) return null; // the day has passed: hide it instead of counting up
+  const text = days > 1 ? `${days} days` : days === 1 ? "tomorrow" : "today";
   return (
     <p className="mono-label inline-flex items-center gap-2 rounded-full border border-violet/30 bg-violet/[0.08] px-3 py-1.5 text-[11px] text-violet">
       <span className="size-1.5 rounded-full bg-violet" />

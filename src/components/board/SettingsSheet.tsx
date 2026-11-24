@@ -83,6 +83,16 @@ export default function SettingsSheet({ settings, onClose, onLogout }: { setting
             onChange={(e) => setCdDate(e.target.value)}
             className="rounded-xl border border-border bg-bg px-3 py-2.5 text-sm text-ink outline-none [color-scheme:dark] focus:border-mint"
           />
+          {(cdDate || cdLabel) && (
+            <button
+              type="button"
+              onClick={() => { setCdLabel(""); setCdDate(""); }}
+              aria-label="Clear countdown"
+              className="rounded-xl border border-border px-3 text-sm text-ink-faint hover:border-mint hover:text-ink"
+            >
+              Clear
+            </button>
+          )}
         </div>
 
         <p className="mono-label mt-6 text-[11px] text-ink-faint">Titen on your Mac (Tailscale address)</p>
