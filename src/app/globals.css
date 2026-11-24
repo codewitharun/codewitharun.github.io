@@ -581,7 +581,7 @@ h1, h2, h3, h4 {
 }
 /* Big screens (the Mac wallpaper): exactly one screen, no scrolling.
    Smaller or shorter screens (iPad landscape, phones): normal scrolling. */
-@media (min-width: 1024px) and (min-height: 1080px) {
+@media (min-width: 1024px) and (min-height: 1400px) {
   .board-root {
     overflow: hidden;
   }
@@ -609,6 +609,10 @@ h1, h2, h3, h4 {
 .board-root[data-titen="talk"] { --tc-acc: #5eead4; --tc-acc2: #a78bfa; }
 .board-root[data-titen="alert"] { --tc-acc: #fb7185; --tc-acc2: #fb923c; }
 .board-root[data-titen="offline"] { --tc-acc: #6b7280; --tc-acc2: #3f3f55; }
+.board-root[data-titen="sleep"] { --tc-acc: #818cf8; --tc-acc2: #312e81; }
+[data-titen="sleep"] .tc-pulse, [data-titen="sleep"] .tc-dots, [data-titen="sleep"] .tc-orbit { animation-duration: 40s; opacity: .25; }
+[data-titen="sleep"] .tc-eye { animation: none; transform: scaleY(.12); }
+[data-titen="sleep"] .tc-body { fill: #9ca3c9; }
 
 .board-aurora {
   position: absolute; inset: -20%;
@@ -654,7 +658,7 @@ h1, h2, h3, h4 {
 [data-titen="think"] .tc-node { animation: tc-node 1s ease-in-out infinite alternate; }
 @keyframes tc-node { to { opacity: 1; } }
 
-.tc-core { position: relative; z-index: 1; width: clamp(230px, 19vw, 300px); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+.tc-core { position: relative; z-index: 1; width: clamp(190px, min(19vw, 27vh), 300px); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
 .tc-core > span { position: absolute; border-radius: 50%; }
 .tc-dots {
   inset: 0;
