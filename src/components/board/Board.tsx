@@ -12,7 +12,9 @@ import Nudges, { buildNudges } from "./Nudges";
 import SettingsSheet from "./SettingsSheet";
 import PipelinesCard, { useCi } from "./PipelinesCard";
 import AppsStrip from "./AppsStrip";
-import TitenChip from "./TitenChip";
+import TitenCore from "./TitenCore";
+import TitenLog from "./TitenLog";
+import { useTiten, type TitenMood } from "./useTiten";
 import { useStatus, type BoardStatus } from "./useStatus";
 import type { Nudge } from "./Nudges";
 import { useBoard, useNow } from "./useBoard";
@@ -27,9 +29,9 @@ export default function Board() {
   return <BoardInner user={user} logout={logout} />;
 }
 
-function Shell({ children }: { children?: React.ReactNode }) {
+function Shell({ children, mood = "idle" }: { children?: React.ReactNode; mood?: TitenMood }) {
   return (
-    <div className="board-root" data-clarity-mask="true">
+    <div className="board-root" data-titen={mood} data-clarity-mask="true">
       <Aurora />
       <div className="relative">{children}</div>
     </div>
@@ -39,9 +41,9 @@ function Shell({ children }: { children?: React.ReactNode }) {
 function Aurora() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-      <div className="absolute -left-[15%] -top-[25%] h-[70vh] w-[60vw] rounded-full bg-mint/[0.07] blur-[120px]" />
-      <div className="absolute -bottom-[30%] right-[-10%] h-[75vh] w-[60vw] rounded-full bg-violet/[0.10] blur-[140px]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.45))]" />
+      <div className="board-aurora" />
+      <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:4px_4px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(0,0,0,0.5))]" />
     </div>
   );
 }
@@ -66,9 +68,10 @@ function BoardInner({ user, logout }: { user: NonNullable<ReturnType<typeof useA
   const reserved = useReservedSpace();
   const ci = useCi(user);
   const status = useStatus(user);
+  const titen = useTiten(data.settings.titenUrl);
   return (
     <>
-      <BoardView {...data} now={now} name={user.displayName?.split(" ")[0] || "Arun"} onSettings={() => setShowSettings(true)} reserved={reserved} ci={ci} status={status} />
+      <BoardView {...data} now={now} name={user.displayName?.split(" ")[0] || "Arun"} onSettings={() => setShowSettings(true)} reserved={reserved} ci={ci} status={status} titen={titen} />
       {showSettings && <SettingsSheet settings={data.settings} onClose={() => setShowSettings(false)} onLogout={logout} />}
     </>
   );
@@ -81,10 +84,11 @@ type ViewProps = Pick<ReturnType<typeof useBoard>, "settings" | "tasks" | "days"
   reserved?: { left: number; right: number };
   ci?: ReturnType<typeof useCi>;
   status?: BoardStatus | null;
+  titen?: ReturnType<typeof useTiten> | null;
 };
 
 /** The whole board, from plain data (also what a preview/demo renders). */
-export function BoardView({ settings, tasks, days, wins, error, online, now, name, onSettings, reserved, ci = null, status = null }: ViewProps) {
+export function BoardView({ settings, tasks, days, wins, error, online, now, name, onSettings, reserved, ci = null, status = null, titen = null }: ViewProps) {
 
   const gymDays = useMemo(() => new Set((wins?.gym ?? []).map((g) => dayKey(new Date(g.at)))), [wins]);
   const todayKey = dayKey(now);
@@ -109,43 +113,57 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
   ];
   const nudges = buildNudges({ tasks, habits: settings.habits, habitsDoneToday, lastLearn, now, alerts });
 
+  const mood: TitenMood = titen?.mood ?? "offline";
+  const focusClass = (card: "pipes" | "apps") => (!titen?.focus ? "" : titen.focus === card ? "board-live" : "board-dim");
+  const idleLine = nudges[0]?.text ?? "All quiet. Ask me anything, or say “Hey Titen”.";
+
   return (
-    <Shell>
-      <div style={reserved && (reserved.left || reserved.right) ? { marginLeft: reserved.left, marginRight: reserved.right, maxWidth: "none" } : undefined} className="board-frame mx-auto flex min-h-[100dvh] max-w-[1600px] flex-col gap-5 px-5 pb-6 pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-8 lg:gap-6 lg:px-12 lg:pb-10 lg:pt-10">
+    <Shell mood={mood}>
+      <div style={reserved && (reserved.left || reserved.right) ? { marginLeft: reserved.left, marginRight: reserved.right, maxWidth: "none" } : undefined} className="board-frame mx-auto flex min-h-[100dvh] max-w-[1600px] flex-col gap-5 px-5 pb-6 pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-8 lg:gap-6 lg:px-12 lg:pb-8 lg:pt-8">
         <header className="flex items-start justify-between gap-6">
-          <div>
-            <Clock now={now} name={name} extra={settings.countdown && <CountdownChip label={settings.countdown.label} date={settings.countdown.date} now={now} />} />
-          </div>
+          <Clock now={now} name={name} extra={settings.countdown && <CountdownChip label={settings.countdown.label} date={settings.countdown.date} now={now} />} />
           <div className="flex flex-col items-end gap-4">
-          <div className="flex items-center gap-2 pt-2">
-            <TitenChip url={settings.titenUrl} />
-            <span className={`mono-label flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] ${online && !error ? "border-mint/20 text-mint/90" : "border-amber-300/30 text-amber-300"}`}>
-              <span className={`size-1.5 rounded-full ${online && !error ? "animate-pulse bg-mint" : "bg-amber-300"}`} />
-              {error ? "Sync error" : online ? "Live" : "Offline"}
-            </span>
-            <button onClick={onSettings} aria-label="Board settings" className="grid size-9 place-items-center rounded-full border border-white/[0.07] text-ink-faint transition-colors hover:border-white/20 hover:text-ink">
-              <Settings2 size={16} />
-            </button>
-          </div>
-          <AppsStrip apps={status?.apps} />
+            <div className="flex items-center gap-2 pt-2">
+              <span className={`mono-label flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] ${online && !error ? "border-mint/20 text-mint/90" : "border-amber-300/30 text-amber-300"}`}>
+                <span className={`size-1.5 rounded-full ${online && !error ? "animate-pulse bg-mint" : "bg-amber-300"}`} />
+                {error ? "Sync error" : online ? "Live" : "Offline"}
+              </span>
+              <button onClick={onSettings} aria-label="Board settings" className="grid size-9 place-items-center rounded-full border border-white/[0.07] text-ink-faint transition-colors hover:border-white/20 hover:text-ink">
+                <Settings2 size={16} />
+              </button>
+            </div>
+            <div className={focusClass("apps")}><AppsStrip apps={status?.apps} /></div>
           </div>
         </header>
 
         {error && <p className="rounded-2xl border border-amber-300/30 bg-amber-300/[0.06] px-4 py-3 text-sm text-amber-100">{error}</p>}
 
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
-          <div className="flex min-h-0 flex-col gap-5 overflow-hidden lg:col-span-5 lg:gap-6">
+          <div className="order-2 flex min-h-0 flex-col gap-5 overflow-hidden lg:order-1 lg:col-span-4 lg:gap-6">
             <FocusCard tasks={tasks} now={now} />
             <Nudges nudges={nudges} />
+            <WinsCard tasks={tasks} wins={wins} learnDays={learnDays} now={now} />
           </div>
-          <div className="grid min-h-0 grid-cols-1 gap-5 lg:col-span-7 lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-6">
-            <HabitsCard habits={settings.habits} days={days} gymDays={gymDays} now={now} />
-            <div className="grid min-h-0 grid-cols-1 gap-5 xl:grid-cols-2 lg:gap-6">
-              <WinsCard tasks={tasks} wins={wins} learnDays={learnDays} now={now} />
-              <PipelinesCard ci={ci} deploys={status?.deploys} now={now} />
-            </div>
+          <div className="order-1 flex min-h-0 justify-center pt-2 lg:order-2 lg:col-span-4">
+            <TitenCore
+              mood={mood}
+              configured={!!titen?.configured}
+              heard={titen?.heard ?? ""}
+              reply={titen?.reply ?? ""}
+              steps={titen?.steps ?? []}
+              privateMode={titen?.privateMode}
+              onAsk={(t) => titen?.ask(t)}
+              idleLine={idleLine}
+              titenUrl={settings.titenUrl}
+            />
+          </div>
+          <div className="order-3 flex min-h-0 flex-col gap-5 lg:col-span-4 lg:gap-6">
+            <div className={`flex min-h-0 flex-col ${focusClass("pipes")}`}><PipelinesCard ci={ci} deploys={status?.deploys} now={now} /></div>
+            <TitenLog items={titen?.log ?? []} online={!!titen?.online} />
           </div>
         </div>
+
+        <HabitsCard habits={settings.habits} days={days} gymDays={gymDays} now={now} />
 
         <Reminder lines={settings.reminders} />
       </div>
