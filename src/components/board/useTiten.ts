@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // The board follows Titen's live events (what it hears, says and does) and can ask it something.
 // Outside Tailscale, or with the Mac asleep, everything here quietly shows "offline".
 
-export type TitenMood = "offline" | "idle" | "listen" | "think" | "talk" | "alert";
+export type TitenMood = "offline" | "sleep" | "idle" | "listen" | "think" | "talk" | "alert";
 export type TitenStep = { id: string; text: string; done: boolean };
 export type TitenLogItem = { id: string; text: string; meta: string; tone: "titen" | "you" | "good" | "bad" | "info"; at: number };
 
@@ -125,6 +125,7 @@ export function useTiten(url?: string) {
   }, [url]);
 
   const mood: TitenMood = !url || !online ? "offline"
+    : state === "asleep" ? "sleep"
     : alert ? "alert"
     : ["listening", "hearing", "detecting"].includes(state) ? "listen"
     : ["thinking", "tool"].includes(state) ? "think"
