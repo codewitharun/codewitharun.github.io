@@ -62,10 +62,45 @@ export function useTiten(url?: string) {
       })
       .catch(() => {});
 
+    // iPhone Safari kills the live stream when the phone sleeps or the tab sits in the background, and a
+    // stream that failed its first connect stays closed forever. So: reconnect with backoff, reconnect when
+    // the tab comes back, and a cheap status check every 20 s as a watchdog.
+    let retry: ReturnType<typeof setTimeout> | undefined;
+    let backoff = 2000;
+    const reopen = (delay = 0) => {
+      clearTimeout(retry);
+      retry = setTimeout(() => { if (alive) { es?.close(); open(); } }, delay);
+    };
+    const check = async () => {
+      if (!alive || document.hidden) return;
+      try {
+        const r = await fetch(`${url}/api/status`, { cache: "no-store", signal: AbortSignal.timeout(4000) });
+        if (!r.ok) throw new Error(String(r.status));
+        const st = (await r.json()) as { state?: string; asleep?: boolean };
+        if (!alive) return;
+        if (st.asleep) setState("asleep");
+        if (!es || es.readyState !== EventSource.OPEN) reopen();
+      } catch {
+        if (alive) setOnline(false);
+      }
+    };
+    const onBack = () => { if (!document.hidden) { backoff = 2000; reopen(); check(); } };
+    const watchdog = setInterval(check, 20_000);
+    document.addEventListener("visibilitychange", onBack);
+    window.addEventListener("online", onBack);
+    window.addEventListener("pageshow", onBack);
+
     const open = () => {
       es = new EventSource(`${url}/api/events`);
-      es.onopen = () => alive && setOnline(true);
-      es.onerror = () => alive && setOnline(false);
+      es.onopen = () => { if (alive) { setOnline(true); backoff = 2000; } };
+      es.onerror = () => {
+        if (!alive) return;
+        setOnline(false);
+        if (es?.readyState === EventSource.CLOSED) {
+          reopen(backoff);
+          backoff = Math.min(backoff * 2, 30_000);
+        }
+      };
       es.onmessage = (m) => {
         if (!alive) return;
         let ev: Record<string, unknown>;
@@ -110,6 +145,11 @@ export function useTiten(url?: string) {
       alive = false;
       es?.close();
       clearTimeout(settle.current);
+      clearTimeout(retry);
+      clearInterval(watchdog);
+      document.removeEventListener("visibilitychange", onBack);
+      window.removeEventListener("online", onBack);
+      window.removeEventListener("pageshow", onBack);
     };
   }, [url, push]);
 
