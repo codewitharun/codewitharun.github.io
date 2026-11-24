@@ -141,7 +141,8 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
           <div className="order-2 flex min-h-0 flex-col gap-5 lg:order-1 lg:col-span-4 lg:gap-6">
             <FocusCard tasks={tasks} now={now} />
-            <Nudges nudges={nudges} />
+            {/* when Titen is up it already says the first nudge, so don't repeat it here */}
+            <Nudges nudges={titen?.online && mood !== "sleep" ? nudges.slice(1) : nudges} />
             <WinsCard tasks={tasks} wins={wins} learnDays={learnDays} now={now} limit={3} />
           </div>
           <div className="order-1 flex min-h-0 justify-center pt-2 lg:order-2 lg:col-span-4">
@@ -155,6 +156,7 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
               onAsk={(t) => titen?.ask(t)}
               idleLine={idleLine}
               titenUrl={settings.titenUrl}
+              why={titen?.why}
             />
           </div>
           <div className="order-3 flex min-h-0 flex-col gap-5 lg:col-span-4 lg:gap-6">

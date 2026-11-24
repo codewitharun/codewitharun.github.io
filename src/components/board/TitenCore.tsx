@@ -104,9 +104,10 @@ type Props = {
   onAsk: (text: string) => void;
   idleLine: string;
   titenUrl?: string;
+  why?: string;
 };
 
-export default function TitenCore({ mood, configured, heard, reply, steps, privateMode, onAsk, idleLine, titenUrl }: Props) {
+export default function TitenCore({ mood, configured, heard, reply, steps, privateMode, onAsk, idleLine, titenUrl, why }: Props) {
   const [draft, setDraft] = useState("");
   const offline = mood === "offline" || mood === "sleep";
   const line = mood === "sleep"
@@ -158,6 +159,12 @@ export default function TitenCore({ mood, configured, heard, reply, steps, priva
             {mood === "listen" || (mood === "think" && !reply) ? (heard ? `“${heard}”` : "Listening…") : line}
           </motion.p>
         </AnimatePresence>
+        {mood === "offline" && configured && (
+          <p className="mono-label mt-2 text-[10px] text-ink-faint/70">
+            {why ? `Last check: ${why}` : "Checking…"}
+            {titenUrl && <> · <a href={`${titenUrl}/api/status`} target="_blank" rel="noreferrer" className="underline">test link</a></>}
+          </p>
+        )}
       </div>
 
       <AnimatePresence>
