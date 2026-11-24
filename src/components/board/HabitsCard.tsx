@@ -6,7 +6,7 @@ import { addDays, dayKey, startOfDay, streak } from "./dates";
 import { GRID_DAYS } from "./useBoard";
 
 const WEEKS = GRID_DAYS / 7;
-const LEVEL = ["bg-white/[0.045]", "bg-mint/[0.18]", "bg-mint/[0.35]", "bg-mint/60", "bg-mint/90"];
+const LEVEL = ["bg-white/[0.045]", "bg-teal-300/[0.2]", "bg-teal-300/[0.38]", "bg-teal-300/60", "bg-teal-300/90"];
 
 type Props = {
   habits: Habit[];
@@ -47,7 +47,8 @@ export default function HabitsCard({ habits, days, gymDays, now }: Props) {
         </p>
       </header>
 
-      <div className="mt-4 grid gap-2.5" style={{ gridTemplateColumns: `repeat(${Math.max(habits.length, 1)}, minmax(0, 1fr))` }}>
+      <div className="mt-4 flex flex-col gap-5 xl:flex-row xl:items-start xl:gap-8">
+      <div className="grid gap-2.5 xl:w-[44%] xl:shrink-0" style={{ gridTemplateColumns: `repeat(${Math.max(habits.length, 1)}, minmax(0, 1fr))` }}>
         {habits.map((h) => {
           const manual = !!days[todayKey]?.has(h.id);
           const auto = h.id === "learn" && gymDays.has(todayKey);
@@ -89,7 +90,8 @@ export default function HabitsCard({ habits, days, gymDays, now }: Props) {
         })}
       </div>
 
-      <div className="mt-5 flex min-h-0 max-w-[720px] gap-2">
+      <div className="min-w-0 flex-1">
+      <div className="flex min-h-0 max-w-[820px] gap-2">
         <div className="mono-label grid shrink-0 grid-rows-7 gap-[3px] pt-[18px] text-[9px] leading-none text-ink-faint/60">
           {["M", "", "W", "", "F", "", "S"].map((l, i) => (
             <span key={i} className="flex items-center">{l}</span>
@@ -126,7 +128,7 @@ export default function HabitsCard({ habits, days, gymDays, now }: Props) {
           </div>
         </div>
       </div>
-      <div className="mt-3 flex max-w-[720px] items-center justify-between gap-4">
+      <div className="mt-3 flex max-w-[820px] items-center justify-between gap-4">
       <p className="mono-label text-[10px] text-ink-faint">
         {showUp > 0 ? (
           <>
@@ -143,6 +145,8 @@ export default function HabitsCard({ habits, days, gymDays, now }: Props) {
         ))}
         More
       </p>
+      </div>
+      </div>
       </div>
     </section>
   );
