@@ -38,6 +38,7 @@ export function useTiten(url?: string) {
   const [alert, setAlert] = useState(false);
   const [log, setLog] = useState<TitenLogItem[]>([]);
   const [privateMode, setPrivateMode] = useState(false);
+  const [why, setWhy] = useState(""); // last connection problem, shown small under "offline" to debug phones
   const settle = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const push = useCallback((item: Omit<TitenLogItem, "id" | "at">) => {
@@ -75,13 +76,17 @@ export function useTiten(url?: string) {
       if (!alive || document.hidden) return;
       try {
         const r = await fetch(`${url}/api/status`, { cache: "no-store", signal: AbortSignal.timeout(4000) });
-        if (!r.ok) throw new Error(String(r.status));
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const st = (await r.json()) as { state?: string; asleep?: boolean };
         if (!alive) return;
+        setWhy("");
         if (st.asleep) setState("asleep");
         if (!es || es.readyState !== EventSource.OPEN) reopen();
-      } catch {
-        if (alive) setOnline(false);
+      } catch (e) {
+        if (alive) {
+          setOnline(false);
+          setWhy(`${e instanceof Error ? `${e.name}: ${e.message}` : String(e)} · ${new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", second: "2-digit" })}`);
+        }
       }
     };
     const onBack = () => { if (!document.hidden) { backoff = 2000; reopen(); check(); } };
@@ -141,6 +146,7 @@ export function useTiten(url?: string) {
       };
     };
     open();
+    check();
     return () => {
       alive = false;
       es?.close();
@@ -173,5 +179,5 @@ export function useTiten(url?: string) {
     : ["writing", "voicing", "speaking"].includes(state) ? "talk"
     : "idle";
 
-  return { configured: !!url, online, mood, state, heard, reply, steps, focus, log, ask, privateMode };
+  return { configured: !!url, online, mood, state, heard, reply, steps, focus, log, ask, privateMode, why };
 }
