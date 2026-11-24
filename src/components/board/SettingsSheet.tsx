@@ -9,6 +9,7 @@ export default function SettingsSheet({ settings, onClose, onLogout }: { setting
   const [reminders, setReminders] = useState(settings.reminders.join("\n"));
   const [cdLabel, setCdLabel] = useState(settings.countdown?.label ?? "");
   const [cdDate, setCdDate] = useState(settings.countdown?.date ?? "");
+  const [titenUrl, setTitenUrl] = useState(settings.titenUrl ?? "");
   const [saving, setSaving] = useState(false);
 
   async function save() {
@@ -17,6 +18,7 @@ export default function SettingsSheet({ settings, onClose, onLogout }: { setting
       habits: habits.map((h) => ({ ...h, label: h.label.trim() })).filter((h) => h.label),
       reminders: reminders.split("\n").map((r) => r.trim()).filter(Boolean),
       countdown: cdDate ? { label: cdLabel.trim() || "Countdown", date: cdDate } : null,
+      titenUrl: cleanTitenUrl(titenUrl),
     });
     setSaving(false);
     onClose();
@@ -83,6 +85,16 @@ export default function SettingsSheet({ settings, onClose, onLogout }: { setting
           />
         </div>
 
+        <p className="mono-label mt-6 text-[11px] text-ink-faint">Titen on your Mac (Tailscale address)</p>
+        <p className="mt-1 text-xs text-ink-faint">From <code>tailscale serve</code>, e.g. https://aruns-macbook.your-tailnet.ts.net. Only works on your own devices.</p>
+        <input
+          value={titenUrl}
+          onChange={(e) => setTitenUrl(e.target.value)}
+          placeholder="https://aruns-macbook.….ts.net"
+          inputMode="url"
+          className="mt-2 w-full rounded-xl border border-border bg-bg px-3 py-2.5 text-sm text-ink outline-none focus:border-mint"
+        />
+
         <div className="mt-6 flex items-center justify-between gap-3">
           <button onClick={onLogout} className="flex items-center gap-2 rounded-full px-3 py-2 text-sm text-ink-faint hover:bg-white/5 hover:text-ink">
             <LogOut size={15} /> Sign out
@@ -94,4 +106,17 @@ export default function SettingsSheet({ settings, onClose, onLogout }: { setting
       </div>
     </div>
   );
+}
+
+/** Only an https Tailscale (or localhost) address is kept, without a trailing slash. */
+function cleanTitenUrl(raw: string): string {
+  const v = raw.trim().replace(/\/+$/, "");
+  if (!v) return "";
+  try {
+    const u = new URL(v);
+    const ok = (u.protocol === "https:" && u.hostname.endsWith(".ts.net")) || u.hostname === "localhost" || u.hostname === "127.0.0.1";
+    return ok ? u.origin : "";
+  } catch {
+    return "";
+  }
 }
