@@ -26,7 +26,7 @@ import { db } from "@/lib/firebase";
 
 export type Habit = { id: string; label: string };
 export type Countdown = { label: string; date: string }; // date = yyyy-mm-dd
-export type BoardSettings = { habits: Habit[]; reminders: string[]; countdown?: Countdown | null };
+export type BoardSettings = { habits: Habit[]; reminders: string[]; countdown?: Countdown | null; titenUrl?: string };
 export type BoardTask = {
   id: string;
   title: string;
@@ -66,6 +66,7 @@ export function watchSettings(cb: (s: BoardSettings) => void, onError: (e: Error
         habits: d?.habits?.length ? d.habits : DEFAULT_SETTINGS.habits,
         reminders: d?.reminders?.length ? d.reminders : DEFAULT_SETTINGS.reminders,
         countdown: d?.countdown?.date ? d.countdown : null,
+        titenUrl: typeof d?.titenUrl === "string" ? d.titenUrl : "",
       });
     },
     onError,

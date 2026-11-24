@@ -12,6 +12,7 @@ import Nudges, { buildNudges } from "./Nudges";
 import SettingsSheet from "./SettingsSheet";
 import PipelinesCard, { useCi } from "./PipelinesCard";
 import AppsStrip from "./AppsStrip";
+import TitenChip from "./TitenChip";
 import { useStatus, type BoardStatus } from "./useStatus";
 import type { Nudge } from "./Nudges";
 import { useBoard, useNow } from "./useBoard";
@@ -117,6 +118,7 @@ export function BoardView({ settings, tasks, days, wins, error, online, now, nam
           </div>
           <div className="flex flex-col items-end gap-4">
           <div className="flex items-center gap-2 pt-2">
+            <TitenChip url={settings.titenUrl} />
             <span className={`mono-label flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] ${online && !error ? "border-mint/20 text-mint/90" : "border-amber-300/30 text-amber-300"}`}>
               <span className={`size-1.5 rounded-full ${online && !error ? "animate-pulse bg-mint" : "bg-amber-300"}`} />
               {error ? "Sync error" : online ? "Live" : "Offline"}
