@@ -120,8 +120,10 @@ export default function SettingsSheet({ settings, onClose, onLogout }: { setting
 
 /** Only an https Tailscale (or localhost) address is kept, without a trailing slash. */
 function cleanTitenUrl(raw: string): string {
-  const v = raw.trim().replace(/\/+$/, "");
+  let v = raw.trim().replace(/\/+$/, "");
   if (!v) return "";
+  // phones often drop the scheme ("host.tailnet.ts.net"); Tailscale serve is always https
+  if (!/^[a-z]+:\/\//i.test(v)) v = `https://${v}`;
   try {
     const u = new URL(v);
     const ok = (u.protocol === "https:" && u.hostname.endsWith(".ts.net")) || u.hostname === "localhost" || u.hostname === "127.0.0.1";
